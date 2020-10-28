@@ -16,9 +16,4 @@ public class BlackCell extends Cell {
     public int getHorizontalSum() {
         return (horizontalSum == 0 ? -1 : horizontalSum);
     }
-
-    @Override
-    public CellType getCellType() {
-        return CellType.BLACK_CELL;
-    }
 }

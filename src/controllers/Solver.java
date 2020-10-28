@@ -1,6 +1,7 @@
 package src.controllers;
 
 import jdk.jshell.spi.ExecutionControl;
+import src.domain.BlackCell;
 import src.domain.Board;
 import src.domain.Cell;
 
@@ -26,7 +27,7 @@ public class Solver {
     }
 
     // TODO: Remove exception signature once this function is implemented
-    private ArrayList<int> getPossibleValues() throws ExecutionControl.NotImplementedException {
+    private ArrayList<Integer> getPossibleValues() throws ExecutionControl.NotImplementedException {
 	    throw new ExecutionControl.NotImplementedException("TODO");
     }
 
@@ -41,7 +42,7 @@ public class Solver {
             return;
         }
 
-        if(board.getCell(row, col).getCellType() == Cell.CellType.BLACK_CELL) {
+        if(board.getCell(row, col) instanceof BlackCell) {
             // If cell type is black, continue solving
             solve(row, col+1);
             return;

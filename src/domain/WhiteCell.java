@@ -21,9 +21,4 @@ public class WhiteCell extends Cell {
 
         this.value = value;
     }
-
-    @Override
-    public CellType getCellType() {
-        return CellType.WHITE_CELL;
-    }
 }
