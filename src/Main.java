@@ -1,10 +1,33 @@
-//import domain.Board;
+package src;
+
+import src.controllers.KakuroReader;
+import src.domain.Board;
+import src.domain.WhiteCell;
+import src.domain.Cell;
+import src.domain.BlackCell;
 
 public class Main {
 	public static void main(String[] args) {
+		KakuroReader r = new KakuroReader("data/sample.kak");
+		Board b = r.readKakuro();
 
-		System.out.println("yerr");
+		printBoard(b);
+	}
 
+	// For debugging purposes only
+	public static void printBoard(Board b) {
+		for (int i = 0; i<b.getHeight() ; i++) {
+			for(int j = 0; j<b.getWidth() ; j++) {
+				Cell c = b.getCell(i, j);
+				if (c instanceof BlackCell) {
+					System.out.print(String.format("(B %s, %s)", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
+				}
+				else {
+					System.out.print(String.format("(W %s)", ((WhiteCell) c).getValue()));
+				}
+			}
+			System.out.println();
+		}
 	}
 }
 
