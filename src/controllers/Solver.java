@@ -27,7 +27,7 @@ public class Solver {
     }
 
     // TODO: Remove exception signature once this function is implemented
-    private ArrayList<Integer> getPossibleValues() throws ExecutionControl.NotImplementedException {
+    private ArrayList<Integer> getPossibleValues(int row, int col) throws ExecutionControl.NotImplementedException {
 	    throw new ExecutionControl.NotImplementedException("TODO");
     }
 
@@ -48,7 +48,12 @@ public class Solver {
             return;
         }
 
-        ArrayList<Integer> possibleValues = getPossibleValues();
+        ArrayList<Integer> possibleValues;
+        try {
+            possibleValues = getPossibleValues(row, col);
+        } catch (Exception e) {
+            return;
+        }
 
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);
