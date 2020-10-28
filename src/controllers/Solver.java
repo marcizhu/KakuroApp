@@ -1,10 +1,17 @@
+package src.controllers;
+
+import jdk.jshell.spi.ExecutionControl;
+import src.domain.Board;
+import src.domain.Cell;
+
+import java.util.ArrayList;
 
 public class Solver {
 	Board board;
 	int solutions;
 
 	public Solver(Board b) {
-		this.board = new Board(b);
+		this.board = b;
         this.solutions = -1;
     }
 
@@ -18,13 +25,34 @@ public class Solver {
         solve(0, 0);
     }
 
+    // TODO: Remove exception signature once this function is implemented
+    private ArrayList<int> getPossibleValues() throws ExecutionControl.NotImplementedException {
+	    throw new ExecutionControl.NotImplementedException("TODO");
+    }
+
     private void solve(int row, int col) {
-        if (we reached the end) { return; }
-        ArrayList<int> possibleValues = getPossibleValues();
-        for (int i in possibleValues) {
+        if (row == board.getHeight() - 1 && col == board.getWidth()) {
+            // At this point a solution has been found
+            return;
+        }
+
+        if(col >= board.getWidth()) {
+            solve(row + 1, 0);
+            return;
+        }
+
+        if(board.getCell(row, col).getCellType() == Cell.CellType.BLACK_CELL) {
+            // If cell type is black, continue solving
+            solve(row, col+1);
+            return;
+        }
+
+        ArrayList<Integer> possibleValues = getPossibleValues();
+
+        for (int i : possibleValues) {
             board.setCellValue(row, col, i);
-            Pair<Integer, Integer> nextPos = board.getNextPos(row, col);
-            solve(nextPos.getValue0(), nextPos.getValue1()) // potser ens passem de la fila
+            solve(row, col+1);
+            board.setCellValue(row, col, 0); // Setting it to 0 counts as empty
             if (solutions > 1) return;
         }
         
