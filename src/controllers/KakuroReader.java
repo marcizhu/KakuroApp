@@ -1,6 +1,5 @@
 package src.controllers;
 
-
 import src.domain.BlackCell;
 import src.domain.Board;
 import src.domain.Cell;
@@ -12,14 +11,13 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class KakuroReader {
-
-    String fileName;
+    private String fileName;
 
     public KakuroReader(String fileName) {
         this.fileName = fileName;
     }
 
-    public Board readKakuro() {
+    public Board read() {
         try {
             File f = new File(fileName);
             Scanner s = new Scanner(f);
@@ -71,7 +69,7 @@ public class KakuroReader {
 
             return b;
         } catch (FileNotFoundException e) {
-            System.err.printf("File %s not found%n", fileName);
+            System.err.printf("File '%s' not found\n", fileName);
             e.printStackTrace();
         }
         return new Board(); //FIXME: return something else if function crashes

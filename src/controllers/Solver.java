@@ -3,7 +3,6 @@ package src.controllers;
 import jdk.jshell.spi.ExecutionControl;
 import src.domain.BlackCell;
 import src.domain.Board;
-import src.domain.Cell;
 
 import java.util.ArrayList;
 
@@ -26,9 +25,9 @@ public class Solver {
         solve(0, 0);
     }
 
-    // TODO: Remove exception signature once this function is implemented
-    private ArrayList<Integer> getPossibleValues(int row, int col) throws ExecutionControl.NotImplementedException {
-	    throw new ExecutionControl.NotImplementedException("TODO");
+    // TODO: Implement this function
+    private ArrayList<Integer> getPossibleValues(int row, int col) {
+	    return new ArrayList<>();
     }
 
     private void solve(int row, int col) {
@@ -37,27 +36,24 @@ public class Solver {
             return;
         }
 
-        if(col >= board.getWidth()) {
+        if (col >= board.getWidth()) {
             solve(row + 1, 0);
             return;
         }
 
-        if(board.getCell(row, col) instanceof BlackCell) {
+        if (board.getCell(row, col) instanceof BlackCell) {
             // If cell type is black, continue solving
             solve(row, col+1);
             return;
         }
 
-        ArrayList<Integer> possibleValues;
-        try {
-            possibleValues = getPossibleValues(row, col);
-        } catch (Exception e) {
-            return;
-        }
+        // NOTE: IntelliJ complains about unhandled exception. Ignore for now until getPossibleValues()
+        // is properly implemented.
+        ArrayList<Integer> possibleValues = getPossibleValues(row, col);
 
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);
-            solve(row, col+1);
+            solve(row, col + 1);
             board.setCellValue(row, col, 0); // Setting it to 0 counts as empty
             if (solutions > 1) return;
         }

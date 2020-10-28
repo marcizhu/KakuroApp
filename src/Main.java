@@ -9,7 +9,7 @@ import src.domain.BlackCell;
 public class Main {
 	public static void main(String[] args) {
 		KakuroReader r = new KakuroReader("data/sample.kak");
-		Board b = r.readKakuro();
+		Board b = r.read();
 
 		printBoard(b);
 	}
@@ -20,10 +20,13 @@ public class Main {
 			for(int j = 0; j<b.getWidth() ; j++) {
 				Cell c = b.getCell(i, j);
 				if (c instanceof BlackCell) {
-					System.out.print(String.format("(B %s, %s)", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
+					System.out.print(String.format("(B %s, %s) ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
+				}
+				else if (c instanceof WhiteCell){
+					System.out.print(String.format("(W %s) ", ((WhiteCell) c).getValue()));
 				}
 				else {
-					System.out.print(String.format("(W %s)", ((WhiteCell) c).getValue()));
+					System.out.print(String.format("(????) "));
 				}
 			}
 			System.out.println();
