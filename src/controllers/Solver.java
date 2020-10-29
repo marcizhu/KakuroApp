@@ -90,71 +90,68 @@ public class Solver {
         }
     }
 
-    private ArrayList<Integer> getPossibleValues(int row, int col) {
+    // TODO: This could be optimized even further: this class could hold an NxN matrix of bools representing
+    //       which values are used in each row & column. That would remove the need for the 4 first for loops
+    //       in this function, greatly reducing the execution time
+    private boolean[] getPossibleValues(int row, int col) {
 	    // Horizontal
         int hSpaces = rowSize[row][col];
         int hSum = rowSums[row][col];
         boolean[] hUsedValues = { false, false, false, false, false, false, false, false, false };
 
-        // recorrer la fila i veure quins nombres s'han utilitzat
         for(int it = col-1; board.isWhiteCell(row, it) && it >= 0; it--) {
             int v = board.getValue(row, it);
-            if (v != 0) hUsedValues[v-1] = true;
+            if (v != 0) hUsedValues[v - 1] = true;
         }
 
-        //recorrem cap a la dreta fins trobar una negre o el final del board
         for(int it = col+1; it < board.getWidth() && board.isWhiteCell(row, it); it++) {
             int v = board.getValue(row, it);
-            if (v != 0) hUsedValues[v-1] = true;
+            if (v != 0) hUsedValues[v - 1] = true;
         }
 
-        //Vertical
+        // Vertical
         int vSpaces = colSize[row][col];
         int vSum = colSums[row][col];
         boolean[] vUsedValues = { false, false, false, false, false, false, false, false, false };
 
-        // recorrer la columna i veure quins nombres s'han utilitzat
         for(int it = row-1; board.isWhiteCell(it, col) && it >= 0; it--) {
             int v = board.getValue(it, col);
             if (v != 0) vUsedValues[v - 1] = true;
         }
 
-        //recorrem cap a la dreta fins trobar una negre o el final del board
         for(int it = row+1; it < board.getHeight() && board.isWhiteCell(it, col); it++) {
             int v = board.getValue(it, col);
-            if (v!=0) vUsedValues[v-1] = true;
+            if (v != 0) vUsedValues[v - 1] = true;
         }
 
-        //ara tenim tota la info que ens fa falta havent recorregur la "creu" on es troba el punt només un cop
-        // veiem quines possibilitats tenim vertical i horitzontalment
+        // Get options for each row and column
         ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCases(hSpaces, hSum);
         ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCases(vSpaces, vSum);
 
-        // ara veiem quins nombres coincideixen en alguna llista horitzontal i alguna llista vertical
-        // això sembla molt lleig i ineficient però cap dels arrays té més de 12 arrays de ints i un cop hem trobat un ja no el tornem a buscar
-        // una altra opció és implementar al KakuroConstants que li puguis passar quins nombres has vist i faci ell la tria
+        boolean[] hAvailable = { false, false, false, false, false, false, false, false, false };
+        boolean[] vAvailable = { false, false, false, false, false, false, false, false, false };
+
+        // Calculate available options for row
+        for (ArrayList<Integer> hOpt : hOptions)
+            for (Integer i : hOpt)
+                hAvailable[i - 1] = true;
+
+        // Calculate available options for column
+        for (ArrayList<Integer> vOpt : vOptions)
+            for (Integer i : vOpt)
+                vAvailable[i - 1] = true;
+
+        // Do the intersection
         boolean[] availableValues = { false, false, false, false, false, false, false, false, false };
-        try {
-            for (ArrayList<Integer> hOpt : hOptions)
-                for (Integer i : hOpt)
-                    if (!availableValues[i - 1])
-                        for (ArrayList<Integer> vOpt : vOptions)
-                            for (Integer j : vOpt)
-                                if (i.intValue() == j.intValue()) availableValues[i - 1] = true;
-        } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-            if (hOptions == null) System.out.println("hOptions is null, hSpaces: " + hSpaces + " , hSum: " + hSum);
-            if (vOptions == null) System.out.println("vOptions is null, vSpaces: " + vSpaces + " , vSum: " + vSum);
+
+        for(int i = 0; i < 9; i++) {
+            availableValues[i] =
+                    hAvailable[i] && vAvailable[i] // A value is available if it is available in both row & col...
+                    && !vUsedValues[i]  // ...and it is not used in the current column...
+                    && !hUsedValues[i]; // ...nor in the current row.
         }
 
-        // fem la intersecció i retornem el resultat.
-        ArrayList<Integer> result = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
-            if (availableValues[i] && !hUsedValues[i] && !vUsedValues[i])
-                result.add(i+1);
-        }
-
-        return result;
+        return availableValues;
 	}
 
     private void solve(int row, int col, int rowSum, int[] colSum) {
@@ -193,15 +190,17 @@ public class Solver {
             return;
         }
 
-        ArrayList<Integer> possibleValues = getPossibleValues(row, col);
+        boolean[] possibleValues = getPossibleValues(row, col);
 
-        for (int i : possibleValues) {
-            board.setCellValue(row, col, i);
-            colSum[col] += i;
-            solve(row, col + 1, rowSum + i, colSum);
-            colSum[col] -= i;
-            board.clearCellValue(row, col);
-            if (solutions.size() > 1) return;
+        for (int i = 1; i <= 9; i++) {
+            if(possibleValues[i - 1]) {
+                board.setCellValue(row, col, i);
+                colSum[col] += i;
+                solve(row, col + 1, rowSum + i, colSum);
+                colSum[col] -= i;
+                board.clearCellValue(row, col);
+                if (solutions.size() > 1) return;
+            }
         }
     }
 

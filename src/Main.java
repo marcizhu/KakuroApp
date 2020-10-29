@@ -10,13 +10,10 @@ import src.domain.BlackCell;
 
 public class Main {
 	public static void main(String[] args) {
-		Reader r = new Reader("data/one-sol.kak");
+		Reader r = new Reader("data/sample.kak");
 		Board b = r.read();
 
 		printBoard(b);
-
-//		Writer writer = new Writer("data/out-test.kak");
-//		writer.write(b);
 
 		// TODO: Debug solver
 		Solver solver = new Solver(b);
@@ -32,8 +29,6 @@ public class Main {
 			Writer writer = new Writer("data/solved"+i+".kak");
 			writer.write(solution);
 		}
-
-
 	}
 
 	// For debugging purposes only
