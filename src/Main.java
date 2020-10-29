@@ -24,6 +24,12 @@ public class Main {
 
 		System.out.print("Solutions found: ");
 		System.out.println(solver.getSolutions().size());
+
+		Board solution = solver.getSolutions().get(0);
+		printBoard(solution);
+
+		Writer writer = new Writer("data/solved.kak");
+		writer.write(solution);
 	}
 
 	// For debugging purposes only

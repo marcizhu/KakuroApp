@@ -22,7 +22,20 @@ public class Board {
 	public Board(Board b) {
         this.width = b.getWidth();
         this.height = b.getHeight();
-        cells = b.cells; //TODO: most likely the new board points to the cells of the original board.
+
+        cells = new Cell[height][width];
+
+        for(int i = 0; i < height; i++)
+            for(int j = 0; j < width; j++) {
+                if(b.cells[i][j] instanceof BlackCell) {
+                    int r = ((BlackCell) b.cells[i][j]).getHorizontalSum();
+                    int c = ((BlackCell) b.cells[i][j]).getVerticalSum();
+                    cells[i][j] = new BlackCell(c, r);
+                } else {
+                    int v = b.cells[i][j].getValue();
+                    cells[i][j] = new WhiteCell(v);
+                }
+            }
     }
 
     public Board(String formattedBoard) {
