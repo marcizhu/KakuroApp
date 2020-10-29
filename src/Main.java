@@ -15,12 +15,15 @@ public class Main {
 
 		printBoard(b);
 
-		Writer writer = new Writer("data/out-test.kak");
-		writer.write(b);
+//		Writer writer = new Writer("data/out-test.kak");
+//		writer.write(b);
 
 		// TODO: Debug solver
-//		Solver solver = new Solver(b);
-//		solver.solve();
+		Solver solver = new Solver(b);
+		solver.solve();
+
+		System.out.print("Solutions found: ");
+		System.out.println(solver.getSolutions().size());
 	}
 
 	// For debugging purposes only

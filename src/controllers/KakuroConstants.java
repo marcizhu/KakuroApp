@@ -1,26 +1,25 @@
 package src.controllers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class KakuroConstants {
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
     //TODO: I add this as a new singleton class, maybe should go inside the solver
-    private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> CASES;
+    private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
 
     private KakuroConstants() {
-        instanciateHashMaps();
+        instantiateHashMaps();
     }
 
     public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
-        return CASES.get(space).get(sum);
+        return cases.get(space).get(sum);
     }
 
-    private void instanciateHashMaps() {
+    private void instantiateHashMaps() {
         final int[] startingValues = {1, 3, 6, 10, 15, 21, 28, 36, 45};
-        CASES = new HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>>();
+        cases = new HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>>();
         for (int i = 1; i <= 9; i++) {
             HashMap<Integer, ArrayList<ArrayList<Integer>>> hm = new HashMap<Integer, ArrayList<ArrayList<Integer>>>();
             int numOfSums = -i*i+9*i+1;
@@ -28,7 +27,7 @@ public class KakuroConstants {
                 int currentSum = startingValues[i-1]+j;
                 hm.put(currentSum, findCombinations(i, currentSum));
             }
-            CASES.put(i, hm);
+            cases.put(i, hm);
         }
     }
 
