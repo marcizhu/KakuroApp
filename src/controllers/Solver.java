@@ -1,6 +1,5 @@
 package src.controllers;
 
-import jdk.jshell.spi.ExecutionControl;
 import src.domain.BlackCell;
 import src.domain.Cell;
 import src.domain.Board;
@@ -16,16 +15,17 @@ public class Solver {
 
 	public Solver(Board b) {
 		this.board = b;
-        this.solutions = new ArrayList<Board>();
+        this.solutions = new ArrayList<>();
     }
 
     public void solve() {
         solve(0, 0);
     }
 
-    // INFO: yet to be tested, also a in memory solution for handling possible values might be better
+    // FIXME: Tested, but throws ConcurrentModificationException on line 64. If this function is fixed, the solver
+    //        should work
     private ArrayList<Integer> getPossibleValues(int row, int col) {
-        ArrayList<Integer> possibleValues = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+        ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
         int horizontalSum = 45;
         int horizontalCurrentSum = 0;
@@ -39,8 +39,8 @@ public class Solver {
                     break;
                 }
             } else { // cell is an instance of WhiteCell
-                int value = ((WhiteCell) cell).getValue();
-                if (value != 0) {
+                if (!cell.isEmpty()) {
+                    int value = cell.getValue();
                     horizontalCurrentSum += value;
                     possibleValues.remove(value);
                 }
@@ -53,8 +53,8 @@ public class Solver {
                 int sum = ((BlackCell) cell).getHorizontalSum();
                 if (sum != 0) break;
             } else { // cell is an instance of WhiteCell
-                int value = ((WhiteCell) cell).getValue();
-                if (value != 0) {
+                if (!cell.isEmpty()) {
+                    int value = cell.getValue();
                     horizontalCurrentSum += value;
                     possibleValues.remove(value);
                 }
@@ -77,8 +77,8 @@ public class Solver {
                     break;
                 }
             } else { // cell is an instance of WhiteCell
-                int value = ((WhiteCell) cell).getValue();
-                if (value != 0) {
+                if (!cell.isEmpty()) {
+                    int value = cell.getValue();
                     verticalCurrentSum += value;
                     possibleValues.remove(value);
                 }
@@ -91,8 +91,8 @@ public class Solver {
                 int sum = ((BlackCell) cell).getHorizontalSum();
                 if (sum != 0) break;
             } else { // cell is an instance of WhiteCell
-                int value = ((WhiteCell) cell).getValue();
-                if (value != 0) {
+                if (!cell.isEmpty()) {
+                    int value = cell.getValue();
                     verticalCurrentSum += value;
                     possibleValues.remove(value);
                 }
@@ -109,6 +109,8 @@ public class Solver {
     private void solve(int row, int col) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
             // At this point a solution has been found
+            // Add a copy of this board to the list of solutions
+            solutions.add(new Board(board));
             return;
         }
 
@@ -117,7 +119,7 @@ public class Solver {
             return;
         }
 
-        if (board.getCell(row, col) instanceof BlackCell) {
+        if (board.isBlackCell(row, col)) {
             solve(row, col + 1); // If cell type is black, continue solving
             return;
         }
@@ -127,13 +129,12 @@ public class Solver {
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);
             solve(row, col + 1);
-            board.setCellValue(row, col, 0); // Setting it to 0 counts as empty
+            board.clearCellValue(row, col);
             if (solutions.size() > 1) return;
         }
-        
     }
 
-	public Board retrieveResult() {
-		return board;
+	public ArrayList<Board> getSolutions() {
+		return solutions;
     }
 }

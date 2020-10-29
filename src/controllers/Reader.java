@@ -36,7 +36,7 @@ public class Reader {
                     String word = line[j].trim();
 
                     if (word.equals("*")) {
-                        c = new BlackCell(0, 0);
+                        c = new BlackCell();
                     }
                     else if (word.equals("?")) {
                         c = new WhiteCell();

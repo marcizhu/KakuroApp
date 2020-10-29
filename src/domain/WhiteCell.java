@@ -21,4 +21,12 @@ public class WhiteCell extends Cell {
 
         this.value = value;
     }
+
+    public void clearValue() {
+        this.value = 0;
+    }
+
+    public boolean isEmpty() {
+        return this.value == 0;
+    }
 }

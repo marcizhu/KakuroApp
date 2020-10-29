@@ -1,6 +1,7 @@
 package src;
 
 import src.controllers.Reader;
+import src.controllers.Solver;
 import src.domain.Board;
 import src.domain.WhiteCell;
 import src.domain.Cell;
@@ -12,6 +13,9 @@ public class Main {
 		Board b = r.read();
 
 		printBoard(b);
+		// TODO: Debug solver
+//		Solver solver = new Solver(b);
+//		solver.solve();
 	}
 
 	// For debugging purposes only

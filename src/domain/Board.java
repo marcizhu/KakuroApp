@@ -45,6 +45,26 @@ public class Board {
         this.cells[row][col].setValue(value);
     }
 
+    public int getValue(int row, int col) {
+        return this.cells[row][col].getValue();
+    }
+
+    public void clearCellValue(int row, int col) {
+	    this.cells[row][col].clearValue();
+    }
+
+    public boolean isEmpty(int row, int col) {
+	    return this.cells[row][col].isEmpty();
+    }
+
+    public boolean isBlackCell(int row, int col) {
+	    return this.cells[row][col] instanceof BlackCell;
+    }
+
+    public boolean isWhiteCell(int row, int col) {
+        return this.cells[row][col] instanceof WhiteCell;
+    }
+
     public void setCell(Cell cell, int row, int col) {
 	    //TODO: handle out of bounds exception
         cells[row][col] = cell;
