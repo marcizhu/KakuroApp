@@ -1,7 +1,7 @@
 package src;
 
-import src.controllers.Reader;
 import src.controllers.Solver;
+import src.controllers.Reader;
 import src.controllers.Writer;
 import src.domain.Board;
 import src.domain.WhiteCell;
@@ -20,14 +20,15 @@ public class Main {
 		solver.solve();
 
 		int s = solver.getSolutions().size();
-		System.out.print("Solutions found: ");
-		System.out.println(s);
+		System.out.println("\nSolutions found: " + s + "\n");
+
 		for (int i = 0; i < s; i++) {
 			Board solution = solver.getSolutions().get(i);
 			printBoard(solution);
-			System.out.println("______________________________________");
-			Writer writer = new Writer("data/solved"+i+".kak");
-			writer.write(solution);
+			System.out.println();
+
+			//Writer writer = new Writer("data/solved"+i+".kak");
+			//writer.write(solution);
 		}
 	}
 
@@ -37,41 +38,16 @@ public class Main {
 			for(int j = 0; j<b.getWidth() ; j++) {
 				Cell c = b.getCell(i, j);
 				if (c instanceof BlackCell) {
-					System.out.print(String.format("(B %s, %s) ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
+					System.out.print(String.format("[F%2d, C%2d] ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
 				}
 				else if (c instanceof WhiteCell){
-					System.out.print(String.format("(W %s) ", c.getValue()));
+					System.out.print(String.format("[   %2d   ] ", c.getValue()));
 				}
 				else {
-					System.out.print(String.format("(????) "));
+					System.out.print(String.format("[????????] "));
 				}
 			}
 			System.out.println();
 		}
 	}
 }
-
-/*
-
-
-
-
-
-public int getHorizontalSum() {
-		if (horizontalSum == null) return -1;
-		return horizontalSum;
-}
-}
-
-public static final class KakuroConstants {
-	public static KakuroConstants instance;
-
-	HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> CASES;
-	
-	// map[column_or_row_size][column_or_row_sum] returns vector of possible integer values.
-	private KakuroConstants() {
-		instance = new KakuroConstants();
-		instance.createCases(); //TODO: crear tots els casos possibles (omplir els hashMaps).
-}
-}
-*/
