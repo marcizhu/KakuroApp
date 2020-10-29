@@ -3,6 +3,7 @@ package src.controllers;
 import src.domain.BlackCell;
 import src.domain.Cell;
 import src.domain.Board;
+import src.domain.WhiteCell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,6 +101,102 @@ public class Solver {
         }
     }
 
+    private ArrayList<Integer> getPossibleValuesAlternative(int row, int col) {
+	    // Horizontal
+        int hSpaces = 1;
+        int hSum = -1;
+        boolean[] hUsedValues = {false,false,false,false,false,false,false,false,false};
+        // recorrer la fila i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
+        int it = col-1;
+        while(hSum == -1 && it >= 0) {
+            Cell cell = board.getCell(row, it);
+            if (cell instanceof BlackCell) {
+                // la primera cell negre cap a l'esquerra hauria de tenir el valor de la suma de la fila (a la dreta no té perquè)
+                //i sempre hi haurà una cell a l'esquerra obligatòriament
+                hSum = ((BlackCell)cell).getHorizontalSum();
+            } else {
+                hSpaces++;
+                int v = ((WhiteCell)cell).getValue();
+                if (v!=0) hUsedValues[v-1] = true;
+                it--;
+            }
+        }
+        //recorrem cap a la dreta fins trobar una negre o el final del board
+        it = col+1;
+        while(it < board.getWidth()) {
+            Cell cell = board.getCell(row, it);
+            if (cell instanceof BlackCell) break; //hem trobat el final de la línia.
+            else {
+                hSpaces++;
+                int v = ((WhiteCell)cell).getValue();
+                if (v!=0) hUsedValues[v-1] = true;
+                it++;
+            }
+        }
+
+        //Vertical
+        int vSpaces = 1;
+        int vSum = -1;
+        boolean[] vUsedValues = {false,false,false,false,false,false,false,false,false};
+        // recorrer la columna i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
+        it = row-1;
+        while(vSum == -1 && it >= 0) {
+            Cell cell = board.getCell(it, col);
+            if (cell instanceof BlackCell) {
+                // la primera cell negre cap amunt hauria de tenir el valor de la suma de la columna (a sota no té perquè)
+                // i sempre hi haurà una cell amunt obligatòriament
+                vSum = ((BlackCell)cell).getVerticalSum();
+            } else {
+                vSpaces++;
+                int v = ((WhiteCell)cell).getValue();
+                if (v!=0) vUsedValues[v-1] = true;
+                it--;
+            }
+        }
+        //recorrem cap a la dreta fins trobar una negre o el final del board
+        it = row+1;
+        while(it < board.getHeight()) {
+            Cell cell = board.getCell(it, col);
+            if (cell instanceof BlackCell) break; //hem trobat el final de la columna.
+            else {
+                vSpaces++;
+                int v = ((WhiteCell)cell).getValue();
+                if (v!=0) vUsedValues[v-1] = true;
+                it++;
+            }
+        }
+
+        //ara tenim tota la info que ens fa falta havent recorregur la "creu" on es troba el punt només un cop
+        // veiem quines possibilitats tenim vertical i horitzontalment
+        ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCases(hSpaces, hSum);
+        ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCases(vSpaces, vSum);
+
+        // ara veiem quins nombres coincideixen en alguna llista horitzontal i alguna llista vertical
+        // això sembla molt lleig i ineficient però cap dels arrays té més de 12 arrays de ints i un cop hem trobat un ja no el tornem a buscar
+        // una altra opció és implementar al KakuroConstants que li puguis passar quins nombres has vist i faci ell la tria
+        boolean[] availableValues = {false,false,false,false,false,false,false,false,false};
+        try {
+            for (ArrayList<Integer> hOpt : hOptions)
+                for (Integer i : hOpt)
+                    if (!availableValues[i - 1])
+                        for (ArrayList<Integer> vOpt : vOptions)
+                            for (Integer j : vOpt)
+                                if (i.intValue() == j.intValue()) availableValues[i - 1] = true;
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+            if (hOptions == null) System.out.println("hOptions is null, hSpaces: "+hSpaces+" , hSum: "+hSum);
+            if (vOptions == null) System.out.println("vOptions is null, vSpaces: "+vSpaces+" , vSum: "+vSum);
+            //System.out.println(hOptions.size()+" horizontal options, vertical options: "+vOptions.size());
+        }
+
+        //fem la intersecció i retornem el resultat.
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        for (int i = 0; i < 9; i++) {
+            if (availableValues[i] && !hUsedValues[i] && !vUsedValues[i]) result.add(i+1);
+        }
+        return result;
+	}
+
     // TODO: reimplement using KakuroConstants to get possible combinations
     private ArrayList<Integer> getPossibleValues(int row, int col, int rowSum) {
         ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
@@ -165,7 +262,13 @@ public class Solver {
             return;
         }
 
-        ArrayList<Integer> possibleValues = getPossibleValues(row, col, rowSum);
+        if (!board.isEmpty(row, col)) {
+            solve(row, col + 1, 0); // If cell has a value, continue solving
+            return;
+        }
+
+        //ArrayList<Integer> possibleValues = getPossibleValues(row, col, rowSum);
+        ArrayList<Integer> possibleValues = getPossibleValuesAlternative(row, col);
 
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);

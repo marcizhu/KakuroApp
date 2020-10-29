@@ -22,14 +22,18 @@ public class Main {
 		Solver solver = new Solver(b);
 		solver.solve();
 
+		int s = solver.getSolutions().size();
 		System.out.print("Solutions found: ");
-		System.out.println(solver.getSolutions().size());
+		System.out.println(s);
+		for (int i = 0; i < s; i++) {
+			Board solution = solver.getSolutions().get(i);
+			printBoard(solution);
+			System.out.println("______________________________________");
+			Writer writer = new Writer("data/solved"+i+".kak");
+			writer.write(solution);
+		}
 
-		Board solution = solver.getSolutions().get(0);
-		printBoard(solution);
 
-		Writer writer = new Writer("data/solved.kak");
-		writer.write(solution);
 	}
 
 	// For debugging purposes only
