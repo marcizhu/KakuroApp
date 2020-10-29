@@ -21,8 +21,7 @@ public class Solver {
         solve(0, 0);
     }
 
-    // FIXME: Tested, but throws ConcurrentModificationException on line 64. If this function is fixed, the solver
-    //        should work
+    // TODO: reimplement using KakuroConstants to get possible combinations
     private ArrayList<Integer> getPossibleValues(int row, int col) {
         ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
@@ -60,9 +59,12 @@ public class Solver {
                 else horizontalEmptyCount++;
             }
         }
-        for (int value : possibleValues) // TODO: use horizontalEmptyCount to make this part smarter
-            if (value + horizontalCurrentSum > horizontalSum)
-                possibleValues.remove(value);
+
+        // TODO: Should be fixed but it's not tested
+        for (int i = possibleValues.size()-1; i >= 0; i--) {
+            if (possibleValues.get(i) + horizontalCurrentSum > horizontalSum)
+                possibleValues.remove(i);
+        }
 
         int verticalSum = 45;
         int verticalCurrentSum = 0;
@@ -98,9 +100,11 @@ public class Solver {
                 else verticalEmptyCount++;
             }
         }
-        for (int value : possibleValues) // TODO: use verticalEmptyCount to make this part smarter
-            if (value + verticalCurrentSum > verticalSum)
-                possibleValues.remove(value);
+        // TODO: use verticalEmptyCount to make this part smarter
+        for (int i = possibleValues.size()-1; i >= 0; i--) {
+            if (possibleValues.get(i) + verticalCurrentSum > verticalSum)
+                possibleValues.remove(i);
+        }
 
         return possibleValues;
     }

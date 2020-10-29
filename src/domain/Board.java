@@ -22,7 +22,7 @@ public class Board {
 	public Board(Board b) {
         this.width = b.getWidth();
         this.height = b.getHeight();
-        cells = b.cells;
+        cells = b.cells; //TODO: most likely the new board points to the cells of the original board.
     }
 
     public Board(String formattedBoard) {
