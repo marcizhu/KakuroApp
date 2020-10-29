@@ -101,65 +101,39 @@ public class Solver {
         }
     }
 
-    private ArrayList<Integer> getPossibleValuesAlternative(int row, int col) {
+    private ArrayList<Integer> getPossibleValues(int row, int col) {
 	    // Horizontal
         int hSpaces = rowSize[row][col];
-        int hSum = -1;
-        boolean[] hUsedValues = {false,false,false,false,false,false,false,false,false};
+        int hSum = rowSums[row][col];
+        boolean[] hUsedValues = { false, false, false, false, false, false, false, false, false };
+
         // recorrer la fila i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
-        int it = col-1;
-        while(hSum == -1 && it >= 0) {
-            Cell cell = board.getCell(row, it);
-            if (cell instanceof BlackCell) {
-                // la primera cell negre cap a l'esquerra hauria de tenir el valor de la suma de la fila (a la dreta no té perquè)
-                //i sempre hi haurà una cell a l'esquerra obligatòriament
-                hSum = ((BlackCell)cell).getHorizontalSum();
-            } else {
-                int v = ((WhiteCell)cell).getValue();
-                if (v!=0) hUsedValues[v-1] = true;
-                it--;
-            }
+        for(int it = col-1; board.isWhiteCell(row, it) && it >= 0; it--) {
+            int v = board.getValue(row, it);
+            if (v != 0) hUsedValues[v-1] = true;
         }
+
         //recorrem cap a la dreta fins trobar una negre o el final del board
-        it = col+1;
-        while(it < board.getWidth()) {
-            Cell cell = board.getCell(row, it);
-            if (cell instanceof BlackCell) break; //hem trobat el final de la línia.
-            else {
-                int v = ((WhiteCell)cell).getValue();
-                if (v!=0) hUsedValues[v-1] = true;
-                it++;
-            }
+        for(int it = col+1; it < board.getWidth() && board.isWhiteCell(row, it); it++) {
+            int v = board.getValue(row, it);
+            if (v != 0) hUsedValues[v-1] = true;
         }
 
         //Vertical
         int vSpaces = colSize[row][col];
-        int vSum = -1;
-        boolean[] vUsedValues = {false,false,false,false,false,false,false,false,false};
+        int vSum = colSums[row][col];
+        boolean[] vUsedValues = { false, false, false, false, false, false, false, false, false };
+
         // recorrer la columna i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
-        it = row-1;
-        while(vSum == -1 && it >= 0) {
-            Cell cell = board.getCell(it, col);
-            if (cell instanceof BlackCell) {
-                // la primera cell negre cap amunt hauria de tenir el valor de la suma de la columna (a sota no té perquè)
-                // i sempre hi haurà una cell amunt obligatòriament
-                vSum = ((BlackCell)cell).getVerticalSum();
-            } else {
-                int v = ((WhiteCell)cell).getValue();
-                if (v!=0) vUsedValues[v-1] = true;
-                it--;
-            }
+        for(int it = row-1; board.isWhiteCell(it, col) && it >= 0; it--) {
+            int v = board.getValue(it, col);
+            if (v != 0) vUsedValues[v - 1] = true;
         }
+
         //recorrem cap a la dreta fins trobar una negre o el final del board
-        it = row+1;
-        while(it < board.getHeight()) {
-            Cell cell = board.getCell(it, col);
-            if (cell instanceof BlackCell) break; //hem trobat el final de la columna.
-            else {
-                int v = ((WhiteCell)cell).getValue();
-                if (v!=0) vUsedValues[v-1] = true;
-                it++;
-            }
+        for(int it = row+1; it < board.getHeight() && board.isWhiteCell(it, col); it++) {
+            int v = board.getValue(it, col);
+            if (v!=0) vUsedValues[v-1] = true;
         }
 
         //ara tenim tota la info que ens fa falta havent recorregur la "creu" on es troba el punt només un cop
@@ -170,7 +144,7 @@ public class Solver {
         // ara veiem quins nombres coincideixen en alguna llista horitzontal i alguna llista vertical
         // això sembla molt lleig i ineficient però cap dels arrays té més de 12 arrays de ints i un cop hem trobat un ja no el tornem a buscar
         // una altra opció és implementar al KakuroConstants que li puguis passar quins nombres has vist i faci ell la tria
-        boolean[] availableValues = {false,false,false,false,false,false,false,false,false};
+        boolean[] availableValues = { false, false, false, false, false, false, false, false, false };
         try {
             for (ArrayList<Integer> hOpt : hOptions)
                 for (Integer i : hOpt)
@@ -185,60 +159,13 @@ public class Solver {
             //System.out.println(hOptions.size()+" horizontal options, vertical options: "+vOptions.size());
         }
 
-        //fem la intersecció i retornem el resultat.
+        // fem la intersecció i retornem el resultat.
         ArrayList<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < 9; i++) {
             if (availableValues[i] && !hUsedValues[i] && !vUsedValues[i]) result.add(i+1);
         }
         return result;
 	}
-
-    // TODO: reimplement using KakuroConstants to get possible combinations
-    private ArrayList<Integer> getPossibleValues(int row, int col, int rowSum) {
-        ArrayList<Integer> possibleValues = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-
-        int horizontalSum = rowSums[row][col];
-        int horizontalCurrentSum = rowSum;
-
-        // TODO: Should be fixed but it's not tested
-        int finalHorizontalCurrentSum = horizontalCurrentSum;
-        possibleValues.removeIf(n -> ((n + finalHorizontalCurrentSum) > horizontalSum));
-
-        int verticalSum = colSums[row][col];
-        int verticalCurrentSum = 0;
-        int verticalEmptyCount = 1;
-        for (int r = row - 1; r > 0; r--) {
-            Cell cell = board.getCell(r, col);
-            if (cell instanceof BlackCell) {
-                break;
-            } else { // cell is an instance of WhiteCell
-                if (!cell.isEmpty()) {
-                    int value = cell.getValue();
-                    verticalCurrentSum += value;
-                    possibleValues.removeIf(val -> val == value);
-                }
-                else verticalEmptyCount++;
-            }
-        }
-        for (int r = row + 1; r < board.getHeight(); r++) {
-            Cell cell = board.getCell(r, col);
-            if (cell instanceof BlackCell) {
-                break;
-            } else { // cell is an instance of WhiteCell
-                if (!cell.isEmpty()) {
-                    int value = cell.getValue();
-                    verticalCurrentSum += value;
-                    possibleValues.removeIf(val -> val == value);
-                }
-                else verticalEmptyCount++;
-            }
-        }
-
-        int finalVerticalCurrentSum = verticalCurrentSum;
-        possibleValues.removeIf(n -> ((n + finalVerticalCurrentSum) > verticalSum));
-
-        return possibleValues;
-    }
 
     private void solve(int row, int col, int rowSum) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
@@ -269,8 +196,7 @@ public class Solver {
             return;
         }
 
-        //ArrayList<Integer> possibleValues = getPossibleValues(row, col, rowSum);
-        ArrayList<Integer> possibleValues = getPossibleValuesAlternative(row, col);
+        ArrayList<Integer> possibleValues = getPossibleValues(row, col);
 
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);
