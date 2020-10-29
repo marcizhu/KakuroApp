@@ -22,17 +22,11 @@ public class Board {
 	public Board(Board b) {
         this.width = b.getWidth();
         this.height = b.getHeight();
-        cells = new Cell[width][height];
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                //cells[i][j] = new Cell(b.getCell(i, j)); //TODO: Make sure it returns a new White or Black cell accordingly
-            }
-        }
+        cells = b.cells;
     }
 
     public Board(String formattedBoard) {
-        //TODO:
+        // TODO: Implement this
     }
 
 	public int getWidth() {

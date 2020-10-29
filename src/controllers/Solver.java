@@ -19,11 +19,6 @@ public class Solver {
         this.solutions = new ArrayList<Board>();
     }
 
-    public Solver(String formattedBoard) {
-		this.board = new Board(formattedBoard);
-        this.solutions = new ArrayList<Board>();
-    }
-
     public void solve() {
         solve(0, 0);
     }
