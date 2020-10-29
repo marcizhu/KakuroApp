@@ -42,19 +42,17 @@ public class Reader {
                         c = new WhiteCell();
                     }
                     else if (Pattern.compile("C([0-9]*)F([0-9]*)").matcher(word).matches()){
-                        String[] values = word.split("[CF]"); // FIXME: ion know if this regex works
+                        String[] values = word.split("[CF]");
                         int col = Integer.parseInt(values[1].trim());
                         int row = Integer.parseInt(values[2].trim());
                         c = new BlackCell(col, row);
                     }
                     else if (Pattern.compile("C([0-9]*)").matcher(word).matches()){
-                        String[] values = word.split("C");
-                        int col = Integer.parseInt(values[1].trim());
+                        int col = Integer.parseInt(word.substring(1));
                         c = new BlackCell(col, 0);
                     }
                     else if (Pattern.compile("F([0-9]*)").matcher(word).matches()){
-                        String[] values = word.split("F");
-                        int row = Integer.parseInt(values[1].trim());
+                        int row = Integer.parseInt(word.substring(1));
                         c = new BlackCell(0, row);
                     }
                     else {
