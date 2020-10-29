@@ -28,23 +28,24 @@ public class Solver {
     }
 
     public void solve() {
-	    preprocessRowSums();
-	    preprocessColSums();
+	    preprocessSums();
 	    preprocessRowSize();
         preprocessColSize();
 
-        solve(0, 0, 0);
+        solve(0, 0, 0, new int[board.getWidth()]);
     }
 
-    private void preprocessRowSums() {
+    private void preprocessSums() {
 	    // Calculate sums for each row
 	    for(int i = 0; i < board.getHeight(); i++) {
 	        for(int j = 0; j < board.getWidth(); j++) {
 	            if(board.isBlackCell(i, j)) {
 	                rowSums[i][j] = ((BlackCell)board.getCell(i, j)).getHorizontalSum();
+                    colSums[i][j] = ((BlackCell)board.getCell(i, j)).getVerticalSum();
                 } else {
 	                // TODO: Check for out-of-bounds access.
                     rowSums[i][j] = rowSums[i][j - 1];
+                    colSums[i][j] = colSums[i - 1][j];
                 }
             }
         }
@@ -57,6 +58,7 @@ public class Solver {
                 if(board.isBlackCell(i, j)) {
                     for(int k = size; k > 0; k--)
                         rowSize[i][j - k] = size;
+
                     size = 0;
                 } else {
                     size++;
@@ -66,19 +68,6 @@ public class Solver {
             for(int k = size; k > 0; k--)
                 rowSize[i][board.getWidth() - k] = size;
             size = 0;
-        }
-    }
-
-    private void preprocessColSums() {
-        for(int i = 0; i < board.getHeight(); i++) {
-            for(int j = 0; j < board.getWidth(); j++) {
-                if(board.isBlackCell(i, j)) {
-                    colSums[i][j] = ((BlackCell)board.getCell(i, j)).getVerticalSum();
-                } else {
-                    // TODO: Check for out-of-bounds access.
-                    colSums[i][j] = colSums[i - 1][j];
-                }
-            }
         }
     }
 
@@ -107,7 +96,7 @@ public class Solver {
         int hSum = rowSums[row][col];
         boolean[] hUsedValues = { false, false, false, false, false, false, false, false, false };
 
-        // recorrer la fila i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
+        // recorrer la fila i veure quins nombres s'han utilitzat
         for(int it = col-1; board.isWhiteCell(row, it) && it >= 0; it--) {
             int v = board.getValue(row, it);
             if (v != 0) hUsedValues[v-1] = true;
@@ -124,7 +113,7 @@ public class Solver {
         int vSum = colSums[row][col];
         boolean[] vUsedValues = { false, false, false, false, false, false, false, false, false };
 
-        // recorrer la columna i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
+        // recorrer la columna i veure quins nombres s'han utilitzat
         for(int it = row-1; board.isWhiteCell(it, col) && it >= 0; it--) {
             int v = board.getValue(it, col);
             if (v != 0) vUsedValues[v - 1] = true;
@@ -154,22 +143,26 @@ public class Solver {
                                 if (i.intValue() == j.intValue()) availableValues[i - 1] = true;
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
-            if (hOptions == null) System.out.println("hOptions is null, hSpaces: "+hSpaces+" , hSum: "+hSum);
-            if (vOptions == null) System.out.println("vOptions is null, vSpaces: "+vSpaces+" , vSum: "+vSum);
-            //System.out.println(hOptions.size()+" horizontal options, vertical options: "+vOptions.size());
+            if (hOptions == null) System.out.println("hOptions is null, hSpaces: " + hSpaces + " , hSum: " + hSum);
+            if (vOptions == null) System.out.println("vOptions is null, vSpaces: " + vSpaces + " , vSum: " + vSum);
         }
 
         // fem la intersecció i retornem el resultat.
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
-            if (availableValues[i] && !hUsedValues[i] && !vUsedValues[i]) result.add(i+1);
+            if (availableValues[i] && !hUsedValues[i] && !vUsedValues[i])
+                result.add(i+1);
         }
+
         return result;
 	}
 
-    private void solve(int row, int col, int rowSum) {
+    private void solve(int row, int col, int rowSum, int[] colSum) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
             if(rowSum != rowSums[row][col - 1]) return;
+
+            for(int i = 0; i < colSum.length; i++)
+                if(colSum[i] != 0 && colSum[i] != colSums[row - 1][i]) return;
 
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions
@@ -180,19 +173,23 @@ public class Solver {
         if (col >= board.getWidth()) {
             if(rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
 
-            solve(row + 1, 0, 0);
+            solve(row + 1, 0, 0, colSum);
             return;
         }
 
         if (board.isBlackCell(row, col)) {
             if(col > 0 && rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
+            if(row > 0 && colSum[col] != colSums[row - 1][col]) return; // if col sum is not correct, return
 
-            solve(row, col + 1, 0); // If cell type is black, continue solving
+            int colSumTemp = colSum[col];
+            colSum[col] = 0;
+            solve(row, col + 1, 0, colSum); // If cell type is black, continue solving
+            colSum[col] = colSumTemp;
             return;
         }
 
         if (!board.isEmpty(row, col)) {
-            solve(row, col + 1, 0); // If cell has a value, continue solving
+            solve(row, col + 1, 0, colSum); // If cell has a value, continue solving
             return;
         }
 
@@ -200,7 +197,9 @@ public class Solver {
 
         for (int i : possibleValues) {
             board.setCellValue(row, col, i);
-            solve(row, col + 1, rowSum + i);
+            colSum[col] += i;
+            solve(row, col + 1, rowSum + i, colSum);
+            colSum[col] -= i;
             board.clearCellValue(row, col);
             if (solutions.size() > 1) return;
         }

@@ -10,7 +10,7 @@ import src.domain.BlackCell;
 
 public class Main {
 	public static void main(String[] args) {
-		Reader r = new Reader("data/sample.kak");
+		Reader r = new Reader("data/one-sol.kak");
 		Board b = r.read();
 
 		printBoard(b);
