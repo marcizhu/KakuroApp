@@ -3,7 +3,6 @@ package src.controllers;
 import src.domain.BlackCell;
 import src.domain.Cell;
 import src.domain.Board;
-import src.domain.WhiteCell;
 
 import java.util.ArrayList;
 import java.util.Arrays;

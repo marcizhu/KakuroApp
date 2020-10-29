@@ -2,6 +2,7 @@ package src;
 
 import src.controllers.Reader;
 import src.controllers.Solver;
+import src.controllers.Writer;
 import src.domain.Board;
 import src.domain.WhiteCell;
 import src.domain.Cell;
@@ -13,6 +14,10 @@ public class Main {
 		Board b = r.read();
 
 		printBoard(b);
+
+		Writer writer = new Writer("data/out-test.kak");
+		writer.write(b);
+
 		// TODO: Debug solver
 //		Solver solver = new Solver(b);
 //		solver.solve();
@@ -27,7 +32,7 @@ public class Main {
 					System.out.print(String.format("(B %s, %s) ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
 				}
 				else if (c instanceof WhiteCell){
-					System.out.print(String.format("(W %s) ", ((WhiteCell) c).getValue()));
+					System.out.print(String.format("(W %s) ", c.getValue()));
 				}
 				else {
 					System.out.print(String.format("(????) "));

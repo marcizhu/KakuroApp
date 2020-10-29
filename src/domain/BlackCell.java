@@ -14,10 +14,10 @@ public class BlackCell extends Cell {
     }
 
     public int getVerticalSum() {
-        return (verticalSum == 0 ? -1 : verticalSum);
+        return verticalSum;
     }
 
     public int getHorizontalSum() {
-        return (horizontalSum == 0 ? -1 : horizontalSum);
+        return horizontalSum;
     }
 }
