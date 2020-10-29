@@ -1,6 +1,6 @@
 package src;
 
-import src.controllers.KakuroReader;
+import src.controllers.Reader;
 import src.domain.Board;
 import src.domain.WhiteCell;
 import src.domain.Cell;
@@ -8,7 +8,7 @@ import src.domain.BlackCell;
 
 public class Main {
 	public static void main(String[] args) {
-		KakuroReader r = new KakuroReader("data/sample.kak");
+		Reader r = new Reader("data/sample.kak");
 		Board b = r.read();
 
 		printBoard(b);

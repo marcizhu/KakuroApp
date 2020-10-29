@@ -10,10 +10,10 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class KakuroReader {
+public class Reader {
     private String fileName;
 
-    public KakuroReader(String fileName) {
+    public Reader(String fileName) {
         this.fileName = fileName;
     }
 
