@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class KakuroConstants {
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
-    //TODO: I add this as a new singleton class, maybe should go inside the solver
+    // TODO: I add this as a new singleton class, maybe it should go inside the solver
     private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
 
     private KakuroConstants() {
@@ -18,23 +18,24 @@ public class KakuroConstants {
     }
 
     private void instantiateHashMaps() {
-        final int[] startingValues = {1, 3, 6, 10, 15, 21, 28, 36, 45};
-        cases = new HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>>();
+        final int[] startingValues = { 1, 3, 6, 10, 15, 21, 28, 36, 45 };
+        cases = new HashMap<>();
         for (int i = 1; i <= 9; i++) {
-            HashMap<Integer, ArrayList<ArrayList<Integer>>> hm = new HashMap<Integer, ArrayList<ArrayList<Integer>>>();
-            int numOfSums = -i*i+9*i+1;
+            HashMap<Integer, ArrayList<ArrayList<Integer>>> hm = new HashMap<>();
+            int numOfSums = -i * i + 9 * i + 1;
             for (int j = 0; j < numOfSums; j++) {
                 int currentSum = startingValues[i-1]+j;
                 hm.put(currentSum, findCombinations(i, currentSum));
             }
+
             cases.put(i, hm);
         }
     }
 
     private ArrayList<ArrayList<Integer>> findCombinations(int space, int sum) {
-        ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
 
-        boolean[] values = {false, false, false, false, false, false, false, false, false};
+        boolean[] values = { false, false, false, false, false, false, false, false, false };
         backtrackingFindCombinations(1, space, sum, 0, 0, values, result);
 
         return result;

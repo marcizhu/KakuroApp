@@ -3,11 +3,11 @@ package src.domain;
 
 
 public class Board {
-	private int width;
-	private int height;
-	private Cell[][] cells;
+    private int width;
+    private int height;
+    private Cell[][] cells;
 
-	public Board() {
+    public Board() {
         width = 0;
         height = 0;
     }
@@ -19,7 +19,7 @@ public class Board {
         cells = new Cell[height][width];
     }
 
-	public Board(Board b) {
+    public Board(Board b) {
         this.width = b.getWidth();
         this.height = b.getHeight();
 
@@ -42,7 +42,7 @@ public class Board {
         // TODO: Implement this
     }
 
-	public int getWidth() {
+    public int getWidth() {
         return width;
     }
 
@@ -63,15 +63,15 @@ public class Board {
     }
 
     public void clearCellValue(int row, int col) {
-	    this.cells[row][col].clearValue();
+        this.cells[row][col].clearValue();
     }
 
     public boolean isEmpty(int row, int col) {
-	    return this.cells[row][col].isEmpty();
+        return this.cells[row][col].isEmpty();
     }
 
     public boolean isBlackCell(int row, int col) {
-	    return this.cells[row][col] instanceof BlackCell;
+        return this.cells[row][col] instanceof BlackCell;
     }
 
     public boolean isWhiteCell(int row, int col) {
@@ -79,7 +79,7 @@ public class Board {
     }
 
     public void setCell(Cell cell, int row, int col) {
-	    //TODO: handle out of bounds exception
+        // TODO: handle out of bounds exception
         cells[row][col] = cell;
     }
 }

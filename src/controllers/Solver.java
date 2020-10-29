@@ -28,8 +28,8 @@ public class Solver {
     }
 
     public void solve() {
-	    preprocessSums();
-	    preprocessRowSize();
+        preprocessSums();
+        preprocessRowSize();
         preprocessColSize();
 
         solve(0, 0, 0, new int[board.getWidth()]);
@@ -37,13 +37,13 @@ public class Solver {
 
     private void preprocessSums() {
 	    // Calculate sums for each row
-	    for(int i = 0; i < board.getHeight(); i++) {
-	        for(int j = 0; j < board.getWidth(); j++) {
-	            if(board.isBlackCell(i, j)) {
-	                rowSums[i][j] = ((BlackCell)board.getCell(i, j)).getHorizontalSum();
+        for(int i = 0; i < board.getHeight(); i++) {
+            for(int j = 0; j < board.getWidth(); j++) {
+                if(board.isBlackCell(i, j)) {
+                    rowSums[i][j] = ((BlackCell)board.getCell(i, j)).getHorizontalSum();
                     colSums[i][j] = ((BlackCell)board.getCell(i, j)).getVerticalSum();
                 } else {
-	                // TODO: Check for out-of-bounds access.
+                    // TODO: Check for out-of-bounds access.
                     rowSums[i][j] = rowSums[i][j - 1];
                     colSums[i][j] = colSums[i - 1][j];
                 }
@@ -52,7 +52,7 @@ public class Solver {
     }
 
     private void preprocessRowSize() {
-	    int size = 0;
+        int size = 0;
         for(int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
                 if(board.isBlackCell(i, j)) {
@@ -94,17 +94,17 @@ public class Solver {
     //       which values are used in each row & column. That would remove the need for the 4 first for loops
     //       in this function, greatly reducing the execution time
     private boolean[] getPossibleValues(int row, int col) {
-	    // Horizontal
         int hSpaces = rowSize[row][col];
         int hSum = rowSums[row][col];
+        // Horizontal
         boolean[] hUsedValues = { false, false, false, false, false, false, false, false, false };
 
-        for(int it = col-1; board.isWhiteCell(row, it) && it >= 0; it--) {
+        for(int it = col - 1; board.isWhiteCell(row, it) && it >= 0; it--) {
             int v = board.getValue(row, it);
             if (v != 0) hUsedValues[v - 1] = true;
         }
 
-        for(int it = col+1; it < board.getWidth() && board.isWhiteCell(row, it); it++) {
+        for(int it = col + 1; it < board.getWidth() && board.isWhiteCell(row, it); it++) {
             int v = board.getValue(row, it);
             if (v != 0) hUsedValues[v - 1] = true;
         }
@@ -152,14 +152,14 @@ public class Solver {
         }
 
         return availableValues;
-	}
+    }
 
     private void solve(int row, int col, int rowSum, int[] colSum) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
-            if(rowSum != rowSums[row][col - 1]) return;
+            if (rowSum != rowSums[row][col - 1]) return;
 
-            for(int i = 0; i < colSum.length; i++)
-                if(colSum[i] != 0 && colSum[i] != colSums[row - 1][i]) return;
+            for (int i = 0; i < colSum.length; i++)
+                if (colSum[i] != 0 && colSum[i] != colSums[row - 1][i]) return;
 
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions
@@ -175,8 +175,8 @@ public class Solver {
         }
 
         if (board.isBlackCell(row, col)) {
-            if(col > 0 && rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
-            if(row > 0 && colSum[col] != colSums[row - 1][col]) return; // if col sum is not correct, return
+            if (col > 0 && rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
+            if (row > 0 && colSum[col] != colSums[row - 1][col]) return; // if col sum is not correct, return
 
             int colSumTemp = colSum[col];
             colSum[col] = 0;
@@ -204,7 +204,7 @@ public class Solver {
         }
     }
 
-	public ArrayList<Board> getSolutions() {
-		return solutions;
+    public ArrayList<Board> getSolutions() {
+        return solutions;
     }
 }
