@@ -103,7 +103,7 @@ public class Solver {
 
     private ArrayList<Integer> getPossibleValuesAlternative(int row, int col) {
 	    // Horizontal
-        int hSpaces = 1;
+        int hSpaces = rowSize[row][col];
         int hSum = -1;
         boolean[] hUsedValues = {false,false,false,false,false,false,false,false,false};
         // recorrer la fila i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
@@ -115,7 +115,6 @@ public class Solver {
                 //i sempre hi haurà una cell a l'esquerra obligatòriament
                 hSum = ((BlackCell)cell).getHorizontalSum();
             } else {
-                hSpaces++;
                 int v = ((WhiteCell)cell).getValue();
                 if (v!=0) hUsedValues[v-1] = true;
                 it--;
@@ -127,7 +126,6 @@ public class Solver {
             Cell cell = board.getCell(row, it);
             if (cell instanceof BlackCell) break; //hem trobat el final de la línia.
             else {
-                hSpaces++;
                 int v = ((WhiteCell)cell).getValue();
                 if (v!=0) hUsedValues[v-1] = true;
                 it++;
@@ -135,7 +133,7 @@ public class Solver {
         }
 
         //Vertical
-        int vSpaces = 1;
+        int vSpaces = colSize[row][col];
         int vSum = -1;
         boolean[] vUsedValues = {false,false,false,false,false,false,false,false,false};
         // recorrer la columna i veure quins nombres s'han utilitzat així com l'espai i la suma total cap a l'esquerra
@@ -147,7 +145,6 @@ public class Solver {
                 // i sempre hi haurà una cell amunt obligatòriament
                 vSum = ((BlackCell)cell).getVerticalSum();
             } else {
-                vSpaces++;
                 int v = ((WhiteCell)cell).getValue();
                 if (v!=0) vUsedValues[v-1] = true;
                 it--;
@@ -159,7 +156,6 @@ public class Solver {
             Cell cell = board.getCell(it, col);
             if (cell instanceof BlackCell) break; //hem trobat el final de la columna.
             else {
-                vSpaces++;
                 int v = ((WhiteCell)cell).getValue();
                 if (v!=0) vUsedValues[v-1] = true;
                 it++;
@@ -246,6 +242,8 @@ public class Solver {
 
     private void solve(int row, int col, int rowSum) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
+            if(rowSum != rowSums[row][col - 1]) return;
+
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions
             solutions.add(new Board(board));
@@ -253,11 +251,15 @@ public class Solver {
         }
 
         if (col >= board.getWidth()) {
+            if(rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
+
             solve(row + 1, 0, 0);
             return;
         }
 
         if (board.isBlackCell(row, col)) {
+            if(col > 0 && rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
+
             solve(row, col + 1, 0); // If cell type is black, continue solving
             return;
         }
