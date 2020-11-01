@@ -38,13 +38,13 @@ public class Main {
 			for(int j = 0; j<b.getWidth() ; j++) {
 				Cell c = b.getCell(i, j);
 				if (c instanceof BlackCell) {
-					System.out.print(String.format("[F%2d, C%2d] ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum()));
+					System.out.printf("[F%2d, C%2d] ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum());
 				}
 				else if (c instanceof WhiteCell){
-					System.out.print(String.format("[   %2d   ] ", c.getValue()));
+					System.out.printf("[   %2d   ] ", c.getValue());
 				}
 				else {
-					System.out.print(String.format("[????????] "));
+					System.out.print("[  ????  ] ");
 				}
 			}
 			System.out.println();
