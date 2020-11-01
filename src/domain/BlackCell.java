@@ -9,8 +9,8 @@ public class BlackCell extends Cell {
     }
 
     public BlackCell(int vert, int horiz) {
-        this.verticalSum = vert;
-        this.horizontalSum = horiz;
+        verticalSum = vert;
+        horizontalSum = horiz;
     }
 
     public int getVerticalSum() {

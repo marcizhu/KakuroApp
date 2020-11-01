@@ -8,25 +8,25 @@ public class WhiteCell extends Cell {
     }
 
     public WhiteCell() {
-        this.value = 0;
+        value = 0;
     }
 
     public int getValue() {
-        return this.value;
+        return value;
     }
 
     public void setValue(int value) throws IllegalArgumentException {
-        if (value > 9 || value < 0) // NOTE: 0 is a valid number, represents an empty white cell
+        if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
 
         this.value = value;
     }
 
     public void clearValue() {
-        this.value = 0;
+        value = 0;
     }
 
     public boolean isEmpty() {
-        return this.value == 0;
+        return value == 0;
     }
 }

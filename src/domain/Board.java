@@ -15,31 +15,25 @@ public class Board {
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-
         cells = new Cell[height][width];
     }
 
     public Board(Board b) {
-        this.width = b.getWidth();
-        this.height = b.getHeight();
-
+        width = b.getWidth();
+        height = b.getHeight();
         cells = new Cell[height][width];
 
         for(int i = 0; i < height; i++)
             for(int j = 0; j < width; j++) {
                 if(b.cells[i][j] instanceof BlackCell) {
-                    int r = ((BlackCell) b.cells[i][j]).getHorizontalSum();
                     int c = ((BlackCell) b.cells[i][j]).getVerticalSum();
+                    int r = ((BlackCell) b.cells[i][j]).getHorizontalSum();
                     cells[i][j] = new BlackCell(c, r);
                 } else {
                     int v = b.cells[i][j].getValue();
                     cells[i][j] = new WhiteCell(v);
                 }
             }
-    }
-
-    public Board(String formattedBoard) {
-        // TODO: Implement this
     }
 
     public int getWidth() {
@@ -55,27 +49,27 @@ public class Board {
     }
 
     public void setCellValue(int row, int col, int value) {
-        this.cells[row][col].setValue(value);
+        cells[row][col].setValue(value);
     }
 
     public int getValue(int row, int col) {
-        return this.cells[row][col].getValue();
+        return cells[row][col].getValue();
     }
 
     public void clearCellValue(int row, int col) {
-        this.cells[row][col].clearValue();
+        cells[row][col].clearValue();
     }
 
     public boolean isEmpty(int row, int col) {
-        return this.cells[row][col].isEmpty();
+        return cells[row][col].isEmpty();
     }
 
     public boolean isBlackCell(int row, int col) {
-        return this.cells[row][col] instanceof BlackCell;
+        return cells[row][col] instanceof BlackCell;
     }
 
     public boolean isWhiteCell(int row, int col) {
-        return this.cells[row][col] instanceof WhiteCell;
+        return cells[row][col] instanceof WhiteCell;
     }
 
     public void setCell(Cell cell, int row, int col) {

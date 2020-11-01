@@ -11,7 +11,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Reader {
-    private String fileName;
+    private final String fileName;
 
     public Reader(String fileName) {
         this.fileName = fileName;
@@ -72,5 +72,4 @@ public class Reader {
         }
         return new Board(); //FIXME: return something else if function crashes
     }
-
 }

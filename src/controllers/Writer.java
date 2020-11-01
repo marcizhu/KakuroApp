@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 public class Writer {
-    private String fileName;
+    private final String fileName;
 
     public Writer(String fileName) {
         this.fileName = fileName;
