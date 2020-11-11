@@ -27,8 +27,8 @@ public class Main {
 			printBoard(solution);
 			System.out.println();
 
-			//Writer writer = new Writer("data/solved"+i+".kak");
-			//writer.write(solution);
+			Writer writer = new Writer("data/sample_solution"+i+".kak");
+			writer.write(solution);
 		}
 	}
 
