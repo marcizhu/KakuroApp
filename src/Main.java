@@ -2,11 +2,13 @@ package src;
 
 import src.controllers.Solver;
 import src.controllers.Reader;
-import src.controllers.Writer;
 import src.domain.Board;
 import src.domain.WhiteCell;
 import src.domain.Cell;
 import src.domain.BlackCell;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 public class Main {
 	public static void main(String[] args) {
@@ -27,8 +29,13 @@ public class Main {
 			printBoard(solution);
 			System.out.println();
 
-			//Writer writer = new Writer("data/solved"+i+".kak");
-			//writer.write(solution);
+			try {
+				PrintWriter serializer = new PrintWriter("data/solved" + i + ".kak");
+				serializer.println(solution.toString());
+				serializer.close();
+			} catch(FileNotFoundException e) {
+				System.err.println("An error occurred while writing to file");
+			}
 		}
 	}
 

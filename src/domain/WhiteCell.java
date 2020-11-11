@@ -29,4 +29,8 @@ public class WhiteCell extends Cell {
     public boolean isEmpty() {
         return value == 0;
     }
+
+    public String toString() {
+        return (value == 0 ? "?" : Integer.toString(value));
+    }
 }

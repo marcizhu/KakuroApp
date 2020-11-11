@@ -1,6 +1,7 @@
 package src.domain;
 
 
+import java.util.List;
 
 public class Board {
     private int width;
@@ -75,5 +76,21 @@ public class Board {
     public void setCell(Cell cell, int row, int col) {
         // TODO: handle out of bounds exception
         cells[row][col] = cell;
+    }
+
+    public String toString() {
+        String[] row = new String[height];
+        String[] col = new String[width];
+
+        for(int i = 0; i < height; i++) {
+            for(int j = 0; j < width; j++) {
+                row[j] = cells[i][j].toString();
+            }
+
+            col[i] = String.join(",", row);
+        }
+
+        String header = height + "," + width + "\n";
+        return header + String.join("\n", col);
     }
 }
