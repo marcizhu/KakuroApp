@@ -18,14 +18,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 class SolverTest {
-    @TempDir
-    Path tempDir;
-
-    @BeforeEach
-    void beforeEach() {
-        assertTrue(Files.isDirectory(this.tempDir));
-    }
-
     @Test
     void SolveSample() throws IOException {
         String inputFile = "data/sample.kak";
