@@ -8,14 +8,13 @@ import src.domain.WhiteCell;
 import src.domain.Cell;
 import src.domain.BlackCell;
 
-public class Main {
-	public static void main(String[] args) {
-		Reader r = new Reader("data/sample.kak");
-		Board b = r.read();
+import java.io.IOException;
 
+public class Main {
+	public static void main(String[] args) throws IOException {
+		Board b = Reader.fromFile("data/sample.kak");
 		printBoard(b);
 
-		// TODO: Debug solver
 		Solver solver = new Solver(b);
 		solver.solve();
 

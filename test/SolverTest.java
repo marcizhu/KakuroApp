@@ -32,10 +32,8 @@ class SolverTest {
         String inputFile = "data/sample.kak";
         String expectedOutputFile = "data/sample_solution0.kak";
         String testOutputFile = tempDir.toString() + "/sample_solution0.kak";
-        
-        Reader r = new Reader(inputFile);
-        Board b = r.read();
 
+        Board b = Reader.fromFile(inputFile);
         Solver solver = new Solver(b);
         solver.solve();
 

@@ -5,71 +5,65 @@ import src.domain.Board;
 import src.domain.Cell;
 import src.domain.WhiteCell;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Reader {
-    private final String fileName;
+    // This regex matches a literal "C" followed by a number, OR a literal "F" followed by a number OR
+    // a literal "C" followed by a number and then a literal "F" followed by a number.
+    private static final Pattern pattern = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$");
 
-    public Reader(String fileName) {
-        this.fileName = fileName;
+    public static Board fromFile(String path) throws IOException {
+        String data = Files.readString(Path.of(path));
+        return fromString(data);
     }
 
-    public Board read() {
-        try {
-            File f = new File(fileName);
-            Scanner s = new Scanner(f);
+    public static Board fromString(String input) {
+        Matcher m = pattern.matcher("");
+        String[] rows = input.split("\\n");
+        String[] line1 = rows[0].split(",");
 
-            String[] line1 = s.nextLine().split(",");
-            int rows = Integer.parseInt(line1[0].trim());
-            int cols = Integer.parseInt(line1[1].trim());
+        int r = Integer.parseInt(line1[0].trim());
+        int c = Integer.parseInt(line1[1].trim());
 
-            Board b = new Board(rows, cols);
+        Board board = new Board(r, c);
+        assert(rows.length - 1 == r);
 
-            for (int i = 0; i < rows; i++) {
-                String[] line = s.nextLine().split(",");
+        for(int i = 0; i < r; i++) {
+            String[] cols = rows[i + 1].split(",");
+            assert(cols.length == c);
 
-                for (int j = 0; j < cols; j++) {
-                    Cell c;
-                    String word = line[j].trim();
+            for (int j = 0; j < c; j++) {
+                cols[j] = cols[j].trim();
+                m.reset(cols[j]);
+                Cell cell;
 
-                    if (word.equals("*")) {
-                        c = new BlackCell();
-                    }
-                    else if (word.equals("?")) {
-                        c = new WhiteCell();
-                    }
-                    else if (Pattern.compile("C([0-9]*)F([0-9]*)").matcher(word).matches()){
-                        String[] values = word.split("[CF]");
-                        int col = Integer.parseInt(values[1].trim());
-                        int row = Integer.parseInt(values[2].trim());
-                        c = new BlackCell(col, row);
-                    }
-                    else if (Pattern.compile("C([0-9]*)").matcher(word).matches()){
-                        int col = Integer.parseInt(word.substring(1));
-                        c = new BlackCell(col, 0);
-                    }
-                    else if (Pattern.compile("F([0-9]*)").matcher(word).matches()){
-                        int row = Integer.parseInt(word.substring(1));
-                        c = new BlackCell(0, row);
-                    }
-                    else {
-                        int val = Integer.parseInt(word);
-                        c = new WhiteCell(val);
+                /**/ if(cols[j].equals("*")) cell = new BlackCell();
+                else if(cols[j].equals("?")) cell = new WhiteCell();
+                else if(m.find()) {
+                    int col = 0;
+                    int row = 0;
+
+                    /**/ if(m.group(1) != null) col = Integer.parseInt(m.group(1));
+                    else if(m.group(2) != null) row = Integer.parseInt(m.group(2));
+                    else if(m.group(3) != null && m.group(4) != null) {
+                        col = Integer.parseInt(m.group(3));
+                        row = Integer.parseInt(m.group(4));
                     }
 
-                    b.setCell(c, i, j);
+                    cell = new BlackCell(col, row);
+                } else {
+                    int val = Integer.parseInt(cols[j]);
+                    cell = new WhiteCell(val);
                 }
-            }
-            s.close();
 
-            return b;
-        } catch (FileNotFoundException e) {
-            System.err.printf("File '%s' not found\n", fileName);
-            e.printStackTrace();
+                board.setCell(cell, i, j);
+            }
         }
-        return new Board(); //FIXME: return something else if function crashes
+
+        return board;
     }
 }
