@@ -13,6 +13,14 @@ public class Cell {
         throw new RuntimeException("Invalid call to clearValue()");
     }
 
+    public int getHorizontalSum() {
+        throw new RuntimeException("Invalid call to getHorizontalSum()");
+    }
+
+    public int getVerticalSum() {
+        throw new RuntimeException("Invalid call to getHorizontalSum()");
+    }
+
     public boolean isEmpty() {
         return false;
     }

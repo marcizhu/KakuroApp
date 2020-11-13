@@ -1,6 +1,5 @@
 package src.controllers;
 
-import src.domain.BlackCell;
 import src.domain.Board;
 
 import java.util.ArrayList;
@@ -35,8 +34,8 @@ public class Solver {
         for(int i = 0; i < board.getHeight(); i++) {
             for(int j = 0; j < board.getWidth(); j++) {
                 if(board.isBlackCell(i, j)) {
-                    rowSums[i][j] = ((BlackCell)board.getCell(i, j)).getHorizontalSum();
-                    colSums[i][j] = ((BlackCell)board.getCell(i, j)).getVerticalSum();
+                    rowSums[i][j] = board.getHorizontalSum(i, j);
+                    colSums[i][j] = board.getVerticalSum(i, j);
                 } else {
                     // TODO: Check for out-of-bounds access.
                     rowSums[i][j] = rowSums[i][j - 1];
@@ -148,9 +147,6 @@ public class Solver {
     private void solve(int row, int col, int rowSum, int[] colSum) {
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
             if (rowSum != rowSums[row][col - 1]) return;
-
-            for (int i = 0; i < colSum.length; i++)
-                if (colSum[i] != 0 && colSum[i] != colSums[row - 1][i]) return;
 
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions

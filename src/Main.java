@@ -3,9 +3,6 @@ package src;
 import src.controllers.Solver;
 import src.controllers.Reader;
 import src.domain.Board;
-import src.domain.WhiteCell;
-import src.domain.Cell;
-import src.domain.BlackCell;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,13 +38,8 @@ public class Main {
 	public static void printBoard(Board b) {
 		for (int i = 0; i<b.getHeight() ; i++) {
 			for(int j = 0; j<b.getWidth() ; j++) {
-				Cell c = b.getCell(i, j);
-				if (c instanceof BlackCell) {
-					System.out.printf("[F%2d, C%2d] ", ((BlackCell) c).getHorizontalSum(), ((BlackCell) c).getVerticalSum());
-				}
-				else if (c instanceof WhiteCell){
-					System.out.printf("[   %2d   ] ", c.getValue());
-				}
+				/**/ if (b.isBlackCell(i, j)) System.out.printf("[F%2d, C%2d] ", b.getHorizontalSum(i, j), b.getVerticalSum(i, j));
+				else if (b.isWhiteCell(i, j)) System.out.printf("[   %2d   ] ", b.getValue(i, j));
 				else {
 					System.out.print("[  ????  ] ");
 				}

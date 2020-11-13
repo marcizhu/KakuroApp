@@ -1,11 +1,8 @@
 package src.domain;
 
-
-import java.util.List;
-
 public class Board {
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
     private Cell[][] cells;
 
     public Board() {
@@ -24,11 +21,11 @@ public class Board {
         height = b.getHeight();
         cells = new Cell[height][width];
 
-        for(int i = 0; i < height; i++)
-            for(int j = 0; j < width; j++) {
-                if(b.cells[i][j] instanceof BlackCell) {
-                    int c = ((BlackCell) b.cells[i][j]).getVerticalSum();
-                    int r = ((BlackCell) b.cells[i][j]).getHorizontalSum();
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++) {
+                if (b.cells[i][j] instanceof BlackCell) {
+                    int c = b.cells[i][j].getVerticalSum();
+                    int r = b.cells[i][j].getHorizontalSum();
                     cells[i][j] = new BlackCell(c, r);
                 } else {
                     int v = b.cells[i][j].getValue();
@@ -45,16 +42,20 @@ public class Board {
         return height;
     }
 
-    public Cell getCell(int row, int col) {
-        return cells[row][col];
-    }
-
     public void setCellValue(int row, int col, int value) {
         cells[row][col].setValue(value);
     }
 
     public int getValue(int row, int col) {
         return cells[row][col].getValue();
+    }
+
+    public int getHorizontalSum(int row, int col) {
+        return cells[row][col].getHorizontalSum();
+    }
+
+    public int getVerticalSum(int row, int col) {
+        return cells[row][col].getVerticalSum();
     }
 
     public void clearCellValue(int row, int col) {
@@ -82,8 +83,8 @@ public class Board {
         String[] row = new String[height];
         String[] col = new String[width];
 
-        for(int i = 0; i < height; i++) {
-            for(int j = 0; j < width; j++) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 row[j] = cells[i][j].toString();
             }
 
