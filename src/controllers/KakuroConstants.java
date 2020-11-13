@@ -1,12 +1,12 @@
 package src.controllers;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class KakuroConstants {
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
-    // TODO: I add this as a new singleton class, maybe it should go inside the solver
     private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
 
     private KakuroConstants() {
@@ -15,6 +15,32 @@ public class KakuroConstants {
 
     public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
         return cases.get(space).get(sum);
+    }
+
+    public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        int sizeOfValues = 0;
+        for (boolean b : values) if (b) sizeOfValues++;
+        if (sizeOfValues >= space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+
+        ArrayList<ArrayList<Integer>> possible = cases.get(space).get(sum);
+        if (sizeOfValues == 0) return possible; // if no values are specified, it will return all possibilities
+
+        for (ArrayList<Integer> p : possible) {
+            int idx = 1;
+            boolean noValuesFound = true;
+            for (int i = 0; i < p.size() && noValuesFound; i++) {
+                Integer o = p.get(i);
+                while (idx < o && noValuesFound) {
+                    noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
+                    idx++;
+                }
+                idx++;
+            }
+            if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
+        }
+
+        return result;
     }
 
     private void instantiateHashMaps() {
@@ -45,7 +71,7 @@ public class KakuroConstants {
         if (idx > 9 || currentSpace >= space) return;
         if (idx + currentSum == sum && currentSpace == space-1) {
             values[idx-1] = true;
-            ArrayList<Integer> solution = new ArrayList<Integer>();
+            ArrayList<Integer> solution = new ArrayList<>();
             for (int i = 0; i < 9; i++) if (values[i]) solution.add(i+1);
             found.add(solution);
             values[idx-1] = false;

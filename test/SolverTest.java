@@ -6,15 +6,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.io.TempDir;
+import src.domain.Board;
 import src.controllers.Reader;
 import src.controllers.Solver;
-import src.domain.Board;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 class SolverTest {
@@ -23,9 +21,7 @@ class SolverTest {
         String inputFile = "data/sample.kak";
         String expectedOutputFile = "data/sample_solution0.kak";
         
-        Reader r = new Reader(inputFile);
-        Board b = r.read();
-
+        Board b = Reader.fromFile(inputFile);
         Solver solver = new Solver(b);
         solver.solve();
 

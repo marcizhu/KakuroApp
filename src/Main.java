@@ -8,16 +8,14 @@ import src.domain.Cell;
 import src.domain.BlackCell;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Main {
-	public static void main(String[] args) {
-		Reader r = new Reader("data/sample.kak");
-		Board b = r.read();
-
+	public static void main(String[] args) throws IOException {
+		Board b = Reader.fromFile("data/sample.kak");
 		printBoard(b);
 
-		// TODO: Debug solver
 		Solver solver = new Solver(b);
 		solver.solve();
 

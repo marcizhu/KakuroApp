@@ -116,8 +116,8 @@ public class Solver {
         }
 
         // Get options for each row and column
-        ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCases(rowSize[row][col], rowSums[row][col]);
-        ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCases(colSize[row][col], colSums[row][col]);
+        ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[row][col], rowSums[row][col], hUsedValues);
+        ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[row][col], colSums[row][col], vUsedValues);
 
         boolean[] hAvailable = { false, false, false, false, false, false, false, false, false };
         boolean[] vAvailable = { false, false, false, false, false, false, false, false, false };
