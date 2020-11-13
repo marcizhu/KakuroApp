@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		Board b = Reader.fromFile("data/sample.kak");
+		Board b = Reader.fromFile("data/kakuros/unsolved/two-sol.kak");
 		printBoard(b);
 
 		Solver solver = new Solver(b);
@@ -25,7 +25,7 @@ public class Main {
 			System.out.println();
 
 			try {
-				PrintWriter serializer = new PrintWriter("data/solved" + i + ".kak");
+				PrintWriter serializer = new PrintWriter("data/kakuros/solved/two-sol-" + (i+1) + ".kak");
 				serializer.println(solution.toString());
 				serializer.close();
 			} catch(FileNotFoundException e) {
