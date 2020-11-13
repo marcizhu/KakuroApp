@@ -34,10 +34,10 @@ public class SolverTest {
 
             File expectedOutput = new File(expectedOutputFiles[i]);
 
-            byte[] f1 = Files.readAllBytes(expectedOutput.toPath());
-            byte[] f2 = (solution.toString() + "\n").getBytes();
+            String s1 = Files.readString(expectedOutput.toPath()).replace("\r","");
+            String s2 = solution.toString() + "\n";
 
-            assertTrue(Arrays.equals(f1, f2));
+            assertEquals(s1, s2);
         }
 
     }
@@ -49,8 +49,8 @@ public class SolverTest {
             Arguments.of("data/kakuros/unsolved/one-sol.kak",    new String[]{"data/kakuros/solved/one-sol.kak"}),
             Arguments.of("data/kakuros/unsolved/sample.kak",     new String[]{"data/kakuros/solved/sample.kak"}),
             Arguments.of("data/kakuros/unsolved/sample2.kak",    new String[]{"data/kakuros/solved/sample2.kak"}),
-                Arguments.of("data/kakuros/unsolved/no-sol.kak",    new String[]{}),
-                Arguments.of("data/kakuros/unsolved/two-sol.kak",    new String[]{"data/kakuros/solved/two-sol-1.kak", "data/kakuros/solved/two-sol-2.kak"})
+            Arguments.of("data/kakuros/unsolved/no-sol.kak",    new String[]{}),
+            Arguments.of("data/kakuros/unsolved/two-sol.kak",    new String[]{"data/kakuros/solved/two-sol-1.kak", "data/kakuros/solved/two-sol-2.kak"})
         );
     }
 }

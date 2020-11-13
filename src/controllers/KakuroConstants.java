@@ -1,6 +1,7 @@
 package src.controllers;
 
-import java.lang.reflect.Array;
+import src.domain.Difficulty;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,6 +9,8 @@ public class KakuroConstants {
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
     private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
+    private final int[] numOfSumsAtSpace = { 9, 15, 19, 21, 21, 19, 15, 9, 1 };
+    private final int[] firstSumAtSpace = { 1, 3, 6, 10, 15, 21, 28, 36, 45 };
 
     private KakuroConstants() {
         instantiateHashMaps();
@@ -43,17 +46,117 @@ public class KakuroConstants {
         return result;
     }
 
+    // TODO: as it is, it always returns the possibilities in a specific order for the same input, maybe should apply some randomness to the order of the partial solutions
+    public ArrayList<int[]> getUniqueCrossValues(int rowSpace, int colSpace, Difficulty diff) {
+        ArrayList<int[]> result = new ArrayList<>(); // all int[] will have 3 values: {rowSum, colSum, uniqueValueInCommon}
+        if (rowSpace < 1 || rowSpace > 9 || colSpace < 1 || colSpace > 9) return result;
+
+        int rowNumOfSums = numOfSumsAtSpace[rowSpace-1], colNumOfSums = numOfSumsAtSpace[colSpace-1];
+
+        ArrayList<int[]> partialEasy = new ArrayList<>();
+        ArrayList<int[]> partialMedium = new ArrayList<>();
+        ArrayList<int[]> partialHard = new ArrayList<>();
+        ArrayList<int[]> partialExtreme = new ArrayList<>();
+
+        for (int rowIdx = 0; rowIdx < rowNumOfSums; rowIdx++) {
+            // How many times is a certain value seen for a given space and a given sum in the row
+            int rowSum = firstSumAtSpace[rowSpace-1]+rowIdx;
+            ArrayList<ArrayList<Integer>> rowOptions = cases.get(rowSpace).get(rowSum);
+            int[] rowTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            for (ArrayList<Integer> rowOption : rowOptions) {
+                for (Integer value : rowOption) {
+                    rowTimesValueSeen[value-1] ++;
+                }
+            }
+
+            for (int colIdx = 0; colIdx < colNumOfSums; colIdx++) {
+                // How many times is a certain value seen for a given space and a given sum in the col
+                int colSum = firstSumAtSpace[colSpace-1]+colIdx;
+                ArrayList<ArrayList<Integer>> colOptions = cases.get(colSpace).get(colSum);
+                int[] colTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                for (ArrayList<Integer> colOption : colOptions) {
+                    for (Integer value : colOption) {
+                        colTimesValueSeen[value-1] ++;
+                    }
+                }
+
+                int uniqueCrossValuePos = -1;
+                for (int i = 0; i < 9 && uniqueCrossValuePos != -2; i++) {
+                    if (rowTimesValueSeen[i] == 1 && colTimesValueSeen[i] == 1) {
+                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i;
+                        else uniqueCrossValuePos = -2;
+                    }
+                }
+
+                if (uniqueCrossValuePos >= 0) {
+                    // Depending on the rowIdx and colIdx we consider them more or less difficult options
+                    int rowOptDiff;
+                    if (rowIdx+1 > rowNumOfSums*3/8 && rowIdx+1 < rowNumOfSums*5/8) rowOptDiff = 5;
+                    else if (rowIdx+1 > rowNumOfSums/4 && rowIdx+1 < rowNumOfSums*3/4) rowOptDiff = 3;
+                    else if (rowIdx+1 > rowNumOfSums/8 && rowIdx+1 < rowNumOfSums*7/8) rowOptDiff = 1;
+                    else rowOptDiff = 0;
+
+                    int colOptDiff;
+                    if (colIdx > colNumOfSums*3/8 && colIdx < colNumOfSums*5/8) colOptDiff = 5;
+                    else if (colIdx > colNumOfSums/4 && colIdx < colNumOfSums*3/4) colOptDiff = 3;
+                    else if (colIdx > colNumOfSums/8 && colIdx < colNumOfSums*7/8) colOptDiff = 1;
+                    else colOptDiff = 0;
+
+                    /* Depending on the difficulty of the options we assign it to its partial solution, so we can
+                     *   return all the options ordered in the difficulty asked for.
+                     * */
+                    int diffValue = rowOptDiff + colOptDiff;
+                    if (diffValue > 7) // EXTREME
+                        partialExtreme.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else if (diffValue > 4) // HARD
+                        partialHard.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else if (diffValue > 1) // MEDIUM
+                        partialMedium.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else // EASY
+                        partialEasy.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                }
+            }
+        }
+
+        switch (diff) {
+            case EASY:
+                partialEasy.addAll(partialMedium);
+                partialEasy.addAll(partialHard);
+                partialEasy.addAll(partialExtreme);
+                result = partialEasy;
+                break;
+            case MEDIUM:
+                partialMedium.addAll(partialEasy);
+                partialMedium.addAll(partialHard);
+                partialMedium.addAll(partialExtreme);
+                result = partialMedium;
+                break;
+            case HARD:
+                partialHard.addAll(partialExtreme);
+                partialHard.addAll(partialMedium);
+                partialHard.addAll(partialEasy);
+                result = partialHard;
+                break;
+            case EXTREME:
+                partialExtreme.addAll(partialHard);
+                partialExtreme.addAll(partialMedium);
+                partialExtreme.addAll(partialEasy);
+                result = partialExtreme;
+                break;
+        }
+
+        return result;
+    }
+
     private void instantiateHashMaps() {
-        final int[] startingValues = { 1, 3, 6, 10, 15, 21, 28, 36, 45 };
         cases = new HashMap<>();
         for (int i = 1; i <= 9; i++) {
             HashMap<Integer, ArrayList<ArrayList<Integer>>> hm = new HashMap<>();
-            int numOfSums = -i * i + 9 * i + 1;
+            int numOfSums = numOfSumsAtSpace[i-1];
             for (int j = 0; j < numOfSums; j++) {
-                int currentSum = startingValues[i-1]+j;
+                int currentSum = firstSumAtSpace[i-1]+j;
                 hm.put(currentSum, findCombinations(i, currentSum));
             }
-
             cases.put(i, hm);
         }
     }
