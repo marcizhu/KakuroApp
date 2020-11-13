@@ -26,17 +26,17 @@ public class Reader {
         String[] rows = input.split("\\n");
         String[] line1 = rows[0].split(",");
 
-        int r = Integer.parseInt(line1[0].trim());
-        int c = Integer.parseInt(line1[1].trim());
+        int height = Integer.parseInt(line1[0].trim());
+        int width  = Integer.parseInt(line1[1].trim());
 
-        Board board = new Board(r, c);
-        assert(rows.length - 1 == r);
+        Board board = new Board(width, height);
+        assert(rows.length - 1 == height);
 
-        for(int i = 0; i < r; i++) {
+        for(int i = 0; i < height; i++) {
             String[] cols = rows[i + 1].split(",");
-            assert(cols.length == c);
+            assert(cols.length == width);
 
-            for (int j = 0; j < c; j++) {
+            for (int j = 0; j < width; j++) {
                 cols[j] = cols[j].trim();
                 m.reset(cols[j]);
                 Cell cell;
