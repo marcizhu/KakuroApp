@@ -20,4 +20,14 @@ public class BlackCell extends Cell {
     public int getHorizontalSum() {
         return horizontalSum;
     }
+
+    public String toString() {
+        if (verticalSum == 0 && horizontalSum == 0) return "*";
+
+        String ret = "";
+        if (verticalSum   > 0) ret += "C" + verticalSum;
+        if (horizontalSum > 0) ret += "F" + horizontalSum;
+
+        return ret;
+    }
 }

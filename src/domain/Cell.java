@@ -16,4 +16,8 @@ public class Cell {
     public boolean isEmpty() {
         return false;
     }
+
+    public String toString() {
+        return "";
+    }
 }
