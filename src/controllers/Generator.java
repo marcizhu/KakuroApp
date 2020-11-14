@@ -158,10 +158,10 @@ public class Generator {
                 rowLineID++; //prepare for next rowLine
             }
         }
-        rowSums = new int[rowLineID];
-        rowSize = new int[rowLineID];
-        rowValuesUsed = new boolean[rowLineID][9];
-        for (int i = 0; i < rowLineID; i++) { //initialize data at default values
+        rowSums = new int[rowLineID+1];
+        rowSize = new int[rowLineID+1];
+        rowValuesUsed = new boolean[rowLineID+1][9];
+        for (int i = 0; i < rowLineID+1; i++) { //initialize data at default values
             rowSums[i] = 0;
             rowSize[i] = sizes.get(i);
             rowValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
@@ -197,10 +197,10 @@ public class Generator {
                 colLineID++; //prepare for next colLine
             }
         }
-        colSums = new int[colLineID];
-        colSize = new int[colLineID];
-        colValuesUsed = new boolean[colLineID][9];
-        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+        colSums = new int[colLineID+1];
+        colSize = new int[colLineID+1];
+        colValuesUsed = new boolean[colLineID+1][9];
+        for (int i = 0; i < colLineID+1; i++) { //initialize data at default values
             colSums[i] = 0;
             colSize[i] = sizes.get(i);
             colValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
