@@ -68,6 +68,11 @@ public class Board {
         return height;
     }
 
+    // TODO: add javadoc
+    public boolean equalsCell(int row, int col, Cell cell) { // checks if they are the same object instance
+        return cells[row][col] == cell;
+    }
+    
     /**
      * Set value of cell
      * @param row   Row of the cell to set the value
@@ -86,6 +91,26 @@ public class Board {
      */
     public int getValue(int row, int col) {
         return cells[row][col].getValue();
+    }
+
+    // TODO: add javadoc
+    public void setCellNotation(int row, int col, int value, boolean checked) {
+        cells[row][col].setNotation(value, checked);
+    }
+
+    // TODO: add javadoc
+    public boolean[] getCellNotations(int row, int col) {
+        return cells[row][col].getNotations();
+    }
+
+    // TODO: add javadoc
+    public int getCellNotationSize(int row, int col) {
+        return cells[row][col].getNotationSize();
+    }
+
+    // TODO: add javadoc
+    public void clearCellNotations(int row, int col) {
+        cells[row][col].clearAllNotations();
     }
 
     /**

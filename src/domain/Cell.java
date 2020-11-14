@@ -6,7 +6,8 @@ package src.domain;
  * @version 0.1.0 (17/11/2020)
  */
 
-public class Cell {
+public abstract class Cell {
+
     /**
      * Set value of the cell
      * @param value Value to set
@@ -29,6 +30,21 @@ public class Cell {
     public void clearValue() {
         throw new RuntimeException("Invalid call to clearValue()");
     }
+
+    // TODO: add javadoc
+    public void setNotation(int value, boolean checked) { throw new RuntimeException("Invalid call to clearValue()"); }
+
+    // TODO: add javadoc
+    public void clearAllNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
+
+    // TODO: add javadoc
+    public boolean[] getNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
+
+    // TODO: add javadoc
+    public int getNotationSize() { throw new RuntimeException("Invalid call to clearValue()"); }
+
+    // TODO: add javadoc
+    public boolean isNotationChecked(int value) { throw new RuntimeException("Invalid call to clearValue()"); }
 
     /**
      * Get horizontal sum indicated by this cell
@@ -58,7 +74,5 @@ public class Cell {
      * Convert cell to string
      * @return a string that represents this cell
      */
-    public String toString() {
-        return "";
-    }
+    public abstract String toString();
 }

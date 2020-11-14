@@ -66,6 +66,13 @@ public class WhiteCell extends Cell {
     }
 
     // TODO: add javadoc
+    public int getNotationSize() {
+        int size = 0;
+        for (int i = 0; i < 9; i++) if (notations[i]) size++;
+        return size;
+    }
+
+    // TODO: add javadoc
     public boolean isNotationChecked(int value) {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
