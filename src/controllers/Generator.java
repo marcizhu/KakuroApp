@@ -1,8 +1,6 @@
 package src.controllers;
 
-import src.domain.Board;
-import src.domain.WhiteCell;
-import src.domain.Difficulty;
+import src.domain.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -52,13 +50,83 @@ public class Generator {
         this.random = new Random(seed);
     }
 
-    private Board prepareWorkingBoard() {
+    private boolean isValidPosition(Board b, int row, int col) { // FIXME: submethod of prepareWorkingBoard
+        /* TODO
+        Returns false if:
+            placing a black cell in position (row, col) would cause board b
+            to have a row or a column with length 1
+         */
+
+        if (col < columns-2 && b.isBlackCell(row, col+2) && b.isWhiteCell(row, col+1)) return false;
+        if (col == columns-2 && b.isWhiteCell(row, col+1)) return false;
+        if (col > 1 && b.isBlackCell(row, col-2) && b.isWhiteCell(row, col-1)) return false;
+        if (col == 1 && b.isWhiteCell(row, col-1)) return false;
+
+        if (row < rows-2 && b.isBlackCell(row+1, col) && b.isWhiteCell(row+1, col)) return false;
+        if (row == rows-2 && b.isWhiteCell(row+1, col)) return false;
+        if (row > 1 && b.isBlackCell(row-2, col) && b.isWhiteCell(row-1, col)) return false;
+        if (row == 1 && b.isWhiteCell(row-1, col)) return false;
+
+        return true;
+    }
+
+    public Board prepareWorkingBoard() { //FIXME: PRIVATE!!
         /* TODO: Generate the black cells on a board of size columns x rows for a given difficulty
         *   - The orderedCells size is rows*columns - numberOfBlackCells, it only contains WhiteCells
         *   - startPos is an array of "pointers" of size 9, startingPos[x-1] has the position in orderedCells
         *       where there is the first WhiteCell with x anotated values
         * */
-        return new Board();
+        Board b = new Board(columns, rows);
+        int width = b.getWidth();
+        int height = b.getHeight();
+
+        for(int i = 0; i<height; i++) {
+            for(int j = 0; j<width; j++) {
+                Cell c = new WhiteCell(true);
+                if (i == 0 || j == 0 || (random.nextInt() % 5 == 0 && isValidPosition(b, i, j))) {
+                    // Cell will be black if we are in the first row or column or randomly with a 1/7 chance
+                    c = new BlackCell();
+                }
+                b.setCell(c, i, j);
+            }
+        }
+
+        // Traverse the board once and fix all rows and columns of length > 9
+        for(int i = 0; i<height; i++) {
+            for(int j = 0; j<width; j++) {
+                if (b.isBlackCell(i, j)) continue;
+
+                int rowLength = 1;
+                int pos = j+1;
+                while (pos < width && b.isWhiteCell(i, pos)) {
+                    rowLength++;
+                    pos++;
+                }
+                pos = j-1;
+                while (j > 0 && b.isWhiteCell(i, pos)) {
+                    rowLength++;
+                    pos--;
+                }
+
+                int colLength = 1;
+                pos = i+1;
+                while (pos < height && b.isWhiteCell(pos, j)) {
+                    colLength++;
+                    pos++;
+                }
+                pos = i-1;
+                while (j > 0 && b.isWhiteCell(pos, j)) {
+                    colLength++;
+                    pos--;
+                }
+
+                if(rowLength > 9 || colLength > 9) {
+                    //TODO
+                }
+            }
+        }
+
+        return b;
     }
 
     private void preprocessRows() {
