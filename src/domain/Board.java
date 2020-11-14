@@ -72,7 +72,10 @@ public class Board {
     public boolean equalsCell(int row, int col, Cell cell) { // checks if they are the same object instance
         return cells[row][col] == cell;
     }
-    
+
+    // TODO: add javadoc
+    public Cell getCell(int row, int col) { return cells[row][col]; }
+
     /**
      * Set value of cell
      * @param row   Row of the cell to set the value
