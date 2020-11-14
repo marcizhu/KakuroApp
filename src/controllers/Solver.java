@@ -145,8 +145,11 @@ public class Solver {
     }
 
     private void solve(int row, int col, int rowSum, int[] colSum) {
+        // Check if we found a solution
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
             if (rowSum != rowSums[row][col - 1]) return;
+            for (int i = 0; i < board.getWidth(); i++)
+                if (colSum[i] != colSums[row][i]) return;
 
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions
