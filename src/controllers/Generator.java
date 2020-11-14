@@ -16,6 +16,9 @@ public class Generator {
     private int columns;
     private Difficulty difficulty;
 
+    private final int[][] rowSize; ///< The size of the row for a cell
+    private final int[][] colSize; ///< The size of the column for a cell
+
     private Random random;
 
     private WhiteCell[] orderedCells; // Contains all the WhiteCells in increasing order of number of anotations
@@ -28,6 +31,8 @@ public class Generator {
         this.rows = rows;
         this.columns = columns;
         this.difficulty = difficulty;
+        rowSize = new int[rows][columns];
+        colSize = new int[rows][columns];
         this.random = new Random();
     }
 
@@ -35,6 +40,8 @@ public class Generator {
         this.rows = rows;
         this.columns = columns;
         this.difficulty = difficulty;
+        rowSize = new int[rows][columns];
+        colSize = new int[rows][columns];
         this.random = new Random(seed);
     }
 
@@ -242,8 +249,7 @@ public class Generator {
 
         while (firstElement < endElement) {
             // then we have elements with no known value so we must do an assignation
-            WhiteCell candidate = orderedCells[firstElement];
-            firstElement ++;
+            WhiteCell candidate = popFirstOrderedCell();
 
             // if one or both of the sums are not assigned, we should choose the value in
             // its notations that given the current values in the row and column there is a unique value for a
@@ -256,6 +262,8 @@ public class Generator {
 
         // when we get out of the while loop we should have a filled board generated,
         // maybe we want to send it to the solver to check if it's unique or not or check for permutations, etc.
+        // then:
+        generatedBoard = workingBoard;
     }
 }
 
