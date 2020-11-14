@@ -13,7 +13,6 @@ import src.controllers.Solver;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class SolverTest {
@@ -45,12 +44,13 @@ public class SolverTest {
     private static Stream<Arguments> testArguments() {
         return Stream.of(
             // Arguments.of("data/unsolved/cpu_burner.kak", "data/solved/cpu_burner.kak"),
-            Arguments.of("data/kakuros/unsolved/evil.kak",       new String[]{"data/kakuros/solved/evil.kak"}),
-            Arguments.of("data/kakuros/unsolved/one-sol.kak",    new String[]{"data/kakuros/solved/one-sol.kak"}),
-            Arguments.of("data/kakuros/unsolved/sample.kak",     new String[]{"data/kakuros/solved/sample.kak"}),
-            Arguments.of("data/kakuros/unsolved/sample2.kak",    new String[]{"data/kakuros/solved/sample2.kak"}),
+            Arguments.of("data/kakuros/unsolved/evil.kak",      new String[]{"data/kakuros/solved/evil.kak"}),
+            Arguments.of("data/kakuros/unsolved/one-sol.kak",   new String[]{"data/kakuros/solved/one-sol.kak"}),
+            Arguments.of("data/kakuros/unsolved/sample.kak",    new String[]{"data/kakuros/solved/sample.kak"}),
+            Arguments.of("data/kakuros/unsolved/sample2.kak",   new String[]{"data/kakuros/solved/sample2.kak"}),
             Arguments.of("data/kakuros/unsolved/no-sol.kak",    new String[]{}),
-            Arguments.of("data/kakuros/unsolved/two-sol.kak",    new String[]{"data/kakuros/solved/two-sol-1.kak", "data/kakuros/solved/two-sol-2.kak"})
+            Arguments.of("data/kakuros/unsolved/two-sol.kak",   new String[]{"data/kakuros/solved/two-sol-1.kak", "data/kakuros/solved/two-sol-2.kak"}),
+            Arguments.of("data/kakuros/unsolved/jutge.kak",    new String[]{"data/kakuros/solved/jutge.kak"})
         );
     }
 }
