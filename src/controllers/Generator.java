@@ -16,8 +16,15 @@ public class Generator {
     private int columns;
     private Difficulty difficulty;
 
-    private final int[][] rowSize; ///< The size of the row for a cell
-    private final int[][] colSize; ///< The size of the column for a cell
+    private int[] rowSums;
+    private int[] rowSize;
+    private boolean[][] rowValuesUsed;
+    private final int[][] rowLine; // Pointers to position at arrays of row related data
+
+    private int[] colSums;
+    private int[] colSize;
+    private boolean[][] colValuesUsed;
+    private final int[][] colLine; // Pointers to position at array of colValuesUsed and colSums
 
     private Random random;
 
@@ -31,8 +38,8 @@ public class Generator {
         this.rows = rows;
         this.columns = columns;
         this.difficulty = difficulty;
-        rowSize = new int[rows][columns];
-        colSize = new int[rows][columns];
+        rowLine = new int[rows][columns];
+        colLine = new int[rows][columns];
         this.random = new Random();
     }
 
@@ -40,8 +47,8 @@ public class Generator {
         this.rows = rows;
         this.columns = columns;
         this.difficulty = difficulty;
-        rowSize = new int[rows][columns];
-        colSize = new int[rows][columns];
+        rowLine = new int[rows][columns];
+        colLine = new int[rows][columns];
         this.random = new Random(seed);
     }
 
@@ -52,6 +59,84 @@ public class Generator {
         *       where there is the first WhiteCell with x anotated values
         * */
         return new Board();
+    }
+
+    private void preprocessRows() {
+        int size = 0;
+        int rowLineID = 0;
+        ArrayList<Integer> sizes = new ArrayList<>();
+        for(int i = 1; i < rows; i++) {
+            for (int j = 1; j < columns; j++) {
+                if(workingBoard.isBlackCell(i, j)) {
+                    if (workingBoard.isWhiteCell(i, j-1)) {// there is a row before the black cell
+                        sizes.add(size);
+                        size = 0;
+                        rowLineID++; //prepare for next rowLine
+                    }
+                    if (j+1 < columns && workingBoard.isWhiteCell(i, j+1)) {
+                        rowLine[i][j] = rowLineID; //black cell is responsible for next rowLine
+                    } else {
+                        rowLine[i][j] = -1; //black cell is not responsible for any rowLine
+                    }
+                } else {
+                    // assign rowLineID to this member of current rowLine
+                    rowLine[i][j] = rowLineID;
+                    size++;
+                }
+            }
+            if (size > 0) { //last rowLine in row if we have seen whiteCells
+                sizes.add(size);
+                size = 0;
+                rowLineID++; //prepare for next rowLine
+            }
+        }
+        rowSums = new int[rowLineID];
+        rowSize = new int[rowLineID];
+        rowValuesUsed = new boolean[rowLineID][9];
+        for (int i = 0; i < rowLineID; i++) { //initialize data at default values
+            rowSums[i] = 0;
+            rowSize[i] = sizes.get(i);
+            rowValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
+        }
+    }
+
+    private void preprocessCols() {
+        int size = 0;
+        int colLineID = 0;
+        ArrayList<Integer> sizes = new ArrayList<>();
+        for(int i = 1; i < columns; i++) {
+            for (int j = 1; j < rows; j++) {
+                if(workingBoard.isBlackCell(i, j)) {
+                    if (workingBoard.isWhiteCell(j-1, i)) {// there is a col before the black cell
+                        sizes.add(size);
+                        size = 0;
+                        colLineID++; //prepare for next colLine
+                    }
+                    if (j+1 < rows && workingBoard.isWhiteCell(j+1, i)) {
+                        colLine[j][i] = colLineID; //black cell is responsible for next colLine
+                    } else {
+                        colLine[j][i] = -1; //black cell is not responsible for any colLine
+                    }
+                } else {
+                    // assign colLineID to this member of current colLine
+                    colLine[j][i] = colLineID;
+                    size++;
+                }
+            }
+            if (size > 0) { //last colLine in col if we have seen whiteCells
+                sizes.add(size);
+                size = 0;
+                colLineID++; //prepare for next colLine
+            }
+        }
+        colSums = new int[colLineID];
+        colSize = new int[colLineID];
+        colValuesUsed = new boolean[colLineID][9];
+        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+            colSums[i] = 0;
+            colSize[i] = sizes.get(i);
+            colValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
+        }
     }
 
     private int findCell(int r, int c) {
@@ -190,7 +275,11 @@ public class Generator {
         //  when in doubt, a sum assignation should be called before a cellValue
         //  assignation because it is more restrictive
         //  Could call other assignations recursively
-        return false;
+        boolean success = false;
+
+
+
+        return success;
     }
 
     private boolean colSumAssignation(int r, int c, int value) {
@@ -214,6 +303,8 @@ public class Generator {
         workingBoard = prepareWorkingBoard();
 
         // TODO: probably should preprocess row and column spaces
+        preprocessRows();
+        preprocessCols();
 
         // Select some random white cells to begin the assignations, depending on difficulty
         int numOfStartingPoints = 0;
@@ -231,9 +322,8 @@ public class Generator {
             int coordRow = random.nextInt(rows);
             int coordCol = random.nextInt(columns);
 
-            if (workingBoard.getValue(coordRow, coordCol) == 0) {
-                int rowSpace = 0, colSpace = 0; // TODO: this is where we assign according to precomputed space values
-                ArrayList<int[]> uniqueCrossValues = KakuroConstants.INSTANCE.getUniqueCrossValues(rowSpace, colSpace, difficulty); // returns [] of {rowSum, colSum, valueInCommon}
+            if (workingBoard.getValue(coordRow, coordCol) == 0) { // in case a previous assignation has assigned this cell's value
+                ArrayList<int[]> uniqueCrossValues = KakuroConstants.INSTANCE.getUniqueCrossValues(rowSize[rowLine[coordRow][coordCol]], colSize[colLine[coordRow][coordCol]], difficulty); // returns [] of {rowSum, colSum, valueInCommon}
                 for (int[] uniqueValue : uniqueCrossValues) {
                     // TODO: assign uniqueValue[0] to the row sum, uniqueValue[1] to de column sum
                     //  and uniqueValue[2] to de WhiteCell value in [coordRow][coordCol]
