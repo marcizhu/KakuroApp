@@ -90,7 +90,7 @@ public class WhiteCell extends Cell {
     public void clearAllNotations() {
         for (int i = 0; i < 9; i++) notations[i] = false;
     }
-    
+
     /**
      * Clear value of the cell
      */
