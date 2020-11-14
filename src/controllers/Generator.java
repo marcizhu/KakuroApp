@@ -390,7 +390,7 @@ public class Generator {
             int coordRow = random.nextInt(rows);
             int coordCol = random.nextInt(columns);
 
-            if (workingBoard.getValue(coordRow, coordCol) == 0) { // in case a previous assignation has assigned this cell's value
+            if (workingBoard.isEmpty(coordRow, coordCol)) { // in case a previous assignation has assigned this cell's value
                 ArrayList<int[]> uniqueCrossValues = KakuroConstants.INSTANCE.getUniqueCrossValues(rowSize[rowLine[coordRow][coordCol]], colSize[colLine[coordRow][coordCol]], difficulty); // returns [] of {rowSum, colSum, valueInCommon}
                 for (int[] uniqueValue : uniqueCrossValues) {
                     // TODO: assign uniqueValue[0] to the row sum, uniqueValue[1] to de column sum
