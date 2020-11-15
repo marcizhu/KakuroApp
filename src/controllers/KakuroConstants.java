@@ -1,6 +1,7 @@
 package src.controllers;
 
 import src.domain.Difficulty;
+import src.utils.Pair;
 
 import java.util.ArrayList;
 
@@ -61,6 +62,23 @@ public class KakuroConstants {
             if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
         }
 
+        return result;
+    }
+
+    public ArrayList<Pair<Integer, ArrayList<Integer>>> getPossibleCasesUnspecifiedSum(int space, boolean[] values) {
+        ArrayList<Pair<Integer, ArrayList<Integer>>> result = new ArrayList<>();
+        if (space < 1 || space > 9) return result;
+        int sizeOfValues = 0;
+        for (boolean b : values) if (b) sizeOfValues++;
+        if (sizeOfValues >= space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+
+        int numOfSums = numOfSumsAtSpace[space-1];
+
+        for (int i = 0; i < numOfSums; i++) {
+            int sum = firstSumAtSpace[space-1]+i;
+            ArrayList<ArrayList<Integer>> possibilities = getPossibleCasesWithValues(space, sum, values);
+            for (ArrayList<Integer> p : possibilities) result.add(new Pair<>(sum, p));
+        }
         return result;
     }
 

@@ -1,8 +1,10 @@
 package src.controllers;
 
 import src.domain.*;
+import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 public class Generator {
@@ -193,10 +195,10 @@ public class Generator {
                 rowLineID++; //prepare for next rowLine
             }
         }
-        rowSums = new int[rowLineID+1];
-        rowSize = new int[rowLineID+1];
-        rowValuesUsed = new boolean[rowLineID+1][9];
-        for (int i = 0; i < rowLineID+1; i++) { //initialize data at default values
+        rowSums = new int[rowLineID];
+        rowSize = new int[rowLineID];
+        rowValuesUsed = new boolean[rowLineID][9];
+        for (int i = 0; i < rowLineID; i++) { //initialize data at default values
             rowSums[i] = 0;
             rowSize[i] = sizes.get(i);
             rowValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
@@ -232,10 +234,10 @@ public class Generator {
                 colLineID++; //prepare for next colLine
             }
         }
-        colSums = new int[colLineID+1];
-        colSize = new int[colLineID+1];
-        colValuesUsed = new boolean[colLineID+1][9];
-        for (int i = 0; i < colLineID+1; i++) { //initialize data at default values
+        colSums = new int[colLineID];
+        colSize = new int[colLineID];
+        colValuesUsed = new boolean[colLineID][9];
+        for (int i = 0; i < colLineID; i++) { //initialize data at default values
             colSums[i] = 0;
             colSize[i] = sizes.get(i);
             colValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
@@ -249,31 +251,201 @@ public class Generator {
     //  THE CURRENT ASSIGNATION SUCCESSFUL), ALL OF THEM SHOULD ROLLBACK AND THE CURRENT ONE SHOULD PRESERVE THE VALUE,
     //  NOTATIONS, SUMS ETC. THAT IT HAD IN THE BEGINNING AND RETURN FALSE SO THAT THE RESPONSIBLE FOR ITS CALL
     //  KNOWS IT HAS FAILED.
-    private boolean rowSumAssignation(int r, int c, int value) {
+    // RollBack structures are to add any change we do, we don't do rollback in these functions
+    // because we only change absolutely necessary cases that depend only on the first assignation call,
+    // thus the responsible for the rollback is the first caller
+    private boolean rowSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
         // TODO: should update the row sum for a given coordinates to the value
         //  when in doubt, a sum assignation should be called before a cellValue
         //  assignation because it is more restrictive
         //  Could call other assignations recursively
-        boolean success = false;
-
-
-
-        return success;
+        int rowID = rowLine[r][c];
+        if (rowSums[rowID] != 0) return false; //already has a sum value assigned
+        rowSums[rowID] = value;
+        rowSumRollBack.add(rowID);
+        return updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
     }
 
-    private boolean colSumAssignation(int r, int c, int value) {
+    private boolean colSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
         // TODO: should update the col sum for a given coordinates to the value
         //  when in doubt, a sum assignation should be called before a cellValue
         //  assignation because it is more restrictive
         //  Could call other assignations recursively
-        return false;
+        int colID = colLine[r][c];
+        if (colSums[colID] != 0) return false; //already has a sum value assigned
+        colSums[colID] = value;
+        colSumRollBack.add(colID);
+        return updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
     }
 
-    private boolean cellValueAssignation(int r, int c, int value) {
+    private boolean cellValueAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
         // TODO: should update the assignation for that cell, remove the notations, update the
         //  orderedCells data structure and its pointers, etc.
         //  Could call other assignations recursively
-        return false;
+        int rowID = rowLine[r][c];
+        int colID = colLine[r][c];
+        if (rowValuesUsed[rowID][value-1] ||  colValuesUsed[colID][value-1]) return false;
+        cellValueRollBack.add(new Coordinates(r, c)); //if rollback we clear this coordinates and insert in notationsQueue
+        notationsQueue.removeOrderedCell(r, c); // removes it from queue but notations are mantained
+        workingBoard.setCellValue(r, c, value);
+        rowValuesUsed[rowID][value-1] = true;
+        colValuesUsed[colID][value-1] = true;
+        boolean success = true;
+        success = success && updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+        success = success && updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+        return success;
+    }
+
+    private boolean updateRowNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+        //updates the notations of the row and can cause assignations, returns whether the update was successful
+        int rowID = rowLine[r][c];
+        ArrayList<Integer> affectedColumns = new ArrayList<>();
+
+        boolean[] rowOptions = new boolean[] { false, false, false, false, false, false, false, false, false };
+
+        if (rowSums[rowID] != 0) { // row sum is assigned
+            // get possible cases for the row
+            ArrayList<ArrayList<Integer>> possibleCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSums[rowID], rowValuesUsed[rowID]);
+            for (ArrayList<Integer> opt : possibleCases)
+                for (Integer v : opt)
+                    rowOptions[v - 1] = true;
+
+        } else { // row sum is NOT assigned
+            // get possible cases for the row
+            ArrayList<Pair<Integer, ArrayList<Integer>>> possibleCases = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(rowSize[rowID], rowValuesUsed[rowID]);
+            int onlySum = -1;
+            for (Pair<Integer, ArrayList<Integer>> p : possibleCases) {
+                if (onlySum == -1) onlySum = p.first;
+                else if (onlySum != p.first) onlySum = -2;
+                for (int opt : p.second) rowOptions[opt -1] = true;
+            }
+            if (onlySum > 0) { // only one sum is possible for this space and values, we assign it
+                rowSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+            }
+        }
+
+        // subtract the already used values
+        boolean[] commonRowNotations = new boolean[] { false, false, false, false, false, false, false, false, false };
+        for (int i = 0; i < 9; i++)
+            commonRowNotations[i] = rowOptions[i] && !rowValuesUsed[rowID][i];
+
+        // check for each non-set white-cell if its notations have som notation that is not in commonRowNotations
+        // if so, erase notations, mark column as affected, add cell notations to rollback
+        int initialCol = c;
+        boolean foundInitCol = false;
+        for (int i = 1; !foundInitCol; i++) {
+            if (workingBoard.isBlackCell(r, c-i)) { initialCol = c - i + 1; foundInitCol = true; }
+            else if (c+i >= columns || workingBoard.isBlackCell(r, c+i)) { initialCol = c+i-rowSize[rowID]; foundInitCol = true; }
+        }
+        for(int it = initialCol; it < initialCol+rowSize[rowID]; it++) {
+            if (workingBoard.isEmpty(r, it)) { //value not set
+                boolean[] cellNotations = workingBoard.getCellNotations(r, it);
+                boolean[] rollbackNotations = new boolean[9]; // IMPORTANT! rollback notations should be a new object
+                // because cellNotations might get modified if we have to erase, rollback holds the original values
+                ArrayList<Integer> toErase = new ArrayList<>();
+                for (int i = 0; i < 9; i++) {
+                    rollbackNotations[i] = cellNotations[i];
+                    if(cellNotations[i] && !commonRowNotations[i]) toErase.add(i+1);
+                }
+                if (toErase.size() > 0) { // we need to erase some notations
+                    affectedColumns.add(it);
+                    cellNotationsRollBack.add(new RollbackNotations(r, it, rollbackNotations));
+                    notationsQueue.eraseNotationsFromCell(r, it, toErase);
+                }
+            }
+        }
+
+        boolean success = true;
+        for (int affected : affectedColumns) {
+            int notationSize = workingBoard.getCellNotationSize(r, affected);
+            if (notationSize == 0) return false; // no values are possible for this empty cell, whole branch must do rollback
+            if (notationSize == 1) { // only one value possible, we assign it
+                int value = -1;
+                boolean[] cellNotations = workingBoard.getCellNotations(r, affected);
+                for (int i = 0; value == -1 && i < 9; i++) if(cellNotations[i]) value = i+1;
+                success = success && cellValueAssignation(r, affected, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                // a cellValueAssignation already calls to updateRow and updateColumn
+            }
+            else success = success && updateColNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
+            if (!success) return false; // responsible for the call will do rollbacks
+        }
+        return true;
+    }
+
+    private boolean updateColNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+        //updates the notations of the column and can cause assignations, returns whether the update was successful
+        int colID = colLine[r][c];
+        ArrayList<Integer> affectedRows = new ArrayList<>();
+
+        boolean[] colOptions = new boolean[] { false, false, false, false, false, false, false, false, false };
+
+        if (colSums[colID] != 0) { // col sum is assigned
+            // get possible cases for the col
+            ArrayList<ArrayList<Integer>> possibleCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSums[colID], colValuesUsed[colID]);
+            for (ArrayList<Integer> opt : possibleCases)
+                for (Integer v : opt)
+                    colOptions[v - 1] = true;
+
+        } else { // col sum is NOT assigned
+            // get possible cases for the col
+            ArrayList<Pair<Integer, ArrayList<Integer>>> possibleCases = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(colSize[colID], colValuesUsed[colID]);
+            int onlySum = -1;
+            for (Pair<Integer, ArrayList<Integer>> p : possibleCases) {
+                if (onlySum == -1) onlySum = p.first;
+                else if (onlySum != p.first) onlySum = -2;
+                for (int opt : p.second) colOptions[opt -1] = true;
+            }
+            if (onlySum > 0) { // only one sum is possible for this space and values, we assign it
+                colSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+            }
+        }
+
+        // subtract the already used values
+        boolean[] commonColNotations = new boolean[] { false, false, false, false, false, false, false, false, false };
+        for (int i = 0; i < 9; i++)
+            commonColNotations[i] = colOptions[i] && !colValuesUsed[colID][i];
+
+        // check for each non-set white-cell if its notations have some notation that is not in commonColNotations
+        // if so, erase notations, mark row as affected, add cell notations to rollback
+        int initialRow = c;
+        boolean foundInitRow = false;
+        for (int i = 1; !foundInitRow; i++) {
+            if (workingBoard.isBlackCell(r-i, c)) { initialRow = r - i + 1; foundInitRow = true; }
+            else if (r+i >= rows || workingBoard.isBlackCell(r+i, c)) { initialRow = r+i-colSize[colID]; foundInitRow = true; }
+        }
+        for(int it = initialRow; it < initialRow+colSize[colID]; it++) {
+            if (workingBoard.isEmpty(it, c)) { //value not set
+                boolean[] cellNotations = workingBoard.getCellNotations(it, c);
+                boolean[] rollbackNotations = new boolean[9]; // IMPORTANT! rollback notations should be a new object
+                // because cellNotations might get modified if we have to erase, rollback holds the original values
+                ArrayList<Integer> toErase = new ArrayList<>();
+                for (int i = 0; i < 9; i++) {
+                    rollbackNotations[i] = cellNotations[i];
+                    if(cellNotations[i] && !commonColNotations[i]) toErase.add(i+1);
+                }
+                if (toErase.size() > 0) { // we need to erase some notations
+                    affectedRows.add(it);
+                    cellNotationsRollBack.add(new RollbackNotations(it, c, rollbackNotations));
+                    notationsQueue.eraseNotationsFromCell(it, c, toErase);
+                }
+            }
+        }
+
+        boolean success = true;
+        for (int affected : affectedRows) {
+            int notationSize = workingBoard.getCellNotationSize(affected, c);
+            if (notationSize == 0) return false; // no values are possible for this empty cell, whole branch must do rollback
+            if (notationSize == 1) { // only one value possible, we assign it
+                int value = -1;
+                boolean[] cellNotations = workingBoard.getCellNotations(affected, c);
+                for (int i = 0; value == -1 && i < 9; i++) if(cellNotations[i]) value = i+1;
+                success = success && cellValueAssignation(affected, c, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                // a cellValueAssignation already calls to updateRow and updateColumn
+            }
+            else success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
+            if (!success) return false; // responsible for the call will do rollbacks
+        }
+        return true;
     }
 
     public void generate() {
@@ -338,76 +510,21 @@ public class Generator {
         // then:
         // generatedBoard = workingBoard; //some process of clearing values, assigning sums, etc.
     }
-}
 
-
-
-/// FOR DEBUGGING PURPOSES ///
-
-    /*public void testDataStructure() {
-        // SETUP OF ALL WHITE CELLS
-        this.rows = 4;
-        this.columns = 4;
-        this.random = new Random();
-
-        endElement = rows*columns;
-        orderedCells = new WhiteCell[endElement];
-        startPos = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        firstElement = 0;
-
-        workingBoard = new Board(rows,columns);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                WhiteCell wc = new WhiteCell(true);
-                workingBoard.setCell(wc, i, j);
-                orderedCells[i*columns+j] = wc;
-            }
+    private class Coordinates {
+        public int r, c;
+        public Coordinates(int r, int c) {
+            this.r = r;
+            this.c = c;
         }
-
-        // ADDING, REMOVING, etc. TESTING
-        ArrayList<Integer> v = new ArrayList<>();
-        v.add(2);
-        v.add(3);
-        eraseNotationsFromCell(2, 2, v);
-        v.add(4);
-        eraseNotationsFromCell(2, 3, v);
-        v.add(5);
-        eraseNotationsFromCell(3, 3, v);
-        v.add(1);
-        v.add(6);
-        v.add(7);
-        v.add(8);
-        eraseNotationsFromCell(0, 0, v);
-        v.add(9);
-        eraseNotationsFromCell(1, 0, v);
-        writeOrderedCells();
-
-        ArrayList<Integer> b = new ArrayList<>();
-        b.add(2);
-        b.add(3);
-        addNotationsToCell(1, 0, b);
-        writeOrderedCells();
-
-        System.out.println("Poping ... ");
-        popFirstOrderedCell();
-        writeOrderedCells();
-
-        System.out.println("Removing ... ");
-        removeOrderedCell(3, 2);
-        writeOrderedCells();
-
-        System.out.println("Inserting ... ");
-        insertOrderedCell(3, 2);
-        writeOrderedCells();
     }
 
-    private void writeOrderedCells() {
-        for (int i = 0; i < endElement; i++) {
-            System.out.println("[ " + i + " : " + orderedCells[i].getNotationSize() + " ]");
+    private class RollbackNotations {
+        public Coordinates coord;
+        public boolean[] notations;
+        public RollbackNotations(int r, int c, boolean[] n) {
+            coord = new Coordinates(r, c);
+            notations = n;
         }
-        System.out.println("Pointers: firstElement: " + firstElement);
-        for (int i = 0; i < 9; i++) {
-            System.out.print("{ " + (i+1) + " :: " + startPos[i] + " }, ");
-        }
-        System.out.println();
-    }*/
+    }
+}
