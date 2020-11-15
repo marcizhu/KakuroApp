@@ -209,13 +209,13 @@ public class Board {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                row[j] = cells[i][j].toString();
+                col[j] = cells[i][j].toString();
             }
 
-            col[i] = String.join(",", row);
+            row[i] = String.join(",", col);
         }
 
         String header = height + "," + width + "\n";
-        return header + String.join("\n", col);
+        return header + String.join("\n", row);
     }
 }

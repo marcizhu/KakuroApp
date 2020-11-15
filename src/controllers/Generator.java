@@ -59,7 +59,7 @@ public class Generator {
         if (col > 1 && b.isBlackCell(row, col-2) && b.isWhiteCell(row, col-1)) return false;
         if (col == 1 && b.isWhiteCell(row, col-1)) return false;
 
-        if (row < height-2 && b.isBlackCell(row+1, col) && b.isWhiteCell(row+1, col)) return false;
+        if (row < height-2 && b.isBlackCell(row+2, col) && b.isWhiteCell(row+1, col)) return false;
         if (row == height-2 && b.isWhiteCell(row+1, col)) return false;
         if (row > 1 && b.isBlackCell(row-2, col) && b.isWhiteCell(row-1, col)) return false;
         if (row == 1 && b.isWhiteCell(row-1, col)) return false;
@@ -77,14 +77,34 @@ public class Generator {
         int width = b.getWidth();
         int height = b.getHeight();
 
+        // Chance of a white cell turning black
+        int diff; //TODO: tweak parameters
+
+        switch (difficulty) {
+            case EASY:
+                diff = 80;
+                break;
+            case MEDIUM:
+                diff = 60;
+                break;
+            case HARD:
+                diff = 45;
+                break;
+            case EXTREME:
+                diff = 20;
+                break;
+            default:
+                System.out.println("fucccc");
+                diff = 50;
+        }
+
         for(int i = 0; i<height; i++) {
             for(int j = 0; j<width; j++) {
                 Cell c = new WhiteCell(true);
-                if (i == 0 || j == 0 || (random.nextInt() % 2 == 0 && isValidPosition(b, i, j))) {
+                if (i == 0 || j == 0 || (Math.abs(random.nextInt(100)) < diff && isValidPosition(b, i, j))) {
                     // Cell will be black if we are in the first row or column or randomly with a 1/7 chance
                     c = new BlackCell();
                 }
-                System.out.println(b.toString());
                 b.setCell(c, i, j);
             }
         }
@@ -94,32 +114,50 @@ public class Generator {
             for(int j = 0; j<width; j++) {
                 if (b.isBlackCell(i, j)) continue;
 
-                int rowLength = 1;
+                int rowStart, rowEnd;
                 int pos = j+1;
                 while (pos < width && b.isWhiteCell(i, pos)) {
-                    rowLength++;
                     pos++;
                 }
+                rowEnd = pos-1;
                 pos = j-1;
                 while (j > 0 && b.isWhiteCell(i, pos)) {
-                    rowLength++;
                     pos--;
                 }
+                rowStart = pos+1;
 
-                int colLength = 1;
+                // FIXME: this can result in columns of size 1!!! :(
+                while (rowEnd - rowStart + 1 > 9) {
+                    for (int p = rowStart + 9; p >= rowStart; p--) {
+                        if (isValidPosition(b, i, p) || p == rowStart) {
+                            b.setCell(new BlackCell(), i, p);
+                            rowStart = p+1;
+                            break;
+                        }
+                    }
+                }
+
+                // Fix columns with len  > 9
+                int colStart, colEnd;
                 pos = i+1;
                 while (pos < height && b.isWhiteCell(pos, j)) {
-                    colLength++;
                     pos++;
                 }
+                colEnd = pos-1;
                 pos = i-1;
                 while (j > 0 && b.isWhiteCell(pos, j)) {
-                    colLength++;
                     pos--;
                 }
+                colStart = pos+1;
 
-                if(rowLength > 9 || colLength > 9) {
-                    //TODO
+                while (colEnd - colStart + 1 > 9) {
+                    for (int p = colStart + 9; p >= colStart; p--) {
+                        if (isValidPosition(b, p, j) || p == colStart) {
+                            b.setCell(new BlackCell(), p, j);
+                            colStart = p+1;
+                            break;
+                        }
+                    }
                 }
             }
         }
