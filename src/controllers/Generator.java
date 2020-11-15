@@ -94,7 +94,6 @@ public class Generator {
                 diff = 20;
                 break;
             default:
-                System.out.println("fucccc");
                 diff = 50;
         }
 
