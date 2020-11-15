@@ -1,6 +1,6 @@
 package tools;
 
-import src.controllers.Generator;
+//import src.controllers.Generator;
 import src.domain.Board;
 
 public class GeneratorApp {
@@ -15,9 +15,9 @@ public class GeneratorApp {
         int height = Integer.parseInt(args[1]);
         int param  = Integer.parseInt(args[2]);
 
-        Board board = Generator.generate(width, height, param);
+        //Board board = Generator.generate(width, height, param);
 
-        System.out.println(board.toString());
+        //System.out.println(board.toString());
     }
 }
 
