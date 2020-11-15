@@ -30,6 +30,19 @@ public class Board {
         cells = new Cell[height][width];
     }
 
+    // TODO: add javadoc
+    public Board(int width, int height, Cell c) {
+        this.width = width;
+        this.height = height;
+        cells = new Cell[height][width];
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                cells[i][j] = c;
+            }
+        }
+    }
+
     /**
      * Copy-constructor
      * @param b Board to copy

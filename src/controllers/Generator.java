@@ -51,14 +51,16 @@ public class Generator {
             placing a black cell in position (row, col) would cause board b
             to have a row or a column with length 1
          */
+        int height = b.getHeight();
+        int width = b.getWidth();
 
-        if (col < columns-2 && b.isBlackCell(row, col+2) && b.isWhiteCell(row, col+1)) return false;
-        if (col == columns-2 && b.isWhiteCell(row, col+1)) return false;
+        if (col < width-2 && b.isBlackCell(row, col+2) && b.isWhiteCell(row, col+1)) return false;
+        if (col == width-2 && b.isWhiteCell(row, col+1)) return false;
         if (col > 1 && b.isBlackCell(row, col-2) && b.isWhiteCell(row, col-1)) return false;
         if (col == 1 && b.isWhiteCell(row, col-1)) return false;
 
-        if (row < rows-2 && b.isBlackCell(row+1, col) && b.isWhiteCell(row+1, col)) return false;
-        if (row == rows-2 && b.isWhiteCell(row+1, col)) return false;
+        if (row < height-2 && b.isBlackCell(row+1, col) && b.isWhiteCell(row+1, col)) return false;
+        if (row == height-2 && b.isWhiteCell(row+1, col)) return false;
         if (row > 1 && b.isBlackCell(row-2, col) && b.isWhiteCell(row-1, col)) return false;
         if (row == 1 && b.isWhiteCell(row-1, col)) return false;
 
@@ -71,17 +73,18 @@ public class Generator {
         *   - startPos is an array of "pointers" of size 9, startingPos[x-1] has the position in orderedCells
         *       where there is the first WhiteCell with x anotated values
         * */
-        Board b = new Board(columns, rows);
+        Board b = new Board(columns, rows, new WhiteCell());
         int width = b.getWidth();
         int height = b.getHeight();
 
         for(int i = 0; i<height; i++) {
             for(int j = 0; j<width; j++) {
                 Cell c = new WhiteCell(true);
-                if (i == 0 || j == 0 || (random.nextInt() % 5 == 0 && isValidPosition(b, i, j))) {
+                if (i == 0 || j == 0 || (random.nextInt() % 2 == 0 && isValidPosition(b, i, j))) {
                     // Cell will be black if we are in the first row or column or randomly with a 1/7 chance
                     c = new BlackCell();
                 }
+                System.out.println(b.toString());
                 b.setCell(c, i, j);
             }
         }
