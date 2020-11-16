@@ -20,12 +20,16 @@ public class Generator {
     private int[] rowSums;
     private int[] rowSize;
     private boolean[][] rowValuesUsed;
+    private Coordinates[] firstRowCoord;
     private final int[][] rowLine; // Pointers to position at arrays of row related data
+    private int rowLineSize;
 
     private int[] colSums;
     private int[] colSize;
     private boolean[][] colValuesUsed;
+    private Coordinates[] firstColCoord;
     private final int[][] colLine; // Pointers to position at array of colValuesUsed and colSums
+    private int colLineSize;
 
     private Random random;
 
@@ -170,6 +174,7 @@ public class Generator {
         int size = 0;
         int rowLineID = 0;
         ArrayList<Integer> sizes = new ArrayList<>();
+        ArrayList<Coordinates> coord = new ArrayList<>();
         for(int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if(workingBoard.isBlackCell(i, j)) {
@@ -180,6 +185,7 @@ public class Generator {
                     }
                     if (j+1 < columns && workingBoard.isWhiteCell(i, j+1)) {
                         rowLine[i][j] = rowLineID; //black cell is responsible for next rowLine
+                        coord.add(new Coordinates(i, j+1));
                     } else {
                         rowLine[i][j] = -1; //black cell is not responsible for any rowLine
                     }
@@ -195,13 +201,16 @@ public class Generator {
                 rowLineID++; //prepare for next rowLine
             }
         }
-        rowSums = new int[rowLineID];
-        rowSize = new int[rowLineID];
-        rowValuesUsed = new boolean[rowLineID][9];
-        for (int i = 0; i < rowLineID; i++) { //initialize data at default values
+        rowLineSize = rowLineID;
+        rowSums = new int[rowLineSize];
+        rowSize = new int[rowLineSize];
+        rowValuesUsed = new boolean[rowLineSize][9];
+        firstRowCoord = new Coordinates[rowLineSize];
+        for (int i = 0; i < rowLineSize; i++) { //initialize data at default values
             rowSums[i] = 0;
             rowSize[i] = sizes.get(i);
             rowValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
+            firstRowCoord[i] = coord.get(i);
         }
     }
 
@@ -209,6 +218,7 @@ public class Generator {
         int size = 0;
         int colLineID = 0;
         ArrayList<Integer> sizes = new ArrayList<>();
+        ArrayList<Coordinates> coord = new ArrayList<>();
         for(int i = 0; i < columns; i++) {
             for (int j = 0; j < rows; j++) {
                 if(workingBoard.isBlackCell(j, i)) {
@@ -219,6 +229,7 @@ public class Generator {
                     }
                     if (j+1 < rows && workingBoard.isWhiteCell(j+1, i)) {
                         colLine[j][i] = colLineID; //black cell is responsible for next colLine
+                        coord.add(new Coordinates(j+1, i));
                     } else {
                         colLine[j][i] = -1; //black cell is not responsible for any colLine
                     }
@@ -234,13 +245,16 @@ public class Generator {
                 colLineID++; //prepare for next colLine
             }
         }
-        colSums = new int[colLineID];
-        colSize = new int[colLineID];
-        colValuesUsed = new boolean[colLineID][9];
-        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+        colLineSize = colLineID;
+        colSums = new int[colLineSize];
+        colSize = new int[colLineSize];
+        colValuesUsed = new boolean[colLineSize][9];
+        firstColCoord = new Coordinates[colLineSize];
+        for (int i = 0; i < colLineSize; i++) { //initialize data at default values
             colSums[i] = 0;
             colSize[i] = sizes.get(i);
             colValuesUsed[i] = new boolean[] { false, false, false, false, false, false, false, false, false };
+            firstColCoord[i] = coord.get(i);
         }
     }
 
@@ -540,9 +554,21 @@ public class Generator {
         }
         int uniqueAssigned = 0;
         for (int start = 0; start < numOfStartingPoints; start++) {
-            // TODO: Find a way to only choose WhiteCell coordinates
-            int coordRow = random.nextInt(rows);
-            int coordCol = random.nextInt(columns);
+
+            int coordRow;
+            int coordCol;
+
+            if (random.nextBoolean()) { // row based assignation
+                int rowID = random.nextInt(rowLineSize);
+                int offset = random.nextInt(rowSize[rowID]);
+                coordRow = firstRowCoord[rowID].r;
+                coordCol = firstRowCoord[rowID].c + offset;
+            } else { // column based assignation
+                int colID = random.nextInt(colLineSize);
+                int offset = random.nextInt(colSize[colID]);
+                coordRow = firstColCoord[colID].r + offset;
+                coordCol = firstColCoord[colID].c;
+            }
 
             // FIXME: DEBUGGING PURPOSES
             //System.out.println("-------------"+start+"----------row: "+coordRow+"------col: "+coordCol+"-------------");
