@@ -27,7 +27,7 @@ public class Board {
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        cells = new Cell[height][width];
+        cells = new Cell[height][width]; // Reminder: cells is declared but no cells are created.
     }
 
     // TODO: add javadoc
@@ -42,6 +42,7 @@ public class Board {
             for (int j = 0; j < width; j++) {
                 if (isWhite) cells[i][j] = new WhiteCell((WhiteCell)c);
                 else cells[i][j] = new BlackCell((BlackCell)c);
+                cells[i][j].setCoordinates(i, j);
             }
         }
     }
@@ -65,6 +66,7 @@ public class Board {
                     int v = b.cells[i][j].getValue();
                     cells[i][j] = new WhiteCell(v);
                 }
+                cells[i][j].setCoordinates(i, j);
             }
     }
 
@@ -199,7 +201,8 @@ public class Board {
      */
     public void setCell(Cell cell, int row, int col) {
         // TODO: handle out of bounds exception
-        cells[row][col] = cell;
+        cells[row][col] = cell; // Reminder: this assigns the same instance cell to cells[row][col]. NOT a copy
+        cells[row][col].setCoordinates(row, col);
     }
 
     /**

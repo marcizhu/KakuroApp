@@ -1,12 +1,25 @@
 package src.domain;
 
+import src.utils.Pair;
+
 /**
  * Class that represents a Kakuro cell
  *
  * @version 0.1.0 (17/11/2020)
  */
 
+
 public abstract class Cell {
+    private int coordRow, coordCol; // any Cell assigned to a board should have these values assigned to the corresponding position
+
+    public void setCoordinates(int r, int c) {
+        this.coordRow = r;
+        this.coordCol = c;
+    }
+
+    public Pair<Integer, Integer> getCoordinates() {
+        return new Pair<>(coordRow, coordCol);
+    }
 
     /**
      * Set value of the cell
