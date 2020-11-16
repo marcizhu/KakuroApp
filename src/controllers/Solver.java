@@ -10,12 +10,12 @@ public class Solver {
 
     private final int[][] rowLine;
     private final int[][] rowSums; // TODO: migrate this so that it uses rowLine
-    private final int[][] rowSize; // TODO: migrate this so that it uses rowLine
+    private int[] rowSize;
     private boolean[][] rowValuesUsed;
 
     private final int[][] colLine;
     private final int[][] colSums; // TODO: migrate this so that it uses rowLine
-    private final int[][] colSize; // TODO: migrate this so that it uses rowLine
+    private int[] colSize;
     private boolean[][] colValuesUsed;
 
     public Solver(Board b) {
@@ -24,43 +24,49 @@ public class Solver {
 
         rowLine = new int[board.getHeight()][board.getWidth()];
         rowSums = new int[board.getHeight()][board.getWidth()];
-        rowSize = new int[board.getHeight()][board.getWidth()];
 
         colLine = new int[board.getHeight()][board.getWidth()];
         colSums = new int[board.getHeight()][board.getWidth()];
-        colSize = new int[board.getHeight()][board.getWidth()];
     }
 
     public void solve() {
-        preprocessRowValuesUsed();
-        preprocessRowSize();
-
-        preprocessColValuesUsed();
-        preprocessColSize();
+        preprocessRows();
+        preprocessCols();
 
         preprocessSums();
 
         solve(0, 0, 0, new int[board.getWidth()]);
     }
 
-    private void preprocessRowValuesUsed() {
+    private void preprocessRows() {
         int rowLineID = 0;
+
+        int size = 0;
+        ArrayList<Integer> sizes = new ArrayList<>();
+
         for(int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
                 if(board.isBlackCell(i, j)) {
                     rowLine[i][j] = -1; // black cell is not responsible for any rowLine
                     if (j-1 >= 0 && board.isWhiteCell(i, j-1)) { // there is a row before the black cell
+                        sizes.add(size);
+                        size = 0;
                         rowLineID++; // prepare for next rowLine
                     }
                 } else {
                     // assign rowLineID to this member of current rowLine
                     rowLine[i][j] = rowLineID;
+                    size++;
                 }
             }
-            if (board.isWhiteCell(i, board.getWidth() - 1)) { // last rowLine in row if we have seen whiteCells
-                rowLineID++; // prepare for next rowLine
+            if (size > 0) { // last rowLine in row if we have seen whiteCells
+                sizes.add(size);
+                size = 0;
+
+                rowLineID++; //prepare for next rowLine
             }
         }
+
         rowValuesUsed = new boolean[rowLineID][9];
         for (int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
@@ -70,45 +76,41 @@ public class Solver {
                 }
             }
         }
-    }
 
-    private void preprocessRowSize() {
-        int size = 0;
-        for(int i = 0; i < board.getHeight(); i++) {
-            for (int j = 0; j < board.getWidth(); j++) {
-                if(board.isBlackCell(i, j)) {
-                    for(int k = size; k > 0; k--)
-                        rowSize[i][j - k] = size;
-                    size = 0;
-                } else {
-                    size++;
-                }
-            }
-
-            for(int k = size; k > 0; k--)
-                rowSize[i][board.getWidth() - k] = size;
-            size = 0;
+        rowSize = new int[rowLineID];
+        for (int i = 0; i < rowLineID; i++) {
+            rowSize[i] = sizes.get(i);
         }
     }
 
-    private void preprocessColValuesUsed() {
+    private void preprocessCols() {
         int colLineID = 0;
+
+        int size = 0;
+        ArrayList<Integer> sizes = new ArrayList<>();
+
         for(int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {
                 if(board.isBlackCell(j, i)) {
                     colLine[j][i] = -1; // black cell is not responsible for any colLine
                     if (j-1 >= 0 && board.isWhiteCell(j-1, i)) { // there is a col before the black cell
+                        sizes.add(size);
+                        size = 0;
                         colLineID++; // prepare for next colLine
                     }
                 } else {
                     // assign colLineID to this member of current colLine
                     colLine[j][i] = colLineID;
+                    size++;
                 }
             }
-            if (board.isWhiteCell(board.getHeight() - 1, i)) { // last colLine in col if we have seen whiteCells
-                colLineID++; // prepare for next colLine
+            if (size > 0) { //last colLine in col if we have seen whiteCells
+                sizes.add(size);
+                size = 0;
+                colLineID++; //prepare for next colLine
             }
         }
+
         colValuesUsed = new boolean[colLineID][9];
         for (int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {
@@ -118,24 +120,10 @@ public class Solver {
                 }
             }
         }
-    }
 
-    private void preprocessColSize() {
-        int size = 0;
-        for (int j = 0; j < board.getWidth(); j++) {
-            for(int i = 0; i < board.getHeight(); i++) {
-                if(board.isBlackCell(i, j)) {
-                    for(int k = size; k > 0; k--)
-                        colSize[i - k][j] = size;
-                    size = 0;
-                } else {
-                    size++;
-                }
-            }
-
-            for(int k = size; k > 0; k--)
-                colSize[board.getHeight() - k][j] = size;
-            size = 0;
+        colSize = new int[colLineID];
+        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+            colSize[i] = sizes.get(i);
         }
     }
 
@@ -158,9 +146,9 @@ public class Solver {
     private boolean[] getPossibleValues(int row, int col) {
         // Get options for each row and column
         ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                rowSize[row][col], rowSums[row][col], rowValuesUsed[rowLine[row][col]]);
+                rowSize[rowLine[row][col]], rowSums[row][col], rowValuesUsed[rowLine[row][col]]);
         ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                colSize[row][col], colSums[row][col], colValuesUsed[colLine[row][col]]);
+                colSize[colLine[row][col]], colSums[row][col], colValuesUsed[colLine[row][col]]);
 
         boolean[] hAvailable = { false, false, false, false, false, false, false, false, false };
         boolean[] vAvailable = { false, false, false, false, false, false, false, false, false };
