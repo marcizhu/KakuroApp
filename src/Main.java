@@ -24,7 +24,7 @@ public class Main {
 		window.setDefaultCloseOperation(window.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
 		window.setSize(1200, 1200);
-		window.setVisible(true);
+		window.setVisible(true);*/
 
 	}
 

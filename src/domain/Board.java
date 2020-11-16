@@ -36,9 +36,12 @@ public class Board {
         this.height = height;
         cells = new Cell[height][width];
 
+        boolean isWhite = c instanceof WhiteCell;
+
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                cells[i][j] = c;
+                if (isWhite) cells[i][j] = new WhiteCell((WhiteCell)c);
+                else cells[i][j] = new BlackCell((BlackCell)c);
             }
         }
     }

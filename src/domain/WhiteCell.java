@@ -19,6 +19,16 @@ public class WhiteCell extends Cell {
         initAllNotations(false);
     }
 
+    // TODO: add javadoc
+    public WhiteCell(WhiteCell c) {
+        this.value = c.getValue();
+        notations = new boolean[9];
+        boolean[] n = c.getNotations();
+        for (int i = 0; i < 9; i++) {
+            notations[i] = n[i];
+        }
+    }
+
     /**
      * Constructor.
      * Initializes a white cell to the given value
