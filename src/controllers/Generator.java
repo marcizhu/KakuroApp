@@ -552,7 +552,7 @@ public class Generator {
             case EXTREME:
                 numOfStartingPoints ++;   // EXTREME will have 1 starting point
         }
-        int uniqueAssigned = 0;
+        int uniqueAssigned = 0; // only used in debugging message
         for (int start = 0; start < numOfStartingPoints; start++) {
 
             int coordRow;
@@ -588,48 +588,293 @@ public class Generator {
                     ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                     ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
                     success = true;
-                    success = success && rowSumAssignation(coordRow, coordCol, uniqueValue[0], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
                     success = success && colSumAssignation(coordRow, coordCol, uniqueValue[1], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    success = success && rowSumAssignation(coordRow, coordCol, uniqueValue[0], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
                     // the row and sum assignation should assign the unique value correctly
                     if (success) {
-                        /* FIXME: DEBUGGING PURPOSES
-                        * System.out.println("Assignation successful: rowSums: ");
-                        * System.out.println("Coord: " + coordRow + "," + coordCol + " Row sum: " + uniqueValue[0] + ", Col sum: " + uniqueValue[1] + ", Unique value: " + uniqueValue[2]);
-                        * printNotations();
-                         */
-                        uniqueAssigned ++;
+                        //* FIXME: DEBUGGING PURPOSES
+                         //System.out.println("Assignation successful:");
+                         //System.out.println("Coord: " + coordRow + "," + coordCol + " Row sum: " + uniqueValue[0] + ", Col sum: " + uniqueValue[1] + ", Unique value: " + uniqueValue[2]);
+                         //printNotations();
+                         //*/
+                        uniqueAssigned ++; // only used in debugging message
                     }
-                    else rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    else {
+                        //System.out.println("Assignation FAILURE:");
+                        //System.out.println("Coord: " + coordRow + "," + coordCol + " Row sum: " + uniqueValue[0] + ", Col sum: " + uniqueValue[1] + ", Unique value: " + uniqueValue[2]);
+                        //printNotations();
+                        rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                        //printNotations();
+                    }
                 }
             }
         }
-        /* FIXME: DEBUGGING PURPOSES
-        * System.out.println("Assigned: " + uniqueAssigned + " unique values, but tried: " + numOfStartingPoints);
-        * printNotations();
-        * return;
-        */
+        // FIXME: DEBUGGING PURPOSES
+         //System.out.println("Assigned: " + uniqueAssigned + " unique values, but tried: " + numOfStartingPoints);
+         //printNotations();
+         //return;
+
 
         // At this point we've had a number of successful starting point assignments, now we assign the WhiteCell
         // that has the least notations (possible values) in a way that makes it non ambiguous
 
+        int ambiguousCells = 0;
+        ArrayList<Coordinates> impossibleAssignments = new ArrayList<>();
+
         while (!notationsQueue.isEmpty()) {
             // then we have elements with no known value so we must do an assignation
-            // TODO: We should be able to get the cell's coordinates from the Cell object. Maybe every cell should save its coord.
-            WhiteCell candidate = notationsQueue.popFirstOrderedCell();
-
+            WhiteCell candidate = notationsQueue.popFirstOrderedCell(); //should never return a cell with value
+            Pair<Integer, Integer> coord = candidate.getCoordinates();
+            boolean isRowSumAssigned = rowSums[rowLine[coord.first][coord.second]] != 0;
+            boolean isColSumAssigned = colSums[colLine[coord.first][coord.second]] != 0;
             // if one or both of the sums are not assigned, we should choose the value in
             // its notations that given the current values in the row and column there is a unique value for a
             // certain sum assignation
+            if (!isRowSumAssigned || !isColSumAssigned) {
+                boolean success = valueBiasedSumAssignation(coord.first, coord.second, isRowSumAssigned, isColSumAssigned, -1);
+                if (success) continue;
+            }
 
             // if both sums are already assigned, then that means there can still go more than one option in this
-            // cell, so we choose and the repercutions of the choice hopefully will make it a unique choice in a
-            // posterior sum assignment that affects other positions in the same row/col.
+            // cell, first we see if one of its notations is unique among the notations of the row or of the column
+            // if none are we try to find a cell in same row or column that has notated one of the notations of this cell
+            // and has a row/column not assigned so that we can try to make it take the value of the specific notation
+            // this way we reduce the ambiguity of the current cell possibilities.
+            // if in the pursuite of finding a "responsible" cell for a notation of this one, we end up in this one,
+            // (i.e. all cells with ambiguity-creating notations have their row/col sums assigned and have no unique notation)
+            // there is ambiguity for that value and we should assign one of its values, the board will have more than one solution
+            else {
+                boolean[] interestNotations = candidate.getNotations();
+                int uniqueValue = uniqueNotationIn(coord.first, coord.second, interestNotations, true);
+                boolean success = false;
+                if (uniqueValue != -1) {
+                    // assign the value to the cell!
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = cellValueAssignation(coord.first, coord.second, uniqueValue, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+                if (!success) { // check unique in col
+                    uniqueValue = uniqueNotationIn(coord.first, coord.second, interestNotations, false);
+                    if (uniqueValue != -1) { // assign the value to the cell!
+                        ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                        ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                        ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                        ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                        success = cellValueAssignation(coord.first, coord.second, uniqueValue, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                        if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    }
+                }
+                if (success) {
+                    // let's check if our cell now has value
+                    if(!workingBoard.isEmpty(coord.first, coord.second)) continue; // ambiguity solved
+                    else success = false;
+                }
+                // at this point, either no notation is unique or assignations failed, or assignations worked but didn't solve the ambiguity
+                // call function to find responsible for undoing ambiguity
+                success = ambiguitySolver(coord.first, coord.second, coord.first, coord.second, 0, coord.first, coord.second, interestNotations, true);
+                if (!success) success = ambiguitySolver(coord.first, coord.second, coord.first, coord.second, 0, coord.first, coord.second, interestNotations, false);
+                if (success) {
+                    // let's check if our cell now has value
+                    if (!workingBoard.isEmpty(coord.first, coord.second)) continue; // ambiguity solved
+                }
+            }
+            // unsolvable ambiguity, choose one of the values and move on with life
+            boolean[] possibleValues = workingBoard.getCellNotations(coord.first, coord.second);
+            boolean success = false;
+            for (int i = 0; !success && i < 9; i++) {
+                if (possibleValues[i]) {
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = cellValueAssignation(coord.first, coord.second, i+1, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+            }
+            if (!success) {
+                System.out.println("UNAVOIDABLE FAILURE: This is a nightmare, no value can be assigned to this cell in ccordinates: "+coord.first+", "+coord.second);
+                impossibleAssignments.add(new Coordinates(coord.first, coord.second));
+            } else {
+                System.out.println("UNAVOIDABLE AMBIGUITY: This board will have more than one solution because of: "+coord.first+", "+coord.second);
+                ambiguousCells++;
+            }
         }
+
+        System.out.println("PROBLEM REPORT: #of unavoidable failures: " + impossibleAssignments.size() + ", #of ambiguities: " + ambiguousCells);
 
         // when we get out of the while loop we should have a filled board generated,
         // maybe we want to send it to the solver to check if it's unique or not or check for permutations, etc.
         // then:
         // generatedBoard = workingBoard; //some process of clearing values, assigning sums, etc.
+    }
+
+    private boolean valueBiasedSumAssignation(int r, int c, boolean isRowAssigned, boolean isColAssigned, int valueOfInterest) {
+        if (isRowAssigned && isColAssigned) return false; // this function only works if at least one is not assigned
+        int rowID = rowLine[r][c], colID = colLine[r][c];
+        boolean[] rowValues = new boolean[9];
+        boolean[] colValues = new boolean[9];
+        for (int i = 0; i < 9; i++) { //copies of used values to be able to modify them
+            rowValues[i] = rowValuesUsed[rowID][i];
+            colValues[i] = colValuesUsed[colID][i];
+        }
+        boolean[] interestedValues = workingBoard.getCellNotations(r, c);
+
+        if (!isRowAssigned && isColAssigned) {
+            ArrayList<Integer> rowSumCandidates = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                if (interestedValues[i]) {
+                    rowValues[i] = true;
+                    ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(rowSize[rowID], rowValues);
+                    for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
+                        boolean foundCandidate = true;
+                        for (int p : poss.second) {
+                            // if candidate combination includes a value in notations other than the one we need it's not useful
+                            if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                        }
+                        if (foundCandidate) rowSumCandidates.add(poss.first);
+                    }
+                    rowValues[i] = false;
+                }
+            }
+            if (rowSumCandidates.size() == 0) {
+                // didn't find any candidates. this should never happen because if there are still notations in cell, it should be possible to find a combination
+                System.out.println("FATAL ERROR: Didn't find a rowSumAssignation");
+                return false;
+            } else {
+                // let's try to make a row assignation, let's check first if we need the valueOfInterest
+                boolean success = false;
+                if (valueOfInterest != -1 && rowSumCandidates.contains(valueOfInterest)) {
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = rowSumAssignation(r, c, valueOfInterest, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+                for(int i = 0; !success && i < rowSumCandidates.size(); i++) {
+                    if (valueOfInterest != -1 && rowSumCandidates.get(i) == valueOfInterest) continue; // we have tried it before
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = rowSumAssignation(r, c, rowSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+                if (success) return true;
+                System.out.println("FATAL ERROR: Didn't find a rowSumAssignation after trying possibilities"); //very unlikely to happen
+                return false;
+            }
+        } else if (isRowAssigned && !isColAssigned) {
+            ArrayList<Integer> colSumCandidates = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                if (interestedValues[i]) {
+                    colValues[i] = true;
+                    ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(colSize[colID], colValues);
+                    for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
+                        boolean foundCandidate = true;
+                        for (int p : poss.second) {
+                            // if candidate combination includes a value in notations other than the one we need it's not useful
+                            if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                        }
+                        if (foundCandidate) colSumCandidates.add(poss.first);
+                    }
+                    colValues[i] = false;
+                }
+            }
+            if (colSumCandidates.size() == 0) {
+                // didn't find any candidates. this should never happen because if there are still notations in cell, it should be possible to find a combination
+                System.out.println("FATAL ERROR: Didn't find a colSumAssignation");
+                return false;
+            } else {
+                // let's try to make a col assignation
+                boolean success = false;
+                if (valueOfInterest != -1 && colSumCandidates.contains(valueOfInterest)) {
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = rowSumAssignation(r, c, valueOfInterest, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+                for(int i = 0; !success && i < colSumCandidates.size(); i++) {
+                    if (valueOfInterest != -1 && colSumCandidates.get(i) == valueOfInterest) continue; // we have tried it before
+                    ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                    ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                    ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    success = colSumAssignation(r, c, colSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                }
+                if (success) return true;
+                System.out.println("FATAL ERROR: Didn't find a colSumAssignation after trying possibilities"); //very unlikely to happen
+                return false;
+            }
+        } else {
+            // tough
+            return false;
+        }
+    }
+
+    private int uniqueNotationIn(int r, int c, boolean[] interestNotations, boolean isRow) {
+        boolean[] uniqueNotations = new boolean[] { true, true, true, true, true, true, true, true, true };
+        int ID = isRow ? rowLine[r][c] : colLine[r][c];
+        int firstPos = isRow ? firstRowCoord[ID].c : firstColCoord[ID].r;
+        int size = isRow ? rowSize[ID] : colSize[ID];
+        for (int it = firstPos; it < firstPos+size; it++) {
+            boolean[] itNotations = isRow ? workingBoard.getCellNotations(r, it) : workingBoard.getCellNotations(it, c);
+            for (int i = 0; i < 9; i++) uniqueNotations[i] = uniqueNotations[i] && interestNotations[i] && !itNotations[i];
+        }
+        boolean uniqueFound = false;
+        int uniqueValue = -1;
+        for (int i = 0; !uniqueFound && i < 9; i++) {
+            uniqueFound = uniqueNotations[i];
+            uniqueValue = i+1;
+        }
+        return uniqueFound ? uniqueValue : -1;
+    }
+
+    private boolean ambiguitySolver(int r, int c, int prev_r, int prev_c, int depth, final int init_r, final int init_c, final boolean[] interestNotations, boolean isRow) {
+        if (r == init_r && c == init_c && depth != 0) return false; //found the original element, ambiguity unsolved
+        boolean success;
+        // check row
+        ArrayList<Coordinates> checkCross = new ArrayList<>();
+        int ID = isRow ? rowLine[r][c] : colLine[r][c];
+        int firstPos = isRow ? firstRowCoord[ID].c : firstColCoord[ID].r;
+        int size = isRow ? rowSize[ID] : colSize[ID];
+        for (int it = firstPos; it < firstPos+size; it++) {
+            if (isRow && r == prev_r && it == prev_c) continue;
+            else if (!isRow && it == prev_r && c == prev_c) continue;
+            boolean[] itNotations = isRow ? workingBoard.getCellNotations(r, it) : workingBoard.getCellNotations(it, c);
+            for (int i = 0; i < 9; i++) {
+                if (interestNotations[i] && itNotations[i]) {
+                    boolean isOfInterest = isRow ? colSums[colLine[r][it]] == 0 : rowSums[rowLine[it][c]] == 0;
+                    if (isOfInterest) {
+                        // TODO: try to assign a value to force this notation
+                        int rowA = isRow ? r : it;
+                        int colA = isRow ? it : c;
+                        boolean isRowAssigned = rowSums[rowLine[rowA][colA]] != 0;
+                        boolean isColAssigned = colSums[colLine[rowA][colA]] != 0;
+                        success = valueBiasedSumAssignation(rowA, colA, isRowAssigned, isColAssigned, i+1);
+                        if (!workingBoard.isEmpty(init_r, init_c)) return true; //ambiguity was successfuly solved
+                        else if (success) {
+                            // there was an assignation that didn't solve the ambiguity but made changes
+                            return ambiguitySolver(r, c, r, c, depth, init_r, init_c, interestNotations, !isRow);
+                            // FIXME: I'm not too sure this is the correct thing to do, or just return false.
+                        }
+                    } else {
+                        checkCross.add(isRow ? new Coordinates(r, it) : new Coordinates(it, c));
+                    }
+                }
+            }
+        }
+        for(Coordinates coord : checkCross) {
+            success = ambiguitySolver(coord.r, coord.c, r, c, depth+1, init_r, init_c, interestNotations, !isRow);
+            if (success) return true;
+        }
+        return false;
     }
 
     // FIXME: DEBUGGING PURPOSES
