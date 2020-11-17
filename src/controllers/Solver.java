@@ -43,14 +43,16 @@ public class Solver {
 
     /**
      * Solve the board
+     * @return the number of solutions of the board
      */
-    public void solve() {
+    public int solve() {
         preprocessRows();
         preprocessCols();
 
         preprocessSums();
 
         solve(0, 0, 0, new int[board.getWidth()]);
+        return solutions.size();
     }
 
     private void preprocessRows() {

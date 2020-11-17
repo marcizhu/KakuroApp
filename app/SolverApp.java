@@ -21,10 +21,9 @@ public class SolverApp {
 
         Board board = Reader.fromString(input);
         Solver solver = new Solver(board);
-        solver.solve();
+        int nSolutions = solver.solve();
 
         ArrayList<Board> solutions = solver.getSolutions();
-        int nSolutions = solutions.size();
 
         System.out.println(nSolutions);
         if (nSolutions > 0) System.out.println(solutions.get(0).toString());

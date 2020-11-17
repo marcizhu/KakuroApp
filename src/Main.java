@@ -14,9 +14,7 @@ public class Main {
 		printBoard(b);
 
 		Solver solver = new Solver(b);
-		solver.solve();
-
-		int s = solver.getSolutions().size();
+		int s = solver.solve();
 		System.out.println("\nSolutions found: " + s + "\n");
 
 		for (int i = 0; i < s; i++) {

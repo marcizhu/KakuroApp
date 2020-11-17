@@ -21,9 +21,7 @@ public class SolverTest {
     public void testSolveSample(String inputFile, String[] expectedOutputFiles) throws IOException {
         Board b = Reader.fromFile(inputFile);
         Solver solver = new Solver(b);
-        solver.solve();
-
-        int numSolutions = solver.getSolutions().size();
+        int numSolutions = solver.solve();
         int expectedNumSolutions = expectedOutputFiles.length;
         assertEquals(expectedNumSolutions, numSolutions);
 
