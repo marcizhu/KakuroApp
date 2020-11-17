@@ -59,6 +59,11 @@ public class KakuroConstants {
                 }
                 idx++;
             }
+            // check up to position 9 if it hadn't reached there yet
+            while (idx < 10 && noValuesFound) {
+                noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
+                idx++;
+            }
             if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
         }
 
