@@ -2,4 +2,4 @@ out/*
 .idea/*
 *.iml
 
-*_test.kak
+*.class

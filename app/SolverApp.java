@@ -1,4 +1,4 @@
-package tools;
+package app;
 
 import java.io.BufferedInputStream;
 import java.util.ArrayList;
@@ -12,9 +12,7 @@ public class SolverApp {
     private static final Scanner scanner = new Scanner(new BufferedInputStream(System.in));
 
     public static String stdin() {
-        if (!scanner.hasNextLine())
-            return "";
-
+        if (!scanner.hasNextLine()) return "";
         return scanner.useDelimiter("\\A").next();
     }
 
@@ -26,10 +24,9 @@ public class SolverApp {
         solver.solve();
 
         ArrayList<Board> solutions = solver.getSolutions();
-        System.out.println(solutions.size());
+        int nSolutions = solutions.size();
 
-        for(Board sol : solutions) {
-            System.out.println(sol.toString());
-        }
+        System.out.println(nSolutions);
+        if (nSolutions > 0) System.out.println(solutions.get(0).toString());
     }
 }

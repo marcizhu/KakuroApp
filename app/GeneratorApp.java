@@ -1,13 +1,12 @@
-package tools;
+package app;
 
 //import src.controllers.Generator;
-import src.domain.Board;
 
 public class GeneratorApp {
     public static void main(String[] args) {
         if(args.length != 3) {
             System.out.println("Kakuro generator tool v1.0.0\n");
-            System.out.println("Usage: ./generator <width> <height> <param>");
+            System.out.println("Usage: java GeneratorApp <width> <height> <param>");
             return;
         }
 
