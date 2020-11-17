@@ -11,16 +11,34 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Kakuro Singleton Reader.
+ * Reads a kakuro from a string or file and returns a new board
+ *
+ * @version 0.1.0 (17/11/2020)
+ */
+
 public class Reader {
     // This regex matches a literal "C" followed by a number, OR a literal "F" followed by a number OR
     // a literal "C" followed by a number and then a literal "F" followed by a number.
     private static final Pattern pattern = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$");
 
+    /**
+     * Read a board from file
+     * @param path Path of the file to read from
+     * @return the board represented by the contents of the given file
+     * @throws IOException if the file could not be opened
+     */
     public static Board fromFile(String path) throws IOException {
         String data = Files.readString(Path.of(path));
         return fromString(data);
     }
 
+    /**
+     * Read a board from string
+     * @param input String representing the board
+     * @return the board represented by the contents of the string
+     */
     public static Board fromString(String input) {
         Matcher m = pattern.matcher("");
         String[] rows = input.split("\\n");

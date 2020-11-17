@@ -4,6 +4,13 @@ import src.domain.Board;
 
 import java.util.ArrayList;
 
+/**
+ * Kakuro Solver.
+ * Solves a given board.
+ *
+ * @version 0.1.0 (17/11/2020)
+ */
+
 public class Solver {
     private final Board board;
     private final ArrayList<Board> solutions;
@@ -18,6 +25,11 @@ public class Solver {
     private int[] colSize;
     private boolean[][] colValuesUsed;
 
+    /**
+     * Constructor.
+     * Initializes the solver to solve the given board
+     * @param b Board to solve
+     */
     public Solver(Board b) {
         board = b;
         solutions = new ArrayList<>();
@@ -29,6 +41,9 @@ public class Solver {
         colSums = new int[board.getHeight()][board.getWidth()];
     }
 
+    /**
+     * Solve the board
+     */
     public void solve() {
         preprocessRows();
         preprocessCols();
@@ -235,6 +250,12 @@ public class Solver {
         }
     }
 
+    /**
+     * Get solutions of the board.
+     * This function *MUST* be called after a call to `solve()`
+     * @return an ArrayList with all possible solutions of the board
+     * @see Solver::solve()
+     */
     public ArrayList<Board> getSolutions() {
         return solutions;
     }

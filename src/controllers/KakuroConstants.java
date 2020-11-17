@@ -5,7 +5,17 @@ import src.domain.Difficulty;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Kakuro Constants.
+ * Contains all possible combinations for different row/column size and sum.
+ *
+ * @version 0.1.0 (17/11/2020)
+ */
+
 public class KakuroConstants {
+    /**
+     * Singleton instance of this class
+     */
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
     private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
@@ -16,10 +26,24 @@ public class KakuroConstants {
         instantiateHashMaps();
     }
 
+    /**
+     * Get possible cases for a row or column with the given size and sum
+     * @param space Number of 'slots' of the row or column
+     * @param sum   Total sum of the row or column
+     * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
+     */
     public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
         return cases.get(space).get(sum);
     }
 
+    /**
+     * Similar to @link KakuroConstants::getPossibleCases(), but for non-empty rows or columns where some values are
+     * already placed
+     * @param space  Number of 'slots' of the row or column
+     * @param sum    Total sum of the row or column
+     * @param values Boolean array representing numbers already present in the row or column
+     * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
+     */
     public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
         int sizeOfValues = 0;
