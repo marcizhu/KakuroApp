@@ -53,8 +53,8 @@ public class WhiteCell extends Cell {
     }
 
     /**
-     * Check whether this cell is empty
-     * @return
+     * Check whether this cell is empty or not
+     * @return whether this cell is empty
      */
     public boolean isEmpty() {
         return value == 0;

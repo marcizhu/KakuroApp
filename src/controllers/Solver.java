@@ -256,7 +256,6 @@ public class Solver {
      * Get solutions of the board.
      * This function *MUST* be called after a call to `solve()`
      * @return an ArrayList with all possible solutions of the board
-     * @see Solver::solve()
      */
     public ArrayList<Board> getSolutions() {
         return solutions;
