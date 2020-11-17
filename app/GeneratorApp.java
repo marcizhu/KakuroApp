@@ -19,4 +19,3 @@ public class GeneratorApp {
         //System.out.println(board.toString());
     }
 }
-
