@@ -103,10 +103,10 @@ public class KakuroConstants {
             // How many times is a certain value seen for a given space and a given sum in the row
             int rowSum = firstSumAtSpace[rowSpace-1]+rowIdx;
             ArrayList<ArrayList<Integer>> rowOptions = cases.get(rowSpace).get(rowSum);
-            int[] rowTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            boolean[] rowValuesSeen = { false, false, false, false, false, false, false, false, false };
             for (ArrayList<Integer> rowOption : rowOptions) {
                 for (Integer value : rowOption) {
-                    rowTimesValueSeen[value-1] ++;
+                    rowValuesSeen[value-1] = true;
                 }
             }
 
@@ -114,18 +114,18 @@ public class KakuroConstants {
                 // How many times is a certain value seen for a given space and a given sum in the col
                 int colSum = firstSumAtSpace[colSpace-1]+colIdx;
                 ArrayList<ArrayList<Integer>> colOptions = cases.get(colSpace).get(colSum);
-                int[] colTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                boolean[] colValuesSeen = { false, false, false, false, false, false, false, false, false };
                 for (ArrayList<Integer> colOption : colOptions) {
                     for (Integer value : colOption) {
-                        colTimesValueSeen[value-1] ++;
+                        colValuesSeen[value-1] = true;
                     }
                 }
 
                 int uniqueCrossValuePos = -1;
                 for (int i = 0; i < 9 && uniqueCrossValuePos != -2; i++) {
-                    if (rowTimesValueSeen[i] == 1 && colTimesValueSeen[i] == 1) {
-                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i;
-                        else uniqueCrossValuePos = -2;
+                    if (rowValuesSeen[i] && colValuesSeen[i]) {
+                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i; // there is one value in common
+                        else uniqueCrossValuePos = -2; // there is more than one value in common
                     }
                 }
 
