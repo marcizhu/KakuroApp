@@ -160,7 +160,7 @@ public class Solver {
         }
     }
 
-    private boolean[] getPossibleValues(int row, int col) {
+    private ArrayList<Integer> getPossibleValues(int row, int col) {
         // Get options for each row and column
         ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
                 rowSize[rowLine[row][col]], rowSums[row][col], rowValuesUsed[rowLine[row][col]]);
@@ -181,13 +181,15 @@ public class Solver {
                 vAvailable[i - 1] = true;
 
         // Do the intersection
-        boolean[] availableValues = { false, false, false, false, false, false, false, false, false };
+        ArrayList<Integer> availableValues = new ArrayList<>(9);
 
         for(int i = 0; i < 9; i++) {
-            availableValues[i] =
-                    hAvailable[i] && vAvailable[i] // A value is available if it is available in both row & col...
-                            && !colValuesUsed[colLine[row][col]][i]  // ...and it is not used in the current column...
-                            && !rowValuesUsed[rowLine[row][col]][i]; // ...nor in the current row.
+            if(hAvailable[i] && vAvailable[i] // A value is available if it is available in both row & col...
+                && !colValuesUsed[colLine[row][col]][i]  // ...and it is not used in the current column...
+                && !rowValuesUsed[rowLine[row][col]][i]) // ...nor in the current row.
+            {
+                availableValues.add(i + 1);
+            }
         }
 
         return availableValues;
@@ -234,11 +236,9 @@ public class Solver {
             return;
         }
 
-        boolean[] possibleValues = getPossibleValues(row, col);
+        ArrayList<Integer> possibleValues = getPossibleValues(row, col);
 
-        for (int i = 1; i <= 9; i++) {
-            if (!possibleValues[i - 1]) continue;
-
+        for (int i : possibleValues) {
             board.setCellValue(row, col, i);
             rowValuesUsed[rowLine[row][col]][i-1] = true;
             colValuesUsed[colLine[row][col]][i-1] = true;

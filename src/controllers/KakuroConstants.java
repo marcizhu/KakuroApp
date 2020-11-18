@@ -3,7 +3,6 @@ package src.controllers;
 import src.domain.Difficulty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Kakuro Constants.
@@ -18,7 +17,7 @@ public class KakuroConstants {
      */
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
-    private HashMap<Integer, HashMap<Integer, ArrayList<ArrayList<Integer>>>> cases;
+    private ArrayList<ArrayList<ArrayList<ArrayList<Integer>>>> cases;
     private final int[] numOfSumsAtSpace = { 9, 15, 19, 21, 21, 19, 15, 9, 1 };
     private final int[] firstSumAtSpace = { 1, 3, 6, 10, 15, 21, 28, 36, 45 };
 
@@ -46,12 +45,7 @@ public class KakuroConstants {
      */
     public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        int sizeOfValues = 0;
-        for (boolean b : values) if (b) sizeOfValues++;
-        if (sizeOfValues >= space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
-
         ArrayList<ArrayList<Integer>> possible = cases.get(space).get(sum);
-        if (sizeOfValues == 0) return possible; // if no values are specified, it will return all possibilities
 
         for (ArrayList<Integer> p : possible) {
             int idx = 1;
@@ -173,15 +167,20 @@ public class KakuroConstants {
     }
 
     private void instantiateHashMaps() {
-        cases = new HashMap<>();
+        cases = new ArrayList<>(10);
+        cases.add(new ArrayList<>());
         for (int i = 1; i <= 9; i++) {
-            HashMap<Integer, ArrayList<ArrayList<Integer>>> hm = new HashMap<>();
+            ArrayList<ArrayList<ArrayList<Integer>>> al = new ArrayList<>(46);
+
+            for(int j = 0; j <= 45; j++)
+                al.add(new ArrayList<>());
+
             int numOfSums = numOfSumsAtSpace[i-1];
             for (int j = 0; j < numOfSums; j++) {
                 int currentSum = firstSumAtSpace[i-1]+j;
-                hm.put(currentSum, findCombinations(i, currentSum));
+                al.set(currentSum, findCombinations(i, currentSum));
             }
-            cases.put(i, hm);
+            cases.add(al);
         }
     }
 
