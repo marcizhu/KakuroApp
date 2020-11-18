@@ -21,9 +21,9 @@ public class WhiteCell extends Cell {
 
     // TODO: add javadoc
     public WhiteCell(WhiteCell c) {
-        this.value = c.getValue();
+        this.value = c.value;
         notations = new boolean[9];
-        boolean[] n = c.getNotations();
+        boolean[] n = c.notations;
         for (int i = 0; i < 9; i++) {
             notations[i] = n[i];
         }

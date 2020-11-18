@@ -58,6 +58,7 @@ public class KakuroGUI extends JFrame {
                 Cell c = b.getCell(i, j);
 
                 if (c instanceof BlackCell) {
+                    l.setForeground(Color.WHITE);
                     int hs = ((BlackCell) c).getHorizontalSum();
                     int vs = ((BlackCell) c).getVerticalSum();
                     if (hs == 0 && vs == 0) s = "*";
@@ -71,6 +72,7 @@ public class KakuroGUI extends JFrame {
 
                     l.setBackground(Color.darkGray);
                 } else {
+                    l.setForeground(Color.BLACK);
                     int val = c.getValue();
                     if (val != 0) s = Integer.toString(val);
 

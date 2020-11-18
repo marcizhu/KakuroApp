@@ -20,8 +20,8 @@ public class BlackCell extends Cell {
 
     // TODO: add javadoc
     public BlackCell(BlackCell c) {
-        this.verticalSum = c.getVerticalSum();
-        this.horizontalSum = c.getHorizontalSum();
+        this.verticalSum = c.verticalSum;
+        this.horizontalSum = c.horizontalSum;
     }
 
     /**

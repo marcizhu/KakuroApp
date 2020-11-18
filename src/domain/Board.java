@@ -56,18 +56,16 @@ public class Board {
         height = b.getHeight();
         cells = new Cell[height][width];
 
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (b.cells[i][j] instanceof BlackCell) {
-                    int c = b.cells[i][j].getVerticalSum();
-                    int r = b.cells[i][j].getHorizontalSum();
-                    cells[i][j] = new BlackCell(c, r);
+                    cells[i][j] = new BlackCell((BlackCell) b.cells[i][j]);
                 } else {
-                    int v = b.cells[i][j].getValue();
-                    cells[i][j] = new WhiteCell(v);
+                    cells[i][j] = new WhiteCell((WhiteCell) b.cells[i][j]);
                 }
                 cells[i][j].setCoordinates(i, j);
             }
+        }
     }
 
     /**
