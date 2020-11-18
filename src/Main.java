@@ -1,6 +1,7 @@
 package src;
 
 import src.controllers.Generator;
+import src.controllers.KakuroConstants;
 import src.controllers.Solver;
 import src.controllers.Reader;
 import src.domain.Board;
@@ -8,8 +9,10 @@ import src.domain.Board;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import src.domain.Difficulty;
+import src.domain.WhiteCell;
 import src.gui.KakuroGUI;
 
 public class Main {

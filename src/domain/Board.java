@@ -125,6 +125,11 @@ public class Board {
     }
 
     // TODO: add javadoc
+    public boolean cellHasNotation(int row, int col, int notation) {
+        return cells[row][col].isNotationChecked(notation);
+    }
+
+    // TODO: add javadoc
     public int getCellNotationSize(int row, int col) {
         return cells[row][col].getNotationSize();
     }
