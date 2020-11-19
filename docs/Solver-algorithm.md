@@ -43,3 +43,9 @@ In our case, for each white cell we get the possible values for that row and col
 But we still can do a bit more in order to reduce the number of branches: say we have a row (or column) with three white cells and a total sum of 8. The possible combinations for that row are only 1, 2, 5 _or_ 1, 3, 4 (in any order). Now supose we already have a 5 in that row. Obviously, the only possible numbers for the other two white cells are 1 and 2, since we already have a 5 in there and replacing either the 1 or the 2 with a 3 or a 4 would exceed the total sum of the row. Thus, we wanted to add this small optimization to our number selection algorithm.
 
 To implement this last bit of optimization, we use some matrices that hold the numbers already present in each row and column of the board, and then we "filter" the possible values given by the class `KakuroConstants` to reduce the possibilities even further.
+
+### Further improvement
+
+While writing the generator algorithm, we discovered some new optimizations that we could use in order to speed up the solver even further. For example, given the previous example of a row (or column) with three white cells and a total sum of 8, if one cell can have the numbers 1, 2 or 5 and the other two can only have the numbers 1 or 2, then we can assume that the first cell can only have a 5, and the other two must have either a 1 or a 2. This approach could prevent the solver from checking some branches while only adding a small overhead, so it might pay off to implement this small feature.
+
+For now though we will leave the code as it is, because we think the solver is good enough and we also don't have the time to implement this, test it, debug it, benchmark the old and the new algorithms... But probably on the near future we will implement this and many other small optimizations which should increase the performance of our algorithm.
