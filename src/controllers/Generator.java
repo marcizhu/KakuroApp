@@ -11,7 +11,7 @@ import java.util.Random;
 public class Generator {
 
     private Board generatedBoard;
-    public Board workingBoard;
+    private Board workingBoard;
     private SwappingCellQueue notationsQueue;
 
     private int rows;
@@ -50,10 +50,6 @@ public class Generator {
         rowLine = new int[rows][columns];
         colLine = new int[rows][columns];
         this.random = new Random(seed);
-    }
-
-    public Board getGeneratedBoard() {
-        return generatedBoard;
     }
 
     private boolean isValidPosition(Board b, int row, int col) { // FIXME: submethod of prepareWorkingBoard
@@ -449,7 +445,7 @@ public class Generator {
             }
             else {
                 success = success && updateColNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
-                //success = success && updateRowNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
+                success = success && updateRowNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
             }
 
             if (!success) return false; // responsible for the call will do rollbacks
@@ -536,7 +532,7 @@ public class Generator {
             int notationSize = workingBoard.getCellNotationSize(affected, c);
             if (notationSize == 0) {
                 // FIXME: DEBUGGING PURPOSES abortion reason
-                 System.out.println("ABORTING: no values are possible in " + affected + ", " + c);
+                 //System.out.println("ABORTING: no values are possible in " + affected + ", " + c);
                 return false; // no values are possible for this empty cell, whole branch must do rollback
             }
             if (notationSize == 1) { // only one value possible, we assign it
@@ -551,7 +547,7 @@ public class Generator {
             }
             else {
                 success = success && updateRowNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
-                //success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful //TODO: analyze if this recursive call is actually needed
+                success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful //TODO: analyze if this recursive call is actually needed
             }
             if (!success) return false; // responsible for the call will do rollbacks
         }
@@ -624,7 +620,7 @@ public class Generator {
         }
     }
 
-    public void generate() {
+    public boolean generate() {
         // Fill the black cells in an empty board, all white cells should have all 9 values in anotations, should fill
         // the data structure to keep white cells ordered increasingly by number of anotations.
         workingBoard = prepareWorkingBoard();
@@ -770,6 +766,7 @@ public class Generator {
             }
             if (!success) {
                 System.out.println("FAILED assignation at coord: " + coord.first + ", " + coord.second);
+                notationsQueue.removeOrderedCell(coord.first, coord.second);
                 possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
             }
             // FIXME:: HERE ENDS THE HOTFIX, WE NEED TO IMPLEMENT FROM HERE ON
@@ -829,8 +826,11 @@ public class Generator {
                 }
             }
             // seems like a possible ambiguity
+            notationsQueue.removeOrderedCell(coord.first, coord.second); // the rollback mechanism will have inserted back to the queue the poped cell
             possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
-            /* unsolvable ambiguity, choose one of the values and move on with life
+            /*TODO: this last part of the while of the original code should probably be removed, it's not a good option
+                 to decide that it will be ambiguous now, better wait until end to see if it was resolved, if not then we accept defeat
+             //unsolvable ambiguity, choose one of the values and move on with life
             boolean[] possibleValues = workingBoard.getCellNotations(coord.first, coord.second);
             boolean success = false;
             for (int i = 0; !success && i < 9; i++) {
@@ -854,6 +854,7 @@ public class Generator {
 
         //System.out.println("PROBLEM REPORT: #of unavoidable failures: " + impossibleAssignments.size() + ", #of ambiguities: " + ambiguousCells);
 
+        /*
         int ambiguitiesRemaining = 0;
         for (Coordinates c : possibleAmbiguities) {
             if (!workingBoard.isEmpty(c.r, c.c)) System.out.println("Ambiguity was solved by itself at: " + c.r + ", " + c.c);
@@ -865,16 +866,35 @@ public class Generator {
         System.out.println("Total ambiguities remaining: " + ambiguitiesRemaining);
         printNotations();
         printData();
-
+*/
         // when we get out of the while loop we should have a filled board generated,
         // maybe we want to send it to the solver to check if it's unique or not or check for permutations, etc.
         // then:
-        // generatedBoard = workingBoard; //some process of clearing values, assigning sums, etc.
 
-        // FIXME:: THIS IS A HOTFIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
+        // FIXME:: THIS IS A PROVISIONAL FIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
 
-        computeRowSums();
-        computeColSums();
+        // IN PROVISIONAL VERSION WE ASSIGN ANY VALUE NOT IN THE ROW OR COLUMN AND WILL RE-ADAPT THE SUMS LATER
+        // BECAUSE IF IT DIDN'T GET ASSIGNED IT WONT BE ABLE TO ASSIGN IT NOW EITHER. IF THE UPDATE OF POSSIBILITIES
+        // MECHANISM IS WORKING WELL THIS SHOULD NEVER HAPPEN, THERE MUST ALWAYS BE AT LEAST ONE POSSIBILITY AVAILABLE
+        ArrayList<Coordinates> toSolve = new ArrayList<>();
+        boolean foundAmbiguous = false;
+        for (Coordinates c : possibleAmbiguities) {
+            if (workingBoard.isEmpty(c.r, c.c)) {
+                toSolve.add(c);
+                foundAmbiguous = true;
+            }
+        }
+        if (toSolve.size() > 0) provisionalFillInBacktracking(toSolve);
+        // IN FINAL VERSION WE NEED TO DECIDE IF WE FILL IT IN WITH AN AMBIGUOUS NUMBER AND LET IT AMBIGUOUS
+        // OR AVOID AMBIGUITY BUT GENERATED BOARD WILL MAYBE HAVE WHITE CELLS WITH INITIALLY SET VALUES.
+        // for (Coordinates c : possibleAmbiguities) {...}
+
+        if (foundAmbiguous) { // we probably added values that do not correspond with the row and col sums
+            computeRowSums();
+            computeColSums();
+        } else { // all values in row sums and col sums have preserved their integity correctly
+            defineBlackCellSums();
+        }
 
         generatedBoard = new Board(columns, rows);
         for (int i = 0; i < rows; i++) {
@@ -883,6 +903,21 @@ public class Generator {
                     generatedBoard.setCell(new BlackCell((BlackCell)workingBoard.getCell(i, j)), i, j);
                 } else {
                     generatedBoard.setCell(new WhiteCell(), i, j);
+                }
+            }
+        }
+        return foundAmbiguous;
+    }
+
+    private void defineBlackCellSums() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (workingBoard.isBlackCell(i, j)) {
+                    int rowSum = 0;
+                    if (rowLine[i][j] != -1) rowSum = rowSums[rowLine[i][j]];
+                    int colSum = 0;
+                    if (colLine[i][j] != -1) colSum = colSums[colLine[i][j]];
+                    workingBoard.setCell(new BlackCell(colSum, rowSum), i, j);
                 }
             }
         }
@@ -919,6 +954,10 @@ public class Generator {
                 }
             }
         }
+    }
+
+    private void provisionalFillInBacktracking(ArrayList<Coordinates> toSolve) {
+        System.out.println("BACKTRACKING___TO_IMPLEMENT");
     }
 
     private boolean valueBiasedSumAssignation(int r, int c, boolean isRowAssigned, boolean isColAssigned, int valueOfInterest) {
@@ -988,9 +1027,10 @@ public class Generator {
                         boolean foundCandidate = true;
                         for (int p : poss.second) {
                             // if candidate combination includes a value in notations other than the one we need it's not useful
+                            // TODO: it could be useful if "i+1" is unique in column
                             if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
                         }
-                        if (foundCandidate) colSumCandidates.add(poss.first);
+                        if (foundCandidate) colSumCandidates.add(poss.first); //TODO: if two values of interest share a sum option it gets added multiple times, should be added NONE of the times
                     }
                     colValues[i] = false;
                 }

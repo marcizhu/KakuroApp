@@ -33,7 +33,7 @@ public class KakuroConstants {
      * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
      */
     public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
-        return cases.get(space).get(sum);
+        return (ArrayList<ArrayList<Integer>>) cases.get(space).get(sum).clone();
     }
 
     /**
@@ -46,7 +46,12 @@ public class KakuroConstants {
      */
     public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        int sizeOfValues = 0;
+        for (boolean b : values) if (b) sizeOfValues++;
+        if (sizeOfValues > space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+
         ArrayList<ArrayList<Integer>> possible = cases.get(space).get(sum);
+        if (sizeOfValues == 0) return (ArrayList<ArrayList<Integer>>) possible.clone(); // if no values are specified, it will return all possibilities
 
         for (ArrayList<Integer> p : possible) {
             int idx = 1;
@@ -64,7 +69,7 @@ public class KakuroConstants {
                 noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
                 idx++;
             }
-            if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
+            if (noValuesFound) result.add((ArrayList<Integer>) p.clone());   // otherwise we add p to the array of valid options "result"
         }
 
         return result;
@@ -75,14 +80,14 @@ public class KakuroConstants {
         if (space < 1 || space > 9) return result;
         int sizeOfValues = 0;
         for (boolean b : values) if (b) sizeOfValues++;
-        if (sizeOfValues >= space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+        if (sizeOfValues > space) return result; //if there are more values than space available there is no possibility to add any more numbers
 
         int numOfSums = numOfSumsAtSpace[space-1];
 
         for (int i = 0; i < numOfSums; i++) {
             int sum = firstSumAtSpace[space-1]+i;
             ArrayList<ArrayList<Integer>> possibilities = getPossibleCasesWithValues(space, sum, values);
-            for (ArrayList<Integer> p : possibilities) result.add(new Pair<>(sum, p));
+            for (ArrayList<Integer> p : possibilities) result.add(new Pair<>(sum, (ArrayList<Integer>) p.clone()));
         }
         return result;
     }
