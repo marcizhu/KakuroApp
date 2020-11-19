@@ -957,7 +957,48 @@ public class Generator {
     }
 
     private void provisionalFillInBacktracking(ArrayList<Coordinates> toSolve) {
-        System.out.println("BACKTRACKING___TO_IMPLEMENT");
+        if (!fillWhiteCells(toSolve, 0)) System.out.println("No correct assignment of values found");
+    }
+
+    private boolean fillWhiteCells (ArrayList<Coordinates> coord, int pos) {
+        if (pos >= coord.size()) return true;
+
+        int r = coord.get(pos).r;
+        int c = coord.get(pos).c;
+        int rowID = rowLine[r][c];
+        int colID = colLine[r][c];
+
+        ArrayList<Integer> possibleValues = notUsedValues(r, c, rowID, colID);
+        Collections.shuffle(possibleValues);
+
+        for (int val: possibleValues) {
+            int currentVal = workingBoard.getValue(r, c);
+            boolean currentUsedR = rowValuesUsed[rowID][val-1];
+            boolean currentUsedC = colValuesUsed[colID][val-1];
+
+            workingBoard.setCellValue(r, c, val);
+            rowValuesUsed[rowID][val-1] = true;
+            colValuesUsed[colID][val-1] = true;
+
+            if (fillWhiteCells(coord, pos+1)) return true;
+
+            workingBoard.setCellValue(r, c, currentVal);
+            rowValuesUsed[rowID][val-1] = currentUsedR;
+            colValuesUsed[colID][val-1] = currentUsedC;
+        }
+
+        return false;
+    }
+
+    private ArrayList<Integer> notUsedValues(int row, int col, int rowID, int colID) {
+        // Returns a list of the values that have not been used in the row and column
+        ArrayList<Integer> values = new ArrayList<>();
+
+        for(int i = 1; i<=0; i++) {
+            if (!rowValuesUsed[rowID][i-1] && !colValuesUsed[colID][i-1]) values.add(i);
+        }
+
+        return values;
     }
 
     private boolean valueBiasedSumAssignation(int r, int c, boolean isRowAssigned, boolean isColAssigned, int valueOfInterest) {
