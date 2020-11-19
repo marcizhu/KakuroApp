@@ -27,7 +27,24 @@ public class Board {
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
+        cells = new Cell[height][width]; // Reminder: cells is declared but no cells are created.
+    }
+
+    // TODO: add javadoc
+    public Board(int width, int height, Cell c) {
+        this.width = width;
+        this.height = height;
         cells = new Cell[height][width];
+
+        boolean isWhite = c instanceof WhiteCell;
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (isWhite) cells[i][j] = new WhiteCell((WhiteCell)c);
+                else cells[i][j] = new BlackCell((BlackCell)c);
+                cells[i][j].setCoordinates(i, j);
+            }
+        }
     }
 
     /**
@@ -39,17 +56,16 @@ public class Board {
         height = b.getHeight();
         cells = new Cell[height][width];
 
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (b.cells[i][j] instanceof BlackCell) {
-                    int c = b.cells[i][j].getVerticalSum();
-                    int r = b.cells[i][j].getHorizontalSum();
-                    cells[i][j] = new BlackCell(c, r);
+                    cells[i][j] = new BlackCell((BlackCell) b.cells[i][j]);
                 } else {
-                    int v = b.cells[i][j].getValue();
-                    cells[i][j] = new WhiteCell(v);
+                    cells[i][j] = new WhiteCell((WhiteCell) b.cells[i][j]);
                 }
+                cells[i][j].setCoordinates(i, j);
             }
+        }
     }
 
     /**
@@ -67,6 +83,14 @@ public class Board {
     public int getHeight() {
         return height;
     }
+
+    // TODO: add javadoc
+    public boolean equalsCell(int row, int col, Cell cell) { // checks if they are the same object instance
+        return cells[row][col] == cell;
+    }
+
+    // TODO: add javadoc
+    public Cell getCell(int row, int col) { return cells[row][col]; }
 
     /**
      * Set value of cell
@@ -86,6 +110,31 @@ public class Board {
      */
     public int getValue(int row, int col) {
         return cells[row][col].getValue();
+    }
+
+    // TODO: add javadoc
+    public void setCellNotation(int row, int col, int value, boolean checked) {
+        cells[row][col].setNotation(value, checked);
+    }
+
+    // TODO: add javadoc
+    public boolean[] getCellNotations(int row, int col) {
+        return cells[row][col].getNotations();
+    }
+
+    // TODO: add javadoc
+    public boolean cellHasNotation(int row, int col, int notation) {
+        return cells[row][col].isNotationChecked(notation);
+    }
+
+    // TODO: add javadoc
+    public int getCellNotationSize(int row, int col) {
+        return cells[row][col].getNotationSize();
+    }
+
+    // TODO: add javadoc
+    public void clearCellNotations(int row, int col) {
+        cells[row][col].clearAllNotations();
     }
 
     /**
@@ -155,7 +204,8 @@ public class Board {
      */
     public void setCell(Cell cell, int row, int col) {
         // TODO: handle out of bounds exception
-        cells[row][col] = cell;
+        cells[row][col] = cell; // Reminder: this assigns the same instance cell to cells[row][col]. NOT a copy
+        cells[row][col].setCoordinates(row, col);
     }
 
     /**
@@ -168,13 +218,13 @@ public class Board {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                row[j] = cells[i][j].toString();
+                col[j] = cells[i][j].toString();
             }
 
-            col[i] = String.join(",", row);
+            row[i] = String.join(",", col);
         }
 
         String header = height + "," + width + "\n";
-        return header + String.join("\n", col);
+        return header + String.join("\n", row);
     }
 }

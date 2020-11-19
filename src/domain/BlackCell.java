@@ -18,6 +18,12 @@ public class BlackCell extends Cell {
         verticalSum = horizontalSum = 0;
     }
 
+    // TODO: add javadoc
+    public BlackCell(BlackCell c) {
+        this.verticalSum = c.verticalSum;
+        this.horizontalSum = c.horizontalSum;
+    }
+
     /**
      * Constructor. Initializes a black cell with given horizontal and vertical sums
      * @param vert  Vertical sum indicated by this black cell

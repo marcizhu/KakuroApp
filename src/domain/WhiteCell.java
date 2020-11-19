@@ -8,6 +8,26 @@ package src.domain;
 
 public class WhiteCell extends Cell {
     private int value;
+    private boolean[] notations;
+
+    /**
+     * Default constructor.
+     * Initializes an empty white cell
+     */
+    public WhiteCell() { //Default constructor --> empty value and empty notations
+        value = 0;
+        initAllNotations(false);
+    }
+
+    // TODO: add javadoc
+    public WhiteCell(WhiteCell c) {
+        this.value = c.value;
+        notations = new boolean[9];
+        boolean[] n = c.notations;
+        for (int i = 0; i < 9; i++) {
+            notations[i] = n[i];
+        }
+    }
 
     /**
      * Constructor.
@@ -16,14 +36,19 @@ public class WhiteCell extends Cell {
      */
     public WhiteCell(int value) {
         setValue(value);
+        initAllNotations(false);
     }
 
-    /**
-     * Default constructor.
-     * Initializes an empty white cell
-     */
-    public WhiteCell() {
+    // TODO: add javadoc
+    public WhiteCell(boolean defaultNotation) {
         value = 0;
+        initAllNotations(defaultNotation);
+    }
+
+    // TODO: add javadoc
+    public WhiteCell(int value, boolean defaultNotation) {
+        setValue(value);
+        initAllNotations(defaultNotation);
     }
 
     /**
@@ -43,6 +68,37 @@ public class WhiteCell extends Cell {
             throw new IllegalArgumentException("Value is out of range");
 
         this.value = value;
+    }
+
+    // TODO: add javadoc
+    public boolean[] getNotations() {
+        return notations;
+    }
+
+    // TODO: add javadoc
+    public int getNotationSize() {
+        int size = 0;
+        for (int i = 0; i < 9; i++) if (notations[i]) size++;
+        return size;
+    }
+
+    // TODO: add javadoc
+    public boolean isNotationChecked(int value) {
+        if (value > 9 || value < 1)
+            throw new IllegalArgumentException("Value is out of range");
+        return notations[value-1];
+    }
+
+    // TODO: add javadoc
+    public void setNotation(int value, boolean checked) {
+        if (value > 9 || value < 1)
+            throw new IllegalArgumentException("Value is out of range");
+        notations[value-1] = checked;
+    }
+
+    // TODO: add javadoc
+    public void clearAllNotations() {
+        for (int i = 0; i < 9; i++) notations[i] = false;
     }
 
     /**
@@ -66,5 +122,9 @@ public class WhiteCell extends Cell {
      */
     public String toString() {
         return (value == 0 ? "?" : Integer.toString(value));
+    }
+
+    private void initAllNotations(boolean b) {
+        notations = new boolean[] { b, b, b, b, b, b, b, b, b };
     }
 }

@@ -1,6 +1,7 @@
 package src.controllers;
 
 import src.domain.Difficulty;
+import src.utils.Pair;
 
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public class KakuroConstants {
      * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
      */
     public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
-        return cases.get(space).get(sum);
+        return (ArrayList<ArrayList<Integer>>) cases.get(space).get(sum).clone();
     }
 
     /**
@@ -45,7 +46,12 @@ public class KakuroConstants {
      */
     public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        int sizeOfValues = 0;
+        for (boolean b : values) if (b) sizeOfValues++;
+        if (sizeOfValues > space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+
         ArrayList<ArrayList<Integer>> possible = cases.get(space).get(sum);
+        if (sizeOfValues == 0) return (ArrayList<ArrayList<Integer>>) possible.clone(); // if no values are specified, it will return all possibilities
 
         for (ArrayList<Integer> p : possible) {
             int idx = 1;
@@ -58,9 +64,31 @@ public class KakuroConstants {
                 }
                 idx++;
             }
-            if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
+            // check up to position 9 if it hadn't reached there yet
+            while (idx < 10 && noValuesFound) {
+                noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
+                idx++;
+            }
+            if (noValuesFound) result.add((ArrayList<Integer>) p.clone());   // otherwise we add p to the array of valid options "result"
         }
 
+        return result;
+    }
+
+    public ArrayList<Pair<Integer, ArrayList<Integer>>> getPossibleCasesUnspecifiedSum(int space, boolean[] values) {
+        ArrayList<Pair<Integer, ArrayList<Integer>>> result = new ArrayList<>();
+        if (space < 1 || space > 9) return result;
+        int sizeOfValues = 0;
+        for (boolean b : values) if (b) sizeOfValues++;
+        if (sizeOfValues > space) return result; //if there are more values than space available there is no possibility to add any more numbers
+
+        int numOfSums = numOfSumsAtSpace[space-1];
+
+        for (int i = 0; i < numOfSums; i++) {
+            int sum = firstSumAtSpace[space-1]+i;
+            ArrayList<ArrayList<Integer>> possibilities = getPossibleCasesWithValues(space, sum, values);
+            for (ArrayList<Integer> p : possibilities) result.add(new Pair<>(sum, (ArrayList<Integer>) p.clone()));
+        }
         return result;
     }
 
@@ -80,10 +108,10 @@ public class KakuroConstants {
             // How many times is a certain value seen for a given space and a given sum in the row
             int rowSum = firstSumAtSpace[rowSpace-1]+rowIdx;
             ArrayList<ArrayList<Integer>> rowOptions = cases.get(rowSpace).get(rowSum);
-            int[] rowTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            boolean[] rowValuesSeen = { false, false, false, false, false, false, false, false, false };
             for (ArrayList<Integer> rowOption : rowOptions) {
                 for (Integer value : rowOption) {
-                    rowTimesValueSeen[value-1] ++;
+                    rowValuesSeen[value-1] = true;
                 }
             }
 
@@ -91,18 +119,18 @@ public class KakuroConstants {
                 // How many times is a certain value seen for a given space and a given sum in the col
                 int colSum = firstSumAtSpace[colSpace-1]+colIdx;
                 ArrayList<ArrayList<Integer>> colOptions = cases.get(colSpace).get(colSum);
-                int[] colTimesValueSeen = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                boolean[] colValuesSeen = { false, false, false, false, false, false, false, false, false };
                 for (ArrayList<Integer> colOption : colOptions) {
                     for (Integer value : colOption) {
-                        colTimesValueSeen[value-1] ++;
+                        colValuesSeen[value-1] = true;
                     }
                 }
 
                 int uniqueCrossValuePos = -1;
                 for (int i = 0; i < 9 && uniqueCrossValuePos != -2; i++) {
-                    if (rowTimesValueSeen[i] == 1 && colTimesValueSeen[i] == 1) {
-                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i;
-                        else uniqueCrossValuePos = -2;
+                    if (rowValuesSeen[i] && colValuesSeen[i]) {
+                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i; // there is one value in common
+                        else uniqueCrossValuePos = -2; // there is more than one value in common
                     }
                 }
 
