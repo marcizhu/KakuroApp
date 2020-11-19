@@ -1264,6 +1264,11 @@ public class Generator {
         }
         System.out.println();
     }
+
+    public Board getGeneratedBoard() {
+        return generatedBoard;
+    }
+
     //
 
     private class Coordinates {
