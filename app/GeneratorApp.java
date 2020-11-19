@@ -8,7 +8,16 @@ public class GeneratorApp {
     public static void main(String[] args) {
         if(args.length != 3) {
             System.out.println("Kakuro generator tool v1.0.0\n");
-            System.out.println("Usage: java GeneratorApp <width> <height> <param>");
+            System.out.println("Usage: java GeneratorApp <width> <height> <difficulty>\n");
+            System.out.println("Parameters:");
+            System.out.println("width       The width of the board to generate");
+            System.out.println("height      The height of the board to generate");
+            System.out.println("difficulty  Difficulty of the board to generate given as a number");
+            System.out.println("            1: Easy difficulty");
+            System.out.println("            2: Medium difficulty");
+            System.out.println("            3: Hard difficulty");
+            System.out.println("            4: Extreme difficulty\n");
+            System.out.println("Example: Use \"java GeneratorApp 10 12 2\" to generate a 10x12 kakuro with medium difficulty");
             return;
         }
 
