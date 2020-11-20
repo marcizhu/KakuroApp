@@ -19,7 +19,10 @@ public class WhiteCell extends Cell {
         initAllNotations(false);
     }
 
-    // TODO: add javadoc
+    /**
+     * Copy constructor
+     * @param c White cell to copy
+     */
     public WhiteCell(WhiteCell c) {
         this.value = c.value;
         notations = new boolean[9];
@@ -39,13 +42,22 @@ public class WhiteCell extends Cell {
         initAllNotations(false);
     }
 
-    // TODO: add javadoc
+    /**
+     * Constructor
+     * Initializes a white cell as empty with default notations set or unset
+     * @param defaultNotation Whether all notations are set or unset
+     */
     public WhiteCell(boolean defaultNotation) {
         value = 0;
         initAllNotations(defaultNotation);
     }
 
-    // TODO: add javadoc
+    /**
+     * Constructor
+     * Initializes a white cell to the given value with default notations set or unset
+     * @param value           Value to set the cell to
+     * @param defaultNotation Whether all notations are set or unset
+     */
     public WhiteCell(int value, boolean defaultNotation) {
         setValue(value);
         initAllNotations(defaultNotation);
@@ -70,33 +82,50 @@ public class WhiteCell extends Cell {
         this.value = value;
     }
 
-    // TODO: add javadoc
+    /**
+     * Get notations of this cell
+     * @return the notations of this cell
+     */
     public boolean[] getNotations() {
         return notations;
     }
 
-    // TODO: add javadoc
+    /**
+     * Get the number of notations of this cell
+     * @return the number of notations of this cell (in the range [0, 9])
+     */
     public int getNotationSize() {
         int size = 0;
-        for (int i = 0; i < 9; i++) if (notations[i]) size++;
+        for (int i = 0; i < 9; i++)
+            if (notations[i]) size++;
         return size;
     }
 
-    // TODO: add javadoc
+    /**
+     * Check whether a notation is set for this cell
+     * @param value Value of the notation to check
+     * @return whether the requested notation is set or not
+     */
     public boolean isNotationChecked(int value) {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
         return notations[value-1];
     }
 
-    // TODO: add javadoc
+    /**
+     * Set notation for this cell
+     * @param value   Value of the notation to set
+     * @param checked Whether this notation will be set or unset
+     */
     public void setNotation(int value, boolean checked) {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
         notations[value-1] = checked;
     }
 
-    // TODO: add javadoc
+    /**
+     * Clear all notations for this cell
+     */
     public void clearAllNotations() {
         for (int i = 0; i < 9; i++) notations[i] = false;
     }

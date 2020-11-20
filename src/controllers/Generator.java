@@ -5,15 +5,22 @@ import src.utils.Pair;
 
 import java.util.*;
 
+/**
+ * Kakuro Generator class.
+ * Holds basic data & algorithms used to generate new Kakuros with selectable dimensions and difficulty
+ *
+ * @version 0.1.0 (20/11/2020)
+ */
+
 public class Generator {
 
     private Board generatedBoard;
     private Board workingBoard;
     private SwappingCellQueue notationsQueue;
 
-    private int rows;
-    private int columns;
-    private Difficulty difficulty;
+    private final int rows;
+    private final int columns;
+    private final Difficulty difficulty;
 
     private Random random;
 
@@ -31,6 +38,13 @@ public class Generator {
     private final int[][] colLine;          // Pointers to position at array of colValuesUsed and colSums
     private int colLineSize;                // Number of different colLines
 
+    /**
+     * Constructor.
+     * Initializes a generator to generate boards of given size and difficulty.
+     * @param rows       Numbers of rows of the board to generate
+     * @param columns    Number of columns of the board to generate
+     * @param difficulty Difficulty of the board to generate
+     */
     public Generator(int rows, int columns, Difficulty difficulty) {
         this.rows = rows;
         this.columns = columns;
@@ -42,6 +56,14 @@ public class Generator {
         this.random = new Random(seed);
     }
 
+    /**
+     * Constructor.
+     * Initializes a generator to generate boards of given size, difficulty and seed
+     * @param rows       Number of rows of the board to generate
+     * @param columns    Number of columns of the board to generate
+     * @param difficulty Difficulty of the board to generate
+     * @param seed       Seed to be used by this generator
+     */
     public Generator(int rows, int columns, Difficulty difficulty, long seed) {
         this.rows = rows;
         this.columns = columns;
@@ -51,6 +73,11 @@ public class Generator {
         this.random = new Random(seed);
     }
 
+    /**
+     * Get generated board.
+     * NOTE: This function *MUST* be called after @link Generator::generate().
+     * @return the newly generated board
+     */
     public Board getGeneratedBoard() {
         return generatedBoard;
     }
@@ -67,12 +94,12 @@ public class Generator {
         if (col < width-2 && b.isBlackCell(row, col+2) && b.isWhiteCell(row, col+1)) return false;
         if (col == width-2 && b.isWhiteCell(row, col+1)) return false;
         if (col > 1 && b.isBlackCell(row, col-2) && b.isWhiteCell(row, col-1)) return false;
-        if (col == 1 && b.isWhiteCell(row, col-1)) return false;
+        if (col == 1 && b.isWhiteCell(row, 0)) return false;
 
         if (row < height-2 && b.isBlackCell(row+2, col) && b.isWhiteCell(row+1, col)) return false;
         if (row == height-2 && b.isWhiteCell(row+1, col)) return false;
         if (row > 1 && b.isBlackCell(row-2, col) && b.isWhiteCell(row-1, col)) return false;
-        if (row == 1 && b.isWhiteCell(row-1, col)) return false;
+        if (row == 1 && b.isWhiteCell(0, col)) return false;
 
         return true;
     }
@@ -607,6 +634,10 @@ public class Generator {
         }
     }
 
+    /**
+     * Generate a new board.
+     * This function generates the new board using the given dimensions, difficulty and (optionally) seed.
+     */
     public void generate() {
         // Fill the black cells in an empty board, all white cells should have all 9 values in anotations, should fill
         // the data structure to keep white cells ordered increasingly by number of anotations.
@@ -1264,11 +1295,22 @@ public class Generator {
 
     private class Coordinates implements Comparable {
         public int r, c;
+
+        /**
+         * Constructor
+         * @param r Row coordinate
+         * @param c Column coordinate
+         */
         public Coordinates(int r, int c) {
             this.r = r;
             this.c = c;
         }
 
+        /**
+         * Comparison operator
+         * @param o Object to compare with
+         * @return whether the compared objects are smaller, equal or greater
+         */
         @Override
         public int compareTo(Object o) {
             if (this.r == ((Coordinates)o).r && this.c == ((Coordinates)o).c) return 0;

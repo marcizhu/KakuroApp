@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 
 public abstract class Game {
     private final User player;
-    private Kakuro kakuro;
-    private float timeSpent;
+    private final Kakuro kakuro;
+    private final float timeSpent;
     private final Timestamp startTime;
 
     public Game(User player, Kakuro kakuro) {
