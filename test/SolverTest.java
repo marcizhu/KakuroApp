@@ -39,7 +39,7 @@ public class SolverTest {
 
     private static Stream<Arguments> testArguments() {
         return Stream.of(
-            // Arguments.of("data/kakuros/unsolved/cpu_burner.kak", new String[]{"data/kakuros/solved/cpu_burner.kak"}),
+            Arguments.of("data/kakuros/unsolved/cpu_burner.kak", new String[]{"data/kakuros/solved/cpu_burner.kak"}),
             Arguments.of("data/kakuros/unsolved/evil.kak",       new String[]{"data/kakuros/solved/evil.kak"}),
             Arguments.of("data/kakuros/unsolved/one-sol.kak",    new String[]{"data/kakuros/solved/one-sol.kak"}),
             Arguments.of("data/kakuros/unsolved/sample.kak",     new String[]{"data/kakuros/solved/sample.kak"}),
