@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * Kakuro Generator class.
- * Holds basic data & algorithms used to generate new Kakuros with selectable dimensions and difficulty
+ * Holds basic data and algorithms used to generate new Kakuros with selectable dimensions and difficulty
  *
  * @version 0.1.0 (20/11/2020)
  */
