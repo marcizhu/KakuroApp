@@ -57,7 +57,7 @@ If the first line is either a `1` or a `2`, it is followed by the first solution
 
 ## Kakuro generator app
 
-The source of this application can be found inside `app/Generator.java`. This application reads three parameters from the command line. The first parameter is the width of the board to generate, the second parameter is the height of the board to generate and the third one is the difficulty of the board specified as a number from 1 to 4, where `1` is `EASY`, `2` is `MEDIUM`, `3` is `HARD` and `4` is `EXTREME`.
+The source of this application can be found inside `app/GeneratorApp.java`. This application reads three parameters from the command line. The first parameter is the width of the board to generate, the second parameter is the height of the board to generate and the third one is the difficulty of the board specified as a number from 1 to 4, where `1` is `EASY`, `2` is `MEDIUM`, `3` is `HARD` and `4` is `EXTREME`.
 
 If this application is called with no parameters or with the wrong number of parameters, it will print some help output about how this application should be used.
 
