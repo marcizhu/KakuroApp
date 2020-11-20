@@ -114,7 +114,7 @@ public class Generator {
 
         switch (difficulty) {
             case EASY:
-                diff = 80;
+                diff = 75;
                 break;
             case MEDIUM:
                 diff = 60;
@@ -123,7 +123,7 @@ public class Generator {
                 diff = 45;
                 break;
             case EXTREME:
-                diff = 20;
+                diff = 30;
                 break;
             default:
                 diff = 50;
@@ -894,7 +894,7 @@ public class Generator {
         int colID = colLine[r][c];
 
         ArrayList<Integer> possibleValues = notUsedValues(rowID, colID);
-        Collections.shuffle(possibleValues);
+        Collections.shuffle(possibleValues, random);
 
         for (int val: possibleValues) {
             int currentVal = workingBoard.getValue(r, c);
