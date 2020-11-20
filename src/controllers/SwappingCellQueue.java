@@ -5,12 +5,18 @@ import src.domain.WhiteCell;
 
 import java.util.ArrayList;
 
+/**
+ * Swapping Cell queue.
+ *
+ * @version 0.1.0 (20/11/2020)
+ */
+
 public class SwappingCellQueue {
     private final Board workingBoard;
 
     private final int rows, columns;
 
-    private WhiteCell[] orderedCells;  // Contains all the WhiteCells in increasing order of number of notations
+    private WhiteCell[] orderedCells; // Contains all the WhiteCells in increasing order of number of notations
     private int[] startPos;           // 1 pointer to hiding cells and 9 pointers to the first position with corresponding number of notations
                                       // if there is no elements of size n, then startPos[n-1] = startPos[n]
                                       // any element in a position before startPos[0] is in an invalid position.
@@ -18,6 +24,10 @@ public class SwappingCellQueue {
     private int firstElement;         // points to first valid element, coincides with startPos[1], any element
                                       // before it and after startPos[0] is hiding
 
+    /**
+     * Constructor
+     * @param b Board to work with
+     */
     public SwappingCellQueue(Board b) {
         workingBoard = b;
         rows = b.getHeight();
@@ -43,6 +53,10 @@ public class SwappingCellQueue {
         firstElement = 0;
     }
 
+    /**
+     * Check if queue is empty
+     * @return whether the queue is empty or not
+     */
     public boolean isEmpty() {
         return firstElement == endElement;
     }

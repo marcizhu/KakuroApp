@@ -30,18 +30,23 @@ public class Board {
         cells = new Cell[height][width]; // Reminder: cells is declared but no cells are created.
     }
 
-    // TODO: add javadoc
+    /**
+     * Constructor.
+     * Initializes a board with the given size and all cells set to the given one
+     * @param width  The width of the board
+     * @param height The height of the board
+     * @param c      Cell to fill the board
+     */
     public Board(int width, int height, Cell c) {
         this.width = width;
         this.height = height;
-        cells = new Cell[height][width];
+        this.cells = new Cell[height][width];
 
         boolean isWhite = c instanceof WhiteCell;
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (isWhite) cells[i][j] = new WhiteCell((WhiteCell)c);
-                else cells[i][j] = new BlackCell((BlackCell)c);
+                cells[i][j] = (isWhite ? new WhiteCell((WhiteCell)c) : new BlackCell((BlackCell)c));
                 cells[i][j].setCoordinates(i, j);
             }
         }
@@ -84,12 +89,23 @@ public class Board {
         return height;
     }
 
-    // TODO: add javadoc
+    /**
+     * Check whether the cell at (i, j) is equal to the given cell
+     * @param row  Row of the cell to check
+     * @param col  Column of the cell to check
+     * @param cell Cell to compare against
+     * @return whether the given cell was equal to the cell at (i, j) or not
+     */
     public boolean equalsCell(int row, int col, Cell cell) { // checks if they are the same object instance
         return cells[row][col] == cell;
     }
 
-    // TODO: add javadoc
+    /**
+     * Get cell
+     * @param row Row of the cell to get
+     * @param col Column of the cell to get
+     * @return the requested cell
+     */
     public Cell getCell(int row, int col) { return cells[row][col]; }
 
     /**
@@ -112,27 +128,53 @@ public class Board {
         return cells[row][col].getValue();
     }
 
-    // TODO: add javadoc
+    /**
+     * Set notations for the given cell
+     * @param row     Row of the cell to set the notations
+     * @param col     Column of the cell to set the notations
+     * @param value   Value of the notation to set
+     * @param checked Whether this notation will be set or unset
+     */
     public void setCellNotation(int row, int col, int value, boolean checked) {
         cells[row][col].setNotation(value, checked);
     }
 
-    // TODO: add javadoc
+    /**
+     * Get cell notations
+     * @param row Row of the cell from which to get the notations
+     * @param col Column of the cell from which to get the notations
+     * @return the notations of the requested cell
+     */
     public boolean[] getCellNotations(int row, int col) {
         return cells[row][col].getNotations();
     }
 
-    // TODO: add javadoc
+    /**
+     * Check whether a cell has a checked notation or not
+     * @param row      Row of the cell to check
+     * @param col      Column of the cell to check
+     * @param notation Notation to check (in the range [1, 9])
+     * @return whether this notation is set or unset for the requested cell
+     */
     public boolean cellHasNotation(int row, int col, int notation) {
         return cells[row][col].isNotationChecked(notation);
     }
 
-    // TODO: add javadoc
+    /**
+     * Get number of notations on a given cell
+     * @param row Row of the cell
+     * @param col Column of the cell
+     * @return the amount of notations set on the given cell (in the range [0, 9])
+     */
     public int getCellNotationSize(int row, int col) {
         return cells[row][col].getNotationSize();
     }
 
-    // TODO: add javadoc
+    /**
+     * Clear all cell notations for a given cell
+     * @param row Row of the cell to clear
+     * @param col Column of the cell to clear
+     */
     public void clearCellNotations(int row, int col) {
         cells[row][col].clearAllNotations();
     }

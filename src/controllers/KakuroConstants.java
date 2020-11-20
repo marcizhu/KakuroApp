@@ -75,6 +75,12 @@ public class KakuroConstants {
         return result;
     }
 
+    /**
+     * Get possible cases given the number of white cells, regardless of the total sum
+     * @param space  Number of white cells in the row or column
+     * @param values Values already present in that row or column, represented as a boolean[9] array
+     * @return the combinations of values that would fit in that row or column, as well as the total sum in each case
+     */
     public ArrayList<Pair<Integer, ArrayList<Integer>>> getPossibleCasesUnspecifiedSum(int space, boolean[] values) {
         ArrayList<Pair<Integer, ArrayList<Integer>>> result = new ArrayList<>();
         if (space < 1 || space > 9) return result;
@@ -92,6 +98,13 @@ public class KakuroConstants {
         return result;
     }
 
+    /**
+     * Get unique cross values given a row size, a column size and the difficulty of the kakuro
+     * @param rowSpace Number of white cells in the row
+     * @param colSpace Number of white cells in the column
+     * @param diff     Difficulty of the kakuro being generated
+     * @return an ArrayList of values unique in that cell
+     */
     // TODO: as it is, it always returns the possibilities in a specific order for the same input, maybe should apply some randomness to the order of the partial solutions
     public ArrayList<int[]> getUniqueCrossValues(int rowSpace, int colSpace, Difficulty diff) {
         ArrayList<int[]> result = new ArrayList<>(); // all int[] will have 3 values: {rowSum, colSum, uniqueValueInCommon}

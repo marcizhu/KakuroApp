@@ -8,10 +8,15 @@ import src.utils.Pair;
  * @version 0.1.0 (17/11/2020)
  */
 
-
 public abstract class Cell {
-    private int coordRow, coordCol; // any Cell assigned to a board should have these values assigned to the corresponding position
+    // any Cell assigned to a board should have these values assigned to the corresponding position
+    private int coordRow, coordCol;
 
+    /**
+     * Set coordinated of this cell
+     * @param r Row coordinated of this cell
+     * @param c Column coordinated of this cell
+     */
     public void setCoordinates(int r, int c) {
         this.coordRow = r;
         this.coordCol = c;
@@ -44,19 +49,35 @@ public abstract class Cell {
         throw new RuntimeException("Invalid call to clearValue()");
     }
 
-    // TODO: add javadoc
+    /**
+     * Set notation for this cell
+     * @param value   Value of the notation to set
+     * @param checked Whether this notation will be set or unset
+     */
     public void setNotation(int value, boolean checked) { throw new RuntimeException("Invalid call to clearValue()"); }
 
-    // TODO: add javadoc
+    /**
+     * Clear all notations for this cell
+     */
     public void clearAllNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
 
-    // TODO: add javadoc
+    /**
+     * Get notations of this cell
+     * @return the notations of this cell
+     */
     public boolean[] getNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
 
-    // TODO: add javadoc
+    /**
+     * Get the number of notations of this cell
+     * @return the number of notations of this cell (in the range [0, 9])
+     */
     public int getNotationSize() { throw new RuntimeException("Invalid call to clearValue()"); }
 
-    // TODO: add javadoc
+    /**
+     * Check whether a notation is set for this cell
+     * @param value Value of the notation to check
+     * @return whether the requested notation is set or not
+     */
     public boolean isNotationChecked(int value) { throw new RuntimeException("Invalid call to clearValue()"); }
 
     /**

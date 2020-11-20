@@ -18,7 +18,10 @@ public class BlackCell extends Cell {
         verticalSum = horizontalSum = 0;
     }
 
-    // TODO: add javadoc
+    /**
+     * Copy constructor.
+     * @param c Black cell to copy
+     */
     public BlackCell(BlackCell c) {
         this.verticalSum = c.verticalSum;
         this.horizontalSum = c.horizontalSum;
