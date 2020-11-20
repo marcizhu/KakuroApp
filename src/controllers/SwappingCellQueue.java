@@ -142,7 +142,7 @@ public class SwappingCellQueue {
     }
 
     public void hideFirstElement() {
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i <= 9; i++) {
             if (startPos[i] == firstElement) startPos[i]++;
             else break;
         }
