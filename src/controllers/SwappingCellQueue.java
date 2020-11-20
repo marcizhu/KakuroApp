@@ -10,8 +10,8 @@ public class SwappingCellQueue {
 
     private final int rows, columns;
 
-    public WhiteCell[] orderedCells;  // Contains all the WhiteCells in increasing order of number of notations
-    public int[] startPos;           // 1 pointer to hiding cells and 9 pointers to the first position with corresponding number of notations
+    private WhiteCell[] orderedCells;  // Contains all the WhiteCells in increasing order of number of notations
+    private int[] startPos;           // 1 pointer to hiding cells and 9 pointers to the first position with corresponding number of notations
                                       // if there is no elements of size n, then startPos[n-1] = startPos[n]
                                       // any element in a position before startPos[0] is in an invalid position.
     private int endElement;           // should coincide with the size of the array
@@ -45,10 +45,6 @@ public class SwappingCellQueue {
 
     public boolean isEmpty() {
         return firstElement == endElement;
-    }
-
-    public int findCell(int r, int c) {
-        return findCell(r, c, workingBoard.getCellNotationSize(r, c));
     }
 
     private int findCell(int r, int c, int notationSize) {
@@ -103,7 +99,7 @@ public class SwappingCellQueue {
                 }
             }
         }
-        firstElement = startPos[1]; //FIXME: to implement hideElement functionality this won't work
+        firstElement = startPos[1];
         return notSize;
     }
 

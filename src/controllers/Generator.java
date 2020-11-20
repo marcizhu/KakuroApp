@@ -78,12 +78,7 @@ public class Generator {
         return true;
     }
 
-    public Board prepareWorkingBoard() { //FIXME: PRIVATE!!
-        /* TODO: Generate the black cells on a board of size columns x rows for a given difficulty
-        *   - The orderedCells size is rows*columns - numberOfBlackCells, it only contains WhiteCells
-        *   - startPos is an array of "pointers" of size 9, startingPos[x-1] has the position in orderedCells
-        *       where there is the first WhiteCell with x anotated values
-        * */
+    private Board prepareWorkingBoard() {
         Board b = new Board(columns, rows, new WhiteCell(true));
         int width = b.getWidth();
         int height = b.getHeight();
@@ -643,7 +638,7 @@ public class Generator {
         }
     }
 
-    public boolean generate() {
+    public void generate() {
         // Fill the black cells in an empty board, all white cells should have all 9 values in anotations, should fill
         // the data structure to keep white cells ordered increasingly by number of anotations.
         workingBoard = prepareWorkingBoard();
@@ -966,7 +961,6 @@ public class Generator {
                 }
             }
         }
-        return foundAmbiguous;
     }
 
     private void defineBlackCellSums() {
@@ -1333,12 +1327,6 @@ public class Generator {
         }
         System.out.println();
     }
-
-    public Board getGeneratedBoard() {
-        return generatedBoard;
-    }
-
-    //
 
     private class Coordinates implements Comparable {
         public int r, c;
