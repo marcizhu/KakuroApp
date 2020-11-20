@@ -19,6 +19,12 @@ tests: test/SolverTest.class
 test/SolverTest.class: test/SolverTest.java src/controllers/Reader.java src/controllers/Solver.java src/domain/Board.java
 	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar test/SolverTest.java
 
+# Make kakurosolver.tar.gz
+kakurosolver:
+	cp test/kakurosolver.java kakurosolver.java
+	tar zcf kakurosolver.tar.gz src/* kakurosolver.java
+	rm kakurosolver.java
+
 # Run targets
 run-solver: app/SolverApp.class
 	java app/SolverApp
@@ -31,4 +37,4 @@ run-tests: test/SolverTest.class
 
 clean:
 	find src app test -name "*.class" -type f -delete
-
+	rm -f kakurosolver.tar.gz
