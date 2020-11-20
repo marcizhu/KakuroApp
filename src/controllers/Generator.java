@@ -3,10 +3,7 @@ package src.controllers;
 import src.domain.*;
 import src.utils.Pair;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Generator {
 
@@ -41,6 +38,9 @@ public class Generator {
         rowLine = new int[rows][columns];
         colLine = new int[rows][columns];
         this.random = new Random();
+        long seed = random.nextLong();
+        this.random = new Random(seed);
+        System.out.println("Seed for random kakuro is: " + seed);
     }
 
     public Generator(int rows, int columns, Difficulty difficulty, long seed) {
@@ -50,6 +50,10 @@ public class Generator {
         rowLine = new int[rows][columns];
         colLine = new int[rows][columns];
         this.random = new Random(seed);
+    }
+
+    public Board getGeneratedBoard() {
+        return generatedBoard;
     }
 
     private boolean isValidPosition(Board b, int row, int col) { // FIXME: submethod of prepareWorkingBoard
@@ -270,7 +274,7 @@ public class Generator {
     // RollBack structures are to add any change we do, we don't do rollback in these functions
     // because we only change absolutely necessary cases that depend only on the first assignation call,
     // thus the responsible for the rollback is the first caller
-    private boolean rowSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private boolean rowSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
         // FIXME: DEBUG
         //System.out.println("rowSumAssignation for coord " + r + "," + c + " , value: " + value);
         // Should update the row sum for a given coordinates to the value and add row to rollback
@@ -284,11 +288,12 @@ public class Generator {
             return false; //already has a sum value assigned
         }
         rowSums[rowID] = value;
+        modifiedRows[rowID] = true;
         rowSumRollBack.add(rowID);
-        return updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+        return updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
     }
 
-    private boolean colSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private boolean colSumAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
         // FIXME: DEBUG
         //System.out.println("colSumAssignation for coord " + r + "," + c + " , value: " + value);
         // Should update the col sum for a given coordinates to the value, and add column to rollback
@@ -302,11 +307,12 @@ public class Generator {
             return false; //already has a sum value assigned
         }
         colSums[colID] = value;
+        modifiedCols[colID] = true;
         colSumRollBack.add(colID);
-        return updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+        return updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
     }
 
-    private boolean cellValueAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private boolean cellValueAssignation(int r, int c, int value, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
         // FIXME: DEBUG
         //System.out.println("cellValueAssignation for coord " + r + "," + c + " , value: " + value);
         // Should update the assignation for that cell, set the value, update the orderedCells data structure
@@ -343,13 +349,15 @@ public class Generator {
         workingBoard.setCellValue(r, c, value);
         rowValuesUsed[rowID][value-1] = true;
         colValuesUsed[colID][value-1] = true;
+        modifiedRows[rowID] = true;
+        modifiedCols[colID] = true;
         boolean success = true;
-        success = success && updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
-        success = success && updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+        success = success && updateRowNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+        success = success && updateColNotations(r, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
         return success;
     }
 
-    private boolean updateRowNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private boolean updateRowNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
         // FIXME: DEBUG        System.out.println("updateRowNotations for coord " + r + "," + c);
         //updates the notations of the row and can cause assignations, returns whether the update was successful
         int rowID = rowLine[r][c];
@@ -373,7 +381,7 @@ public class Generator {
             }
             if (onlySum > 0) { // only one sum is possible for this space and values, we assign it
                 //System.out.println("Only one possible sum is available: " + onlySum + " at row of: " + r + ", " + c);
-                rowSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                return rowSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
             }
         }
 
@@ -419,14 +427,18 @@ public class Generator {
                     if(cellNotations[i] && !commonRowNotations[i]) toErase.add(i + 1); // if it isn't part of the validated possible notations for the row
                 }
                 if (toErase.size() > 0) { // we need to erase some notations
+                    modifiedRows[rowID] = true;
+                    modifiedCols[colLine[r][it]] = true;
                     affectedColumns.add(it);
-                    cellNotationsRollBack.add(new RollbackNotations(r, it, rollbackNotations));
+                    if (notationsQueue.isHiding(r, it)) hidingCellNotationsRollBack.add(new RollbackNotations(r, it, rollbackNotations));
+                    else cellNotationsRollBack.add(new RollbackNotations(r, it, rollbackNotations));
                     notationsQueue.eraseNotationsFromCell(r, it, toErase);
                 }
             }
         }
 
         boolean success = true;
+        if (affectedColumns.size() == 0) modifiedRows[rowID] = false; //the cells on this row were not modified.
         for (int affected : affectedColumns) {
             int notationSize = workingBoard.getCellNotationSize(r, affected);
             if (notationSize == 0) {
@@ -439,13 +451,13 @@ public class Generator {
                 boolean[] cellNotations = workingBoard.getCellNotations(r, affected);
                 for (int i = 0; value == -1 && i < 9; i++) if(cellNotations[i]) value = i+1;
                 //System.out.println("Trying to assign only possible value " + value + " in " + r + ", " + affected);
-                success = success && cellValueAssignation(r, affected, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                success = success && cellValueAssignation(r, affected, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
                 //System.out.println("Value assignation success was: " + success + " in " + r + ", " + affected);
                 // a cellValueAssignation already calls to updateRow and updateColumn
             }
             else {
-                success = success && updateColNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
-                success = success && updateRowNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
+                success = success && updateColNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful
+                if (modifiedRows[rowID]) success = success && updateRowNotations(r, affected, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful
             }
 
             if (!success) return false; // responsible for the call will do rollbacks
@@ -453,7 +465,7 @@ public class Generator {
         return true;
     }
 
-    private boolean updateColNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private boolean updateColNotations(int r, int c, ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
         // FIXME: DEBUG     System.out.println("updateColNotations for coord " + r + "," + c);
         //updates the notations of the column and can cause assignations, returns whether the update was successful
         int colID = colLine[r][c];
@@ -477,7 +489,7 @@ public class Generator {
             }
             if (onlySum > 0) { // only one sum is possible for this space and values, we assign it
                 //System.out.println("Only one possible sum is available: " + onlySum + " at col of: " + r + ", " + c);
-                colSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                return colSumAssignation(r, c, onlySum, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
             }
         }
 
@@ -520,14 +532,18 @@ public class Generator {
                     if(cellNotations[i] && !commonColNotations[i]) toErase.add(i+1);
                 }
                 if (toErase.size() > 0) { // we need to erase some notations
+                    modifiedRows[rowLine[it][c]] = true;
+                    modifiedCols[colID] = true;
                     affectedRows.add(it);
-                    cellNotationsRollBack.add(new RollbackNotations(it, c, rollbackNotations));
+                    if (notationsQueue.isHiding(it, c)) hidingCellNotationsRollBack.add(new RollbackNotations(it, c, rollbackNotations));
+                    else cellNotationsRollBack.add(new RollbackNotations(it, c, rollbackNotations));
                     notationsQueue.eraseNotationsFromCell(it, c, toErase);
                 }
             }
         }
 
         boolean success = true;
+        if (affectedRows.size() == 0) modifiedCols[colID] = false; //the cells on this column were not modified.
         for (int affected : affectedRows) {
             int notationSize = workingBoard.getCellNotationSize(affected, c);
             if (notationSize == 0) {
@@ -541,13 +557,13 @@ public class Generator {
                 for (int i = 0; value == -1 && i < 9; i++) if(cellNotations[i]) value = i+1;
 
                 //System.out.println("Trying to assign only possible value " + value + " in " + r + ", " + affected);
-                success = success && cellValueAssignation(affected, c, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                success = success && cellValueAssignation(affected, c, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
                 //System.out.println("Value assignation success was: " + success + " in " + r + ", " + affected);
                 // a cellValueAssignation already calls to updateRow and updateColumn
             }
             else {
-                success = success && updateRowNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful
-                success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack); //all must be successful //TODO: analyze if this recursive call is actually needed
+                success = success && updateRowNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful
+                if (modifiedCols[colID]) success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful //TODO: analyze if this recursive call is actually needed
             }
             if (!success) return false; // responsible for the call will do rollbacks
         }
@@ -555,7 +571,7 @@ public class Generator {
     }
 
     private boolean isCombinationPossible(ArrayList<Integer> comb, ArrayList<WhiteCell> cells) {
-        if (cells.size() < comb.size()) return false;
+        if (cells.size() < comb.size() || comb.size() == 0) return false;
         if (comb.size() == 1) {
             int digit = comb.get(0);
             for (WhiteCell c : cells) {
@@ -563,10 +579,10 @@ public class Generator {
             }
             return false;
         }
-        boolean success = false;
-        for (int i = cells.size()-1; !success && i >= 0; i--) {
-            WhiteCell c = cells.get(i);
-            cells.remove(i);
+        //for (int i = cells.size()-1; !success && i >= 0; i--) {
+            WhiteCell c = cells.get(0);
+            cells.remove(0);
+            boolean success = false;
             if (c.isEmpty()) {
                 for (int j = comb.size()-1; !success && j >= 0; j--) {
                     int digit = comb.get(j);
@@ -582,17 +598,17 @@ public class Generator {
                         comb.remove(j);
                         success = isCombinationPossible(comb, cells);
                         comb.add(j, c.getValue());
-                        cells.add(i, c);
+                        cells.add(0, c);
                         return success;
                     }
                 }
             }
-            cells.add(i, c);
-        }
+            cells.add(0, c);
+        //}
         return success;
     }
 
-    private void rollBack(ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack) {
+    private void rollBack(ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack) {
         // Row sums
         for (int row : rowSumRollBack) {
             rowSums[row] = 0;
@@ -617,6 +633,13 @@ public class Generator {
             ArrayList<Integer> toAdd = new ArrayList<>();
             for (int i = 0; i < 9; i++) if (n.notations[i]) toAdd.add(i+1);
             notationsQueue.addNotationsToCell(c.r, c.c, toAdd);
+        }
+        for (RollbackNotations n : hidingCellNotationsRollBack) {
+            Coordinates c = n.coord;
+            ArrayList<Integer> toAdd = new ArrayList<>();
+            for (int i = 0; i < 9; i++) if (n.notations[i]) toAdd.add(i+1);
+            notationsQueue.addNotationsToCell(c.r, c.c, toAdd);
+            notationsQueue.hideElement(c.r, c.c);
         }
     }
 
@@ -693,9 +716,12 @@ public class Generator {
                     ArrayList<Integer> colSumRollBack = new ArrayList<>();
                     ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                     ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                    ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                    boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                    boolean[] modifiedCols = new boolean[colLineSize]; //default to false
                     success = true;
-                    success = success && rowSumAssignation(coordRow, coordCol, uniqueValue[0], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
-                    success = success && colSumAssignation(coordRow, coordCol, uniqueValue[1], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    success = success && rowSumAssignation(coordRow, coordCol, uniqueValue[0], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    success = success && colSumAssignation(coordRow, coordCol, uniqueValue[1], rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
                     // the row and sum assignation should assign the unique value correctly
                     if (success) {
                         uniqueAssigned ++;
@@ -709,7 +735,7 @@ public class Generator {
                         System.out.println("Assignation FAILURE:");
                         System.out.println("Coord: " + coordRow + "," + coordCol + " Row sum: " + uniqueValue[0] + ", Col sum: " + uniqueValue[1] + ", Unique value: " + uniqueValue[2]);
                         //printNotations();*/
-                        rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                        rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                         //printNotations();
                     }
                 }
@@ -728,22 +754,22 @@ public class Generator {
         int ambiguousCells = 0;
         ArrayList<Coordinates> impossibleAssignments = new ArrayList<>();
 
-        ArrayList<Coordinates> possibleAmbiguities = new ArrayList<>();
+        TreeSet<Coordinates> possibleAmbiguities = new TreeSet<>();
 
-        //int iter = 0;
+        int iter = 0;
         while (!notationsQueue.isEmpty()) {
             // then we have elements with no known value so we must do an assignation
-            WhiteCell candidate = notationsQueue.popFirstOrderedCell(); //should never return a cell with value
+            WhiteCell candidate = notationsQueue.getFirstElement(); //should never return a cell with value
             Pair<Integer, Integer> coord = candidate.getCoordinates();
             boolean isRowSumAssigned = rowSums[rowLine[coord.first][coord.second]] != 0;
             boolean isColSumAssigned = colSums[colLine[coord.first][coord.second]] != 0;
             // if one or both of the sums are not assigned, we should choose the value in
             // its notations that given the current values in the row and column there is a unique value for a
             // certain sum assignation
-            //System.out.println("At iteration " + iter + ", cell has notationSize: " + workingBoard.getCellNotationSize(coord.first, coord.second));
-            //iter++;
+            System.out.println("At iteration " + iter + ", cell at: " + coord.first + "," + coord.second + " has notationSize: " + workingBoard.getCellNotationSize(coord.first, coord.second));
+            iter++;
 
-            // FIXME:: THIS IS A HOTFIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
+            //*/ FIXME:: THIS IS A HOTFIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
             boolean[] candidateNotations = candidate.getNotations();
             ArrayList<Integer> candNot = new ArrayList<>();
             for (int i = 0; i < 9; i++) {
@@ -756,12 +782,15 @@ public class Generator {
                 ArrayList<Integer> colSumRollBack = new ArrayList<>();
                 ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                 ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
-                success = cellValueAssignation(coord.first, coord.second, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                boolean[] modifiedCols = new boolean[colLineSize]; //default to false
+                success = cellValueAssignation(coord.first, coord.second, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
                 if (success) {
                     System.out.println("Successful assignation at coord: " + coord.first + ", " + coord.second);
                     break;
                 } else {
-                    rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                 }
             }
             if (!success) {
@@ -771,10 +800,18 @@ public class Generator {
             }
             // FIXME:: HERE ENDS THE HOTFIX, WE NEED TO IMPLEMENT FROM HERE ON
 
-            /*
+            /*/
             if (!isRowSumAssigned || !isColSumAssigned) {
                 boolean success = valueBiasedSumAssignation(coord.first, coord.second, isRowSumAssigned, isColSumAssigned, -1);
-                if (success) continue;
+                if (success) {
+                    if (workingBoard.isEmpty(coord.first, coord.second)) { // if function above is working perfectly this shouldn't happen
+                        if (notationsQueue.getFirstElement().equals(candidate))
+                            notationsQueue.hideFirstElement();
+                    } else {
+                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+                    }
+                    continue;
+                }
             }
 
             // if both sums are already assigned, then that means there can still go more than one option in this
@@ -786,9 +823,9 @@ public class Generator {
             // (i.e. all cells with ambiguity-creating notations have their row/col sums assigned and have no unique notation)
             // there is ambiguity for that value and we should assign one of its values, the board will have more than one solution
             else {
+                boolean success;
                 boolean[] interestNotations = candidate.getNotations();
-                int uniqueValue = uniqueNotationIn(coord.first, coord.second, interestNotations, true);
-                boolean success = false;
+                /*int uniqueValue = uniqueNotationIn(coord.first, coord.second, interestNotations, true);
                 if (uniqueValue != -1) {
                     // assign the value to the cell!
                     ArrayList<Integer> rowSumRollBack = new ArrayList<>();
@@ -811,23 +848,40 @@ public class Generator {
                 }
                 if (success) {
                     // let's check if our cell now has value
-                    if(!workingBoard.isEmpty(coord.first, coord.second)) continue; // ambiguity solved
-                }
+                    if(!workingBoard.isEmpty(coord.first, coord.second)) {
+                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+                        continue; // ambiguity solved
+                    }
+                }*/
                 // at this point, either no notation is unique or assignations failed, or assignations worked but didn't solve the ambiguity
                 // call function to find responsible for undoing ambiguity
                 // FIXME: Something isn't working, it causes a stack overflow
                 //System.out.println("Would call ambiguity solver");
+                /*
                 boolean[][] visited = new boolean[rows][columns];
                 success = ambiguitySolver(coord.first, coord.second, visited, coord.first, coord.second, interestNotations, true);
                 if (!success) success = ambiguitySolver(coord.first, coord.second, visited, coord.first, coord.second, interestNotations, false);
                 if (success) {
                     // let's check if our cell now has value
-                    if (!workingBoard.isEmpty(coord.first, coord.second)) continue; // ambiguity solved
-                }
+                    if (!workingBoard.isEmpty(coord.first, coord.second)) {
+                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+                        continue; // ambiguity solved
+                    }
+                }*/
             }
-            // seems like a possible ambiguity
-            notationsQueue.removeOrderedCell(coord.first, coord.second); // the rollback mechanism will have inserted back to the queue the poped cell
-            possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
+            /*/ seems like a possible ambiguity
+
+            if (workingBoard.isEmpty(coord.first, coord.second)) {
+                WhiteCell currentFirstElem = notationsQueue.getFirstElement();
+                if (currentFirstElem.equals(candidate)) {
+                    notationsQueue.hideFirstElement();
+                } else if (candidate.getNotationSize() == currentFirstElem.getNotationSize()) {
+                    notationsQueue.hideElement(coord.first, coord.second);
+                }
+                possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
+            } else {
+                notationsQueue.removeOrderedCell(coord.first, coord.second);
+            }
             /*TODO: this last part of the while of the original code should probably be removed, it's not a good option
                  to decide that it will be ambiguous now, better wait until end to see if it was resolved, if not then we accept defeat
              //unsolvable ambiguity, choose one of the values and move on with life
@@ -850,7 +904,7 @@ public class Generator {
                 System.out.println("UNAVOIDABLE AMBIGUITY: This board will have more than one solution because of: "+coord.first+", "+coord.second);
                 ambiguousCells++;
             }*/
-        }
+        //}
 
         //System.out.println("PROBLEM REPORT: #of unavoidable failures: " + impossibleAssignments.size() + ", #of ambiguities: " + ambiguousCells);
 
@@ -873,6 +927,9 @@ public class Generator {
 
         // FIXME:: THIS IS A PROVISIONAL FIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
 
+        System.out.println("Working board before backtracking");
+        printNotations();
+
         // IN PROVISIONAL VERSION WE ASSIGN ANY VALUE NOT IN THE ROW OR COLUMN AND WILL RE-ADAPT THE SUMS LATER
         // BECAUSE IF IT DIDN'T GET ASSIGNED IT WONT BE ABLE TO ASSIGN IT NOW EITHER. IF THE UPDATE OF POSSIBILITIES
         // MECHANISM IS WORKING WELL THIS SHOULD NEVER HAPPEN, THERE MUST ALWAYS BE AT LEAST ONE POSSIBILITY AVAILABLE
@@ -881,6 +938,7 @@ public class Generator {
         for (Coordinates c : possibleAmbiguities) {
             if (workingBoard.isEmpty(c.r, c.c)) {
                 toSolve.add(c);
+                System.out.println("Ambiguous white cell at: " + c.r + "," + c.c);
                 foundAmbiguous = true;
             }
         }
@@ -890,6 +948,8 @@ public class Generator {
         // for (Coordinates c : possibleAmbiguities) {...}
 
         if (foundAmbiguous) { // we probably added values that do not correspond with the row and col sums
+            System.out.println("Working board after backtracking");
+            printNotations();
             computeRowSums();
             computeColSums();
         } else { // all values in row sums and col sums have preserved their integity correctly
@@ -968,7 +1028,7 @@ public class Generator {
         int rowID = rowLine[r][c];
         int colID = colLine[r][c];
 
-        ArrayList<Integer> possibleValues = notUsedValues(r, c, rowID, colID);
+        ArrayList<Integer> possibleValues = notUsedValues(rowID, colID);
         Collections.shuffle(possibleValues);
 
         for (int val: possibleValues) {
@@ -982,7 +1042,8 @@ public class Generator {
 
             if (fillWhiteCells(coord, pos+1)) return true;
 
-            workingBoard.setCellValue(r, c, currentVal);
+            if (currentVal == 0) workingBoard.clearCellValue(r, c);
+            else workingBoard.setCellValue(r, c, currentVal);
             rowValuesUsed[rowID][val-1] = currentUsedR;
             colValuesUsed[colID][val-1] = currentUsedC;
         }
@@ -990,11 +1051,11 @@ public class Generator {
         return false;
     }
 
-    private ArrayList<Integer> notUsedValues(int row, int col, int rowID, int colID) {
+    private ArrayList<Integer> notUsedValues(int rowID, int colID) {
         // Returns a list of the values that have not been used in the row and column
         ArrayList<Integer> values = new ArrayList<>();
 
-        for(int i = 1; i<=0; i++) {
+        for(int i = 1; i<=9; i++) {
             if (!rowValuesUsed[rowID][i-1] && !colValuesUsed[colID][i-1]) values.add(i);
         }
 
@@ -1013,6 +1074,7 @@ public class Generator {
         boolean[] interestedValues = workingBoard.getCellNotations(r, c);
 
         if (!isRowAssigned && isColAssigned) { //try to assign a value to row to force cell[r][c] into taking a value of its notations
+            boolean[] uniqueNotations = uniqueNotationsIn(r, c, workingBoard.getCellNotations(r, c), true);
             ArrayList<Integer> rowSumCandidates = new ArrayList<>();
             for (int i = 0; i < 9; i++) {
                 if (interestedValues[i]) {
@@ -1020,9 +1082,11 @@ public class Generator {
                     ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(rowSize[rowID], rowValues);
                     for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
                         boolean foundCandidate = true;
-                        for (int p : poss.second) {
-                            // if candidate combination includes a value in notations other than the one we need it's not useful
-                            if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                        if (!uniqueNotations[i]) { //if i is a unique notation, any combination that contains it is useful
+                            for (int p : poss.second) {
+                                // if candidate combination includes a value in notations other than the one we need it's not useful
+                                if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                            }
                         }
                         if (foundCandidate) rowSumCandidates.add(poss.first);
                     }
@@ -1051,14 +1115,18 @@ public class Generator {
                     ArrayList<Integer> colSumRollBack = new ArrayList<>();
                     ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                     ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
-                    success = rowSumAssignation(r, c, rowSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
-                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                    boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                    boolean[] modifiedCols = new boolean[colLineSize]; //default to false
+                    success = rowSumAssignation(r, c, rowSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                 }
                 if (success) return true;
                 System.out.println("FATAL ERROR: Didn't find a rowSumAssignation after trying possibilities"); //very unlikely to happen
                 return false;
             }
         } else if (isRowAssigned && !isColAssigned) {
+            boolean[] uniqueNotations = uniqueNotationsIn(r, c, workingBoard.getCellNotations(r, c), false);
             ArrayList<Integer> colSumCandidates = new ArrayList<>();
             for (int i = 0; i < 9; i++) {
                 if (interestedValues[i]) {
@@ -1066,10 +1134,11 @@ public class Generator {
                     ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(colSize[colID], colValues);
                     for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
                         boolean foundCandidate = true;
-                        for (int p : poss.second) {
-                            // if candidate combination includes a value in notations other than the one we need it's not useful
-                            // TODO: it could be useful if "i+1" is unique in column
-                            if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                        if (!uniqueNotations[i]) { //if i is a unique notation, any combination that contains it is useful
+                            for (int p : poss.second) {
+                                // if candidate combination includes a value in notations other than the one we need it's not useful
+                                if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                            }
                         }
                         if (foundCandidate) colSumCandidates.add(poss.first); //TODO: if two values of interest share a sum option it gets added multiple times, should be added NONE of the times
                     }
@@ -1088,8 +1157,11 @@ public class Generator {
                     ArrayList<Integer> colSumRollBack = new ArrayList<>();
                     ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                     ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
-                    success = rowSumAssignation(r, c, valueOfInterest, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
-                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                    boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                    boolean[] modifiedCols = new boolean[colLineSize]; //default to false
+                    success = rowSumAssignation(r, c, valueOfInterest, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                 }
                 for(int i = 0; !success && i < colSumCandidates.size(); i++) {
                     if (valueOfInterest != -1 && colSumCandidates.get(i) == valueOfInterest) continue; // we have tried it before
@@ -1097,8 +1169,11 @@ public class Generator {
                     ArrayList<Integer> colSumRollBack = new ArrayList<>();
                     ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
                     ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
-                    success = colSumAssignation(r, c, colSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
-                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack);
+                    ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                    boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                    boolean[] modifiedCols = new boolean[colLineSize]; //default to false
+                    success = colSumAssignation(r, c, colSumCandidates.get(i), rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                 }
                 if (success) return true;
                 System.out.println("FATAL ERROR: Didn't find a colSumAssignation after trying possibilities"); //very unlikely to happen
@@ -1111,7 +1186,7 @@ public class Generator {
         }
     }
 
-    private int uniqueNotationIn(int r, int c, boolean[] interestNotations, boolean isRow) {
+    private boolean[] uniqueNotationsIn(int r, int c, boolean[] interestNotations, boolean isRow) {
         boolean[] uniqueNotations = new boolean[] { true, true, true, true, true, true, true, true, true };
         int ID = isRow ? rowLine[r][c] : colLine[r][c];
         int firstPos = isRow ? firstRowCoord[ID].c : firstColCoord[ID].r;
@@ -1121,13 +1196,7 @@ public class Generator {
             boolean[] itNotations = isRow ? workingBoard.getCellNotations(r, it) : workingBoard.getCellNotations(it, c);
             for (int i = 0; i < 9; i++) uniqueNotations[i] = uniqueNotations[i] && interestNotations[i] && !itNotations[i];
         }
-        boolean uniqueFound = false;
-        int uniqueValue = -1;
-        for (int i = 0; !uniqueFound && i < 9; i++) {
-            uniqueFound = uniqueNotations[i];
-            uniqueValue = i+1;
-        }
-        return uniqueFound ? uniqueValue : -1;
+        return uniqueNotations;
     }
 
     private boolean ambiguitySolver(int r, int c, boolean[][] visited, final int init_r, final int init_c, final boolean[] interestNotations, boolean isRow) {
@@ -1266,11 +1335,22 @@ public class Generator {
     }
     //
 
-    private class Coordinates {
+    private class Coordinates implements Comparable {
         public int r, c;
         public Coordinates(int r, int c) {
             this.r = r;
             this.c = c;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if (this.r == ((Coordinates)o).r && this.c == ((Coordinates)o).c) return 0;
+            if (this.r == ((Coordinates)o).r) {
+                if (this.c < ((Coordinates)o).c) return -1;
+                return 1;
+            }
+            if (this.r < ((Coordinates)o).r) return -1;
+            return 1;
         }
     }
 
