@@ -94,6 +94,7 @@ public class SwappingCellQueue {
         }
         boolean [] cellNotations = workingBoard.getCellNotations(r, c);
         for (int i : toErase) {
+            if (i<1 || i>9) continue;
             if (cellNotations[i-1]) { // if there was such notation we erase it
                 workingBoard.setCellNotation(r, c, i, false);
                 cellNotations[i-1] = false;
@@ -134,6 +135,7 @@ public class SwappingCellQueue {
             startPos[0]--;
         }
         for (int i : toAdd) {
+            if (i<1 || i>9) continue;
             if (!cellNotations[i-1]) { // if there was not such notation we add it
                 workingBoard.setCellNotation(r, c, i, true);
                 cellNotations[i-1] = true;
