@@ -333,7 +333,6 @@ public class Generator {
         int colID = colLine[r][c];
         if (rowValuesUsed[rowID][value-1] ||  colValuesUsed[colID][value-1] || !workingBoard.isEmpty(r, c)){
             if (rowValuesUsed[rowID][value-1] && colValuesUsed[colID][value-1] && workingBoard.getValue(r, c) == value) {
-                //System.out.println("Redundant cellValue assignation at: " + r + ", " + c + " with value: " + value);
                 return true; // assignation is redundant, we already had it assigned so we give it as correct
             }
             return false;
