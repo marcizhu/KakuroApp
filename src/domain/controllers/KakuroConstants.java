@@ -18,7 +18,7 @@ public class KakuroConstants {
      */
     public static final KakuroConstants INSTANCE = new KakuroConstants();
 
-    private ArrayList<ArrayList<ArrayList<ArrayList<Integer>>>> cases;
+    private ArrayList<ArrayList<ArrayList<Integer>>> cases;
     private final int[] numOfSumsAtSpace = { 9, 15, 19, 21, 21, 19, 15, 9, 1 };
     private final int[] firstSumAtSpace = { 1, 3, 6, 10, 15, 21, 28, 36, 45 };
 
@@ -32,8 +32,8 @@ public class KakuroConstants {
      * @param sum   Total sum of the row or column
      * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
      */
-    public ArrayList<ArrayList<Integer>> getPossibleCases(int space, int sum) {
-        return (ArrayList<ArrayList<Integer>>) cases.get(space).get(sum).clone();
+    public ArrayList<Integer> getPossibleCases(int space, int sum) {
+        return (ArrayList<Integer>) cases.get(space).get(sum).clone();
     }
 
     /**
@@ -44,32 +44,32 @@ public class KakuroConstants {
      * @param values Boolean array representing numbers already present in the row or column
      * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
      */
-    public ArrayList<ArrayList<Integer>> getPossibleCasesWithValues(int space, int sum, boolean[] values) {
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        int sizeOfValues = 0;
-        for (boolean b : values) if (b) sizeOfValues++;
-        if (sizeOfValues > space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
+    public ArrayList<Integer> getPossibleCasesWithValues(int space, int sum, int values) {
+        ArrayList<Integer> result = new ArrayList<>();
 
-        ArrayList<ArrayList<Integer>> possible = cases.get(space).get(sum);
-        if (sizeOfValues == 0) return (ArrayList<ArrayList<Integer>>) possible.clone(); // if no values are specified, it will return all possibilities
+        if (Integer.bitCount(values) > space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
 
-        for (ArrayList<Integer> p : possible) {
+        ArrayList<Integer> possible = cases.get(space).get(sum);
+        if (values == 0) return (ArrayList<Integer>) possible.clone(); // if no values are specified, it will return all possibilities
+
+        for (Integer p : possible) {
             int idx = 1;
             boolean noValuesFound = true;
-            for (int i = 0; i < p.size() && noValuesFound; i++) {
-                Integer o = p.get(i);
-                while (idx < o && noValuesFound) {
-                    noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
+            for (int i = 0; i < 9 && noValuesFound; i++) {
+                if(((p >> i) & 1) == 0) continue;
+
+                while (idx < (i + 1) && noValuesFound) {
+                    noValuesFound = !((values >> (idx - 1) & 1) == 1); // if there is a value in values[] and not in an option p, the option is not valid
                     idx++;
                 }
                 idx++;
             }
             // check up to position 9 if it hadn't reached there yet
             while (idx < 10 && noValuesFound) {
-                noValuesFound = !values[idx-1]; // if there is a value in values[] and not in an option p, the option is not valid
+                noValuesFound = !((values >> (idx - 1) & 1) == 1); // if there is a value in values[] and not in an option p, the option is not valid
                 idx++;
             }
-            if (noValuesFound) result.add((ArrayList<Integer>) p.clone());   // otherwise we add p to the array of valid options "result"
+            if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
         }
 
         return result;
@@ -81,19 +81,17 @@ public class KakuroConstants {
      * @param values Values already present in that row or column, represented as a boolean[9] array
      * @return the combinations of values that would fit in that row or column, as well as the total sum in each case
      */
-    public ArrayList<Pair<Integer, ArrayList<Integer>>> getPossibleCasesUnspecifiedSum(int space, boolean[] values) {
-        ArrayList<Pair<Integer, ArrayList<Integer>>> result = new ArrayList<>();
+    public ArrayList<Pair<Integer, Integer>> getPossibleCasesUnspecifiedSum(int space, int values) {
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
         if (space < 1 || space > 9) return result;
-        int sizeOfValues = 0;
-        for (boolean b : values) if (b) sizeOfValues++;
-        if (sizeOfValues > space) return result; //if there are more values than space available there is no possibility to add any more numbers
+        if (Integer.bitCount(values) > space) return result; //if there are more values than space available there is no possibility to add any more numbers
 
         int numOfSums = numOfSumsAtSpace[space-1];
 
         for (int i = 0; i < numOfSums; i++) {
             int sum = firstSumAtSpace[space-1]+i;
-            ArrayList<ArrayList<Integer>> possibilities = getPossibleCasesWithValues(space, sum, values);
-            for (ArrayList<Integer> p : possibilities) result.add(new Pair<>(sum, (ArrayList<Integer>) p.clone()));
+            ArrayList<Integer> possibilities = getPossibleCasesWithValues(space, sum, values);
+            for (Integer p : possibilities) result.add(new Pair<>(sum, p));
         }
         return result;
     }
@@ -120,22 +118,22 @@ public class KakuroConstants {
         for (int rowIdx = 0; rowIdx < rowNumOfSums; rowIdx++) {
             // How many times is a certain value seen for a given space and a given sum in the row
             int rowSum = firstSumAtSpace[rowSpace-1]+rowIdx;
-            ArrayList<ArrayList<Integer>> rowOptions = cases.get(rowSpace).get(rowSum);
+            ArrayList<Integer> rowOptions = cases.get(rowSpace).get(rowSum);
             boolean[] rowValuesSeen = { false, false, false, false, false, false, false, false, false };
-            for (ArrayList<Integer> rowOption : rowOptions) {
-                for (Integer value : rowOption) {
-                    rowValuesSeen[value-1] = true;
+            for (Integer rowOption : rowOptions) {
+                for (int i = 0; i < 9; i++) {
+                    if(((rowOption >> i) & 1) == 1) rowValuesSeen[i - 1] = true;
                 }
             }
 
             for (int colIdx = 0; colIdx < colNumOfSums; colIdx++) {
                 // How many times is a certain value seen for a given space and a given sum in the col
                 int colSum = firstSumAtSpace[colSpace-1]+colIdx;
-                ArrayList<ArrayList<Integer>> colOptions = cases.get(colSpace).get(colSum);
+                ArrayList<Integer> colOptions = cases.get(colSpace).get(colSum);
                 boolean[] colValuesSeen = { false, false, false, false, false, false, false, false, false };
-                for (ArrayList<Integer> colOption : colOptions) {
-                    for (Integer value : colOption) {
-                        colValuesSeen[value-1] = true;
+                for (Integer colOption : colOptions) {
+                    for (int i = 0; i < 9; i++) {
+                        if(((colOption >> i) & 1) == 1) colValuesSeen[i - 1] = true;
                     }
                 }
 
@@ -211,7 +209,7 @@ public class KakuroConstants {
         cases = new ArrayList<>(10);
         cases.add(new ArrayList<>());
         for (int i = 1; i <= 9; i++) {
-            ArrayList<ArrayList<ArrayList<Integer>>> al = new ArrayList<>(46);
+            ArrayList<ArrayList<Integer>> al = new ArrayList<>(46);
 
             for(int j = 0; j <= 45; j++)
                 al.add(new ArrayList<>());
@@ -225,8 +223,8 @@ public class KakuroConstants {
         }
     }
 
-    private ArrayList<ArrayList<Integer>> findCombinations(int space, int sum) {
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+    private ArrayList<Integer> findCombinations(int space, int sum) {
+        ArrayList<Integer> result = new ArrayList<>();
 
         boolean[] values = { false, false, false, false, false, false, false, false, false };
         backtrackingFindCombinations(1, space, sum, 0, 0, values, result);
@@ -234,12 +232,12 @@ public class KakuroConstants {
         return result;
     }
 
-    private void backtrackingFindCombinations(int idx, int space, int sum, int currentSpace, int currentSum, boolean[] values, ArrayList<ArrayList<Integer>> found) {
+    private void backtrackingFindCombinations(int idx, int space, int sum, int currentSpace, int currentSum, boolean[] values, ArrayList<Integer> found) {
         if (idx > 9 || currentSpace >= space) return;
         if (idx + currentSum == sum && currentSpace == space-1) {
             values[idx-1] = true;
-            ArrayList<Integer> solution = new ArrayList<>();
-            for (int i = 0; i < 9; i++) if (values[i]) solution.add(i+1);
+            int solution = 0;
+            for (int i = 0; i < 9; i++) if (values[i]) solution |= (1 << i);
             found.add(solution);
             values[idx-1] = false;
             return;
