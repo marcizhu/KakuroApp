@@ -87,9 +87,8 @@ public class Solver {
         rowValuesUsed = new boolean[rowLineID][9];
         for (int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
-                if (board.isWhiteCell(i, j)) {
-                    int value = board.getValue(i, j);
-                    if (value != 0) rowValuesUsed[rowLine[j][i]][value-1] = true;
+                if (board.isWhiteCell(i, j) && !board.isEmpty(i, j)) {
+                    rowValuesUsed[rowLine[i][j]][board.getValue(i, j) - 1] = true;
                 }
             }
         }
@@ -131,9 +130,8 @@ public class Solver {
         colValuesUsed = new boolean[colLineID][9];
         for (int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {
-                if (board.isWhiteCell(j, i)) {
-                    int value = board.getValue(j, i);
-                    if (value != 0) colValuesUsed[colLine[j][i]][value-1] = true;
+                if (board.isWhiteCell(j, i) && !board.isEmpty(j, i)) {
+                    colValuesUsed[colLine[j][i]][board.getValue(j, i) - 1] = true;
                 }
             }
         }
