@@ -41,35 +41,25 @@ public class KakuroConstants {
      * already placed
      * @param space  Number of 'slots' of the row or column
      * @param sum    Total sum of the row or column
-     * @param values Boolean array representing numbers already present in the row or column
-     * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
+     * @param values Bitfield representing numbers already present in the row or column
+     * @return an ArrayList of Integers containing all possible cases for this row or column (without permutations)
      */
     public ArrayList<Integer> getPossibleCasesWithValues(int space, int sum, int values) {
         ArrayList<Integer> result = new ArrayList<>();
-
-        if (Integer.bitCount(values) > space) return result; //if there are more values than space available (or same) there is no possibility to add any more numbers
-
         ArrayList<Integer> possible = cases.get(space).get(sum);
+
         if (values == 0) return (ArrayList<Integer>) possible.clone(); // if no values are specified, it will return all possibilities
 
         for (Integer p : possible) {
-            int idx = 1;
             boolean noValuesFound = true;
             for (int i = 0; i < 9 && noValuesFound; i++) {
-                if(((p >> i) & 1) == 0) continue;
+                if(((p >> i) & 1) == 1) continue;
 
-                while (idx < (i + 1) && noValuesFound) {
-                    noValuesFound = !((values >> (idx - 1) & 1) == 1); // if there is a value in values[] and not in an option p, the option is not valid
-                    idx++;
-                }
-                idx++;
+                // if there is a value in use and not in an option p, the option is not valid
+                noValuesFound = !((values >> i & 1) == 1);
             }
-            // check up to position 9 if it hadn't reached there yet
-            while (idx < 10 && noValuesFound) {
-                noValuesFound = !((values >> (idx - 1) & 1) == 1); // if there is a value in values[] and not in an option p, the option is not valid
-                idx++;
-            }
-            if (noValuesFound) result.add(p);   // otherwise we add p to the array of valid options "result"
+
+            if (noValuesFound) result.add(p); // otherwise we add p to the array of valid options "result"
         }
 
         return result;
@@ -78,7 +68,7 @@ public class KakuroConstants {
     /**
      * Get possible cases given the number of white cells, regardless of the total sum
      * @param space  Number of white cells in the row or column
-     * @param values Values already present in that row or column, represented as a boolean[9] array
+     * @param values Values already present in that row or column, represented as a bitfield
      * @return the combinations of values that would fit in that row or column, as well as the total sum in each case
      */
     public ArrayList<Pair<Integer, Integer>> getPossibleCasesUnspecifiedSum(int space, int values) {

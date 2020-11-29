@@ -234,8 +234,8 @@ public class Solver {
             colSum[col] += i;
             solve(row, col + 1, rowSum + i, colSum);
             board.clearCellValue(row, col);
-            rowValuesUsed[rowLine[row][col]] ^= (1 << (i-1));
-            colValuesUsed[colLine[row][col]] ^= (1 << (i-1));
+            rowValuesUsed[rowLine[row][col]] &= ~(1 << (i-1));
+            colValuesUsed[colLine[row][col]] &= ~(1 << (i-1));
             colSum[col] -= i;
             if (solutions.size() > 1) return;
         }
