@@ -21,6 +21,8 @@ public class Generator {
     private final int rows;
     private final int columns;
     private final Difficulty difficulty;
+    private final long seed;
+    private final boolean forceUniqueSolution;
 
     private Random random;
 
@@ -46,14 +48,7 @@ public class Generator {
      * @param difficulty Difficulty of the board to generate
      */
     public Generator(int rows, int columns, Difficulty difficulty) {
-        this.rows = rows;
-        this.columns = columns;
-        this.difficulty = difficulty;
-        rowLine = new int[rows][columns];
-        colLine = new int[rows][columns];
-        this.random = new Random();
-        long seed = random.nextLong();
-        this.random = new Random(seed);
+        this(rows, columns, difficulty, (new Random()).nextLong(), false);
     }
 
     /**
@@ -65,21 +60,56 @@ public class Generator {
      * @param seed       Seed to be used by this generator
      */
     public Generator(int rows, int columns, Difficulty difficulty, long seed) {
+        this(rows, columns, difficulty, seed, false);
+    }
+
+    /**
+     * Constructor.
+     * Initializes a generator to generate boards of given size, difficulty and seed
+     * @param rows                  Number of rows of the board to generate
+     * @param columns               Number of columns of the board to generate
+     * @param difficulty            Difficulty of the board to generate
+     * @param forceUniqueSolution   Whether the generated board should be forced into having unique solution.
+     */
+    public Generator(int rows, int columns, Difficulty difficulty, boolean forceUniqueSolution) {
+        this(rows, columns, difficulty, (new Random()).nextLong(), forceUniqueSolution);
+    }
+
+    /**
+     * Constructor.
+     * Initializes a generator to generate boards of given size, difficulty and seed
+     * @param rows                  Number of rows of the board to generate
+     * @param columns               Number of columns of the board to generate
+     * @param difficulty            Difficulty of the board to generate
+     * @param seed                  Seed to be used by this generator
+     * @param forceUniqueSolution   Whether the generated board should be forced into having unique solution.
+     */
+    public Generator(int rows, int columns, Difficulty difficulty, long seed, boolean forceUniqueSolution) {
         this.rows = rows;
         this.columns = columns;
         this.difficulty = difficulty;
+        this.seed = seed;
+        this.forceUniqueSolution = forceUniqueSolution;
         rowLine = new int[rows][columns];
         colLine = new int[rows][columns];
-        this.random = new Random(seed);
+        this.random = new Random(this.seed);
     }
 
     /**
      * Get generated board.
      * NOTE: This function *MUST* be called after @link Generator::generate().
-     * @return the newly generated board
+     * @return the newly generated board.
      */
     public Board getGeneratedBoard() {
-        return generatedBoard;
+        return this.generatedBoard;
+    }
+
+    /**
+     * Get the seed used for the generation.
+     * @return the seed of the Random object used for generating the board.
+     */
+    public long getUsedSeed() {
+        return this.seed;
     }
 
     private boolean isValidPosition(Board b, int row, int col) {
@@ -302,6 +332,7 @@ public class Generator {
         //  Could call other assignations recursively
         int rowID = rowLine[r][c];
         if (rowSums[rowID] != 0) {
+            if (rowSums[rowID] == value) return true; //the assignation has already happened, no problem
             return false; //already has a sum value assigned
         }
         rowSums[rowID] = value;
@@ -317,6 +348,7 @@ public class Generator {
         //  Could call other assignations recursively
         int colID = colLine[r][c];
         if (colSums[colID] != 0) {
+            if (colSums[colID] == value) return true; //the assignation has already happened, no problem
             return false; //already has a sum value assigned
         }
         colSums[colID] = value;
@@ -415,6 +447,34 @@ public class Generator {
             if (!commonRowNotations[i]) superPermissive = false;
         }
 
+        ArrayList<ArrayList<Integer>> allToErase = new ArrayList<>();
+        int minRowNotSize = 10;
+        for(int it = 0; it < rowSize[rowID]; it++) {
+            allToErase.add(it, new ArrayList<>());
+            if (workingBoard.isEmpty(r, it+firstRowCoord[rowID].c)){
+                int s = workingBoard.getCellNotationSize(r, it+firstRowCoord[rowID].c);
+                if (s < minRowNotSize) minRowNotSize = s;
+            }
+        }
+        if (minRowNotSize < rowSize[rowID]) {
+            int num_cells = rowSize[rowID];
+            int[] size = new int[num_cells];
+            int[] notations = new int[num_cells];
+            int[] insertPtrs = new int[num_cells];
+            for(int it = 0; it < num_cells; it++) {
+                insertPtrs[it] = it;
+                size[it] = 0;
+                notations[it] = 0;
+                for (int i = 0; i < 9; i++) {
+                    if (workingBoard.cellHasNotation(r, it + firstRowCoord[rowID].c, i+1)) {
+                        notations[it] |= (1<<i);
+                        size[it]++;
+                    }
+                }
+            }
+            deepNotationAnalysis(num_cells, size, notations, insertPtrs, allToErase);
+        }
+
         // check for each non-set white-cell if its notations have some notation that is not in commonRowNotations
         // if so, erase notations, mark column as affected, add cell notations to rollback
 
@@ -423,7 +483,7 @@ public class Generator {
                 boolean[] cellNotations = workingBoard.getCellNotations(r, it);
                 boolean[] rollbackNotations = new boolean[9]; // IMPORTANT! rollback notations should be a new object
                 // because cellNotations might get modified if we have to erase, rollback holds the original values
-                ArrayList<Integer> toErase = new ArrayList<>();
+                ArrayList<Integer> toErase = allToErase.get(it - firstRowCoord[rowID].c); //new ArrayList<>();
                 for (int i = 0; i < 9; i++) {
                     rollbackNotations[i] = cellNotations[i];
                     if(cellNotations[i] && !commonRowNotations[i]) toErase.add(i + 1); // if it isn't part of the validated possible notations for the row
@@ -516,12 +576,40 @@ public class Generator {
             if (!commonColNotations[i]) superPermissive = false;
         }
 
+        ArrayList<ArrayList<Integer>> allToErase = new ArrayList<>();
+        int minColNotSize = 10;
+        for(int it = 0; it < colSize[colID]; it++) {
+            allToErase.add(it, new ArrayList<>());
+            if (workingBoard.isEmpty(it + firstColCoord[colID].r, c)){
+                int s = workingBoard.getCellNotationSize(it + firstColCoord[colID].r, c);
+                if (s < minColNotSize) minColNotSize = s;
+            }
+        }
+        if (minColNotSize < colSize[colID]) {
+            int num_cells = colSize[colID];
+            int[] size = new int[num_cells];
+            int[] notations = new int[num_cells];
+            int[] insertPtrs = new int[num_cells];
+            for(int it = 0; it < colSize[colID]; it++) {
+                insertPtrs[it] = it;
+                size[it] = 0;
+                notations[it] = 0;
+                for (int i = 0; i < 9; i++) {
+                    if (workingBoard.cellHasNotation(it + firstColCoord[colID].r, c, i+1)) {
+                        notations[it] |= (1<<i);
+                        size[it]++;
+                    }
+                }
+            }
+            deepNotationAnalysis(num_cells, size, notations, insertPtrs, allToErase);
+        }
+
         for(int it = firstColCoord[colID].r; !superPermissive && it < firstColCoord[colID].r+colSize[colID]; it++) {
             if (workingBoard.isEmpty(it, c)) { //value not set
                 boolean[] cellNotations = workingBoard.getCellNotations(it, c);
                 boolean[] rollbackNotations = new boolean[9]; // IMPORTANT! rollback notations should be a new object
                 // because cellNotations might get modified if we have to erase, rollback holds the original values
-                ArrayList<Integer> toErase = new ArrayList<>();
+                ArrayList<Integer> toErase = allToErase.get(it - firstColCoord[colID].r);
                 for (int i = 0; i < 9; i++) {
                     rollbackNotations[i] = cellNotations[i];
                     if(cellNotations[i] && !commonColNotations[i]) toErase.add(i+1);
@@ -596,6 +684,116 @@ public class Generator {
         cells.add(0, c);
 
         return success;
+    }
+
+    // Pre: size, notations, insertPtrs and result have size num_cells, all arrays in results are declared.
+    private void deepNotationAnalysis(int num_cells, int[] size, int[] notations, int[] insertPtrs, ArrayList<ArrayList<Integer>> result) {
+        if (num_cells == 0) return;
+
+        // we order the cell info by size.
+        for (int i = 0; i < num_cells; i++) { //selection sort because maximum there are 9 cells
+            int minPos = i;
+            for (int j = i+1; j < num_cells; j++)
+                if (size[j] < size[minPos]) minPos = j;
+            if (minPos != i) { // swap
+                int swpSize, swpNts, swpPtrs;
+                swpSize = size[i]; swpNts = notations[i]; swpPtrs = insertPtrs[i];
+                size[i] = size[minPos]; notations[i] = notations[minPos]; insertPtrs[i] = insertPtrs[minPos];
+                size[minPos] = swpSize; notations[minPos] = swpNts; insertPtrs[minPos] = swpPtrs;
+            }
+        }
+
+        int ini = 0;
+        while(ini < num_cells && size[ini] < 2) ini++;
+
+        if (ini < num_cells)
+        for (int length = size[ini]; length < num_cells; length++) {
+            int end = num_cells-1;
+            while (end >= ini && size[end] > length) end--;
+
+            if (end - ini +1 < length || end == num_cells-1) continue;
+
+            int[] indices = new int[length];
+            for (int j = 0; j < length; j++) {
+                indices[j] = ini+j;
+            }
+
+            boolean atEnd = false;
+            while (!atEnd) {
+                // consider this possibility
+                int poss = 0;
+                for (int j : indices)
+                    poss |= notations[j];
+
+                int checkSize = poss, nSize = 0;
+                while (checkSize > 0) {
+                    nSize += (checkSize & 1);
+                    checkSize >>>= 1;
+                }
+
+                if (nSize == length) { // these |length| values have to be in the corresponding cells, not in others
+                    ArrayList<Integer> toErase = new ArrayList<>();
+                    for (int j = 0; toErase.size() < length && j < 9; j++) {
+                        if ((poss & (1<<j)) > 0) toErase.add(j);
+                    }
+                    int minLengthChanged = -1;
+                    int kIdx = 0;
+                    for (int j = 0; j < num_cells; j++) {
+                        if (kIdx < length-1 && j > indices[kIdx]) kIdx++;
+                        if (j != indices[kIdx]) {
+                            for (int val : toErase) {
+                                if ((notations[j] & (1<<val)) > 0) { // has a value to be erased
+                                    result.get(insertPtrs[j]).add(val+1); //mark it to erase
+                                    notations[j] &= ~(1<<val); // erase from notations to calc.
+                                    size[j]--;
+                                    if (minLengthChanged == -1 || size[j] < minLengthChanged) minLengthChanged = size[j];
+                                }
+                            }
+                        }
+                    }
+
+                    // if any changes, reorganize and check the new lengths again, some might have new unique values.
+                    if (minLengthChanged >= 0) {
+                        for (int i = 0; i < num_cells; i++) { //selection sort because maximum there are 9 cells
+                            int minPos = i;
+                            for (int j = i+1; j < num_cells; j++)
+                                if (size[j] < size[minPos]) minPos = j;
+                            if (minPos != i) { // swap
+                                int swpSize, swpNts, swpPtrs;
+                                swpSize = size[i]; swpNts = notations[i]; swpPtrs = insertPtrs[i];
+                                size[i] = size[minPos]; notations[i] = notations[minPos]; insertPtrs[i] = insertPtrs[minPos];
+                                size[minPos] = swpSize; notations[minPos] = swpNts; insertPtrs[minPos] = swpPtrs;
+                            }
+                        }
+
+                        if (minLengthChanged < 2) {
+                            ini = 0;
+                            while(ini < num_cells && size[ini] < 2) ini++;
+                            length = size[ini];
+                            break;
+                        } else if (minLengthChanged < length) {
+                            length = minLengthChanged;
+                            break;
+                        }
+                    }
+                }
+
+                if (indices[0] == end - (length-1)) atEnd = true;
+                for (int i = 1; !atEnd && i < length; i++) {
+                    if (indices[i] == end - ((length-1) - i)) {
+                        indices[i-1]++;
+                        indices[i] = indices[i-1] + 1;
+                        if (indices[i] != end - ((length-1) - i)) {
+                            // idx was moved, must take the rest with him
+                            for (int j = i+1; j < length; j++) indices[j] = indices[j-1]+1;
+                        }
+                        break;
+                    } else if (i == length-1) {
+                        indices[i]++;
+                    }
+                }
+            }
+        }
     }
 
     private void rollBack(ArrayList<Integer> rowSumRollBack, ArrayList<Integer> colSumRollBack, ArrayList<Coordinates> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack) {
@@ -688,132 +886,81 @@ public class Generator {
             possibleStartingPoints.remove(0);
 
             if (workingBoard.isEmpty(coordRow, coordCol)) { // in case a previous assignation has assigned this cell's value
-                if (generateStartingPoint(coordRow, coordCol)) uniqueAssigned++;
+                if (generateStartingPoint(coordRow, coordCol, workingBoard.getCellNotations(coordRow, coordCol))) uniqueAssigned++;
             }
         }
 
         // At this point we've had a number of successful starting point assignments, now we assign the WhiteCell
         // that has the least notations (possible values) in a way that makes it non ambiguous
         TreeSet<Coordinates> possibleAmbiguities = new TreeSet<>();
+        resolveEnqueuedCellValues(possibleAmbiguities);
 
-        while (!notationsQueue.isEmpty()) {
-            // then we have elements with no known value so we must do an assignation
-            WhiteCell candidate = notationsQueue.getFirstElement(); //should never return a cell with value
-            Pair<Integer, Integer> coord = candidate.getCoordinates();
-            boolean isRowSumAssigned = rowSums[rowLine[coord.first][coord.second]] != 0;
-            boolean isColSumAssigned = colSums[colLine[coord.first][coord.second]] != 0;
-            // if one or both of the sums are not assigned, we should choose the value in
-            // its notations that given the current values in the row and column there is a unique value for a
-            // certain sum assignation
-            if (!isRowSumAssigned || !isColSumAssigned) {
-                boolean success = valueBiasedSumAssignation(coord.first, coord.second, workingBoard.getCellNotations(coord.first, coord.second));
-                if (success) {
-                    if (workingBoard.isEmpty(coord.first, coord.second)) { // if function above is working perfectly this shouldn't happen
-                        if (notationsQueue.getFirstElement().equals(candidate))
-                            notationsQueue.hideFirstElement();
-                    } else {
-                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+        // After assigning as many cells as possible we check for existing ambiguities and resolve them
+        TreeSet<Coordinates> forcedValues = new TreeSet<>();
+        TreeSet<Coordinates> realAmbiguities = new TreeSet<>(); // should never be used if everything is okay
+        boolean finished = false;
+        while (!finished) {
+            finished = true;
+            for (Coordinates c : possibleAmbiguities) {
+                if (workingBoard.isEmpty(c.r, c.c)) { // still ambiguous, assign one of the values...
+                    ArrayList<Integer> valuesToTry = new ArrayList<>();
+                    for (int i = 0; i < 9; i++) if (workingBoard.cellHasNotation(c.r, c.c, i+1)) valuesToTry.add(i+1);
+                    Collections.shuffle(valuesToTry, random);
+                    for (int value : valuesToTry) {
+                        ArrayList<Integer> rowSumRollBack = new ArrayList<>();
+                        ArrayList<Integer> colSumRollBack = new ArrayList<>();
+                        ArrayList<Coordinates> cellValueRollBack = new ArrayList<>();
+                        ArrayList<RollbackNotations> cellNotationsRollBack = new ArrayList<>();
+                        ArrayList<RollbackNotations> hidingCellNotationsRollBack = new ArrayList<>();
+                        boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
+                        boolean[] modifiedCols = new boolean[colLineSize]; //default to false
+                        boolean success = cellValueAssignation(c.r, c.c, value, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                        if (success) {
+                            if (forceUniqueSolution) forcedValues.add(c);
+                            finished = false;
+                            break;
+                        } else {
+                            rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
+                        }
                     }
-                    continue;
+                    if (workingBoard.isEmpty(c.r, c.c)) realAmbiguities.add(c); //this should never happen
+                    if (!finished) break; // a value was assigned, should check the correct way of assigning values before continuing.
                 }
             }
-
-            // if both sums are already assigned, then that means there can still go more than one option in this
-            // cell, first we see if one of its notations is unique among the notations of the row or of the column
-            // if none are we try to find a cell in same row or column that has notated one of the notations of this cell
-            // and has a row/column not assigned so that we can try to make it take the value of the specific notation
-            // this way we reduce the ambiguity of the current cell possibilities.
-            // if in the pursuite of finding a "responsible" cell for a notation of this one, we end up in this one,
-            // (i.e. all cells with ambiguity-creating notations have their row/col sums assigned and have no unique notation)
-            // there is ambiguity for that value and we should assign one of its values, the board will have more than one solution
-            else {
-                /*
-                boolean success;
-                boolean[] interestNotations = candidate.getNotations();
-
-                // call function to find responsible for undoing ambiguity
-                // TODO: ambiguitySolver needs to be checked, it's not ready for the first deliver
-
-                boolean[][] visited = new boolean[rows][columns];
-                success = ambiguitySolver(coord.first, coord.second, visited, coord.first, coord.second, interestNotations, true);
-                if (!success) success = ambiguitySolver(coord.first, coord.second, visited, coord.first, coord.second, interestNotations, false);
-                if (success) {
-                    // let's check if our cell now has value
-                    if (!workingBoard.isEmpty(coord.first, coord.second)) {
-                        notationsQueue.removeOrderedCell(coord.first, coord.second);
-                        continue; // ambiguity solved
-                    }
-                }*/
-            }
-            // seems like a possible ambiguity
-
-            if (workingBoard.isEmpty(coord.first, coord.second)) {
-                WhiteCell currentFirstElem = notationsQueue.getFirstElement();
-                if (currentFirstElem.equals(candidate)) {
-                    notationsQueue.hideFirstElement();
-                } else if (candidate.getNotationSize() == currentFirstElem.getNotationSize()) {
-                    notationsQueue.hideElement(coord.first, coord.second);
-                }
-                possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
-            } else {
-                notationsQueue.removeOrderedCell(coord.first, coord.second);
-            }
+            if (!notationsQueue.isEmpty()) resolveEnqueuedCellValues(possibleAmbiguities);
         }
 
-        // when we get out of the while loop we should have a filled board generated,
-        // maybe we want to send it to the solver to check if it's unique or not or check for permutations, etc.
-
-        /*for (Coordinates c : possibleAmbiguities) {
-            if (workingBoard.isEmpty(c.r, c.c)) {
-                toSolve.add(c);
-                System.out.println("Ambiguous white cell at: " + c.r + "," + c.c);
-                foundAmbiguous = true;
-            }
-        }*/
-
-        // FIXME:: THIS IS A PROVISIONAL FIX THAT CREATES TOTALLY AMBIGUOUS KAKUROS, JUST TO HAVE SOMETHING FOR THE FIRST DELIVER
-
-        // IN PROVISIONAL VERSION WE ASSIGN ANY VALUE NOT IN THE ROW OR COLUMN AND WILL RE-ADAPT THE SUMS LATER
-        // BECAUSE IF IT DIDN'T GET ASSIGNED IT WONT BE ABLE TO ASSIGN IT NOW EITHER. IF THE UPDATE OF POSSIBILITIES
-        // MECHANISM IS WORKING WELL THIS SHOULD NEVER HAPPEN, THERE MUST ALWAYS BE AT LEAST ONE POSSIBILITY AVAILABLE
-        ArrayList<Coordinates> toSolve = new ArrayList<>();
-        boolean foundAmbiguous = false;
-        for (int i = 1; i < rows; i++) {
-            for (int j = 1; j < columns; j++) {
-                if (workingBoard.isWhiteCell(i,j) && workingBoard.isEmpty(i, j)) {
-                    foundAmbiguous = true;
-                    toSolve.add(new Coordinates(i, j));
-                }
-            }
-        }
-        if (toSolve.size() > 0) provisionalFillInBacktracking(toSolve);
-        // IN FINAL VERSION WE NEED TO DECIDE IF WE FILL IT IN WITH AN AMBIGUOUS NUMBER AND LET IT AMBIGUOUS
-        // OR AVOID AMBIGUITY BUT GENERATED BOARD WILL MAYBE HAVE WHITE CELLS WITH INITIALLY SET VALUES.
-        // for (Coordinates c : possibleAmbiguities) {...}
-
-        if (foundAmbiguous) { // we probably added values that do not correspond with the row and col sums
+        if (realAmbiguities.size() > 0) { // this should never happen
+            System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
+            ArrayList<Coordinates> toSolve = new ArrayList<>();
+            for (Coordinates c : realAmbiguities)
+                if (workingBoard.isEmpty(c.r, c.c)) toSolve.add(c);
+            provisionalFillInBacktracking(toSolve);
             computeRowSums();
             computeColSums();
-        } else { // all values in row sums and col sums have preserved their integrity correctly
+        } else {
             defineBlackCellSums();
         }
 
+        // Finally, after resolving all ambiguities we proceed to create the generated board.
         generatedBoard = new Board(columns, rows);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if (workingBoard.isBlackCell(i, j)) {
                     generatedBoard.setCell(new BlackCell((BlackCell)workingBoard.getCell(i, j)), i, j);
                 } else {
-                    generatedBoard.setCell(new WhiteCell(), i, j);
+                    if (forcedValues.contains(new Coordinates(i, j))) generatedBoard.setCell(new WhiteCell(workingBoard.getValue(i, j)), i, j);
+                    else generatedBoard.setCell(new WhiteCell(), i, j);
                 }
             }
         }
     }
 
-    private boolean generateStartingPoint (int coordRow, int coordCol) {
+    private boolean generateStartingPoint (int coordRow, int coordCol, boolean[] interestedValues) {
         ArrayList<int[]> uniqueCrossValues = KakuroConstants.INSTANCE.getUniqueCrossValues(rowSize[rowLine[coordRow][coordCol]], colSize[colLine[coordRow][coordCol]], difficulty); // returns [] of {rowSum, colSum, valueInCommon}
         for (int i = 0; i < uniqueCrossValues.size(); i++) {
             int[] uniqueValue = uniqueCrossValues.get(i);
+            if (!interestedValues[uniqueValue[2]-1]) continue;
             // Assign uniqueValue[0] to the row sum, uniqueValue[1] to de column sum, cell value should update automatically
             //  these assignments will take care to modify the notations and call other
             //  assignments recursively as well as change the pointers in notationsQueue as needed.
@@ -832,6 +979,75 @@ public class Generator {
             else rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
         }
         return false;
+    }
+
+    private void resolveEnqueuedCellValues(TreeSet<Coordinates> possibleAmbiguities) {
+        int iter = 0;
+        while (!notationsQueue.isEmpty()) {
+            iter++;
+            // then we have elements with no known value so we must do an assignation
+            WhiteCell candidate = notationsQueue.getFirstElement(); //should never return a cell with value
+            Pair<Integer, Integer> coord = candidate.getCoordinates();
+            boolean isRowSumAssigned = rowSums[rowLine[coord.first][coord.second]] != 0;
+            boolean isColSumAssigned = colSums[colLine[coord.first][coord.second]] != 0;
+            // if one or both of the sums are not assigned, we should choose the value in
+            // its notations that given the current values in the row and column there is a unique value for a
+            // certain sum assignation
+            if (!isRowSumAssigned || !isColSumAssigned) {
+                //if (iter == 41) printNotations();
+                boolean success = valueBiasedSumAssignation(coord.first, coord.second, workingBoard.getCellNotations(coord.first, coord.second));
+                if (success) {
+                    if (workingBoard.isEmpty(coord.first, coord.second)) { // if function above is working perfectly this shouldn't happen
+                        System.out.println("Success at valueBiasedSumAssig but no value was assigned at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
+                        if (notationsQueue.getFirstElement().equals(candidate))
+                            notationsQueue.hideFirstElement();
+                    } else {
+                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+                    }
+                    continue;
+                }
+            }
+
+            // if both sums are already assigned, then that means there can still go more than one option in this
+            // cell, first we see if one of its notations is unique among the notations of the row or of the column
+            // if none are we try to find a cell in same row or column that has notated one of the notations of this cell
+            // and has a row/column not assigned so that we can try to make it take the value of the specific notation
+            // this way we reduce the ambiguity of the current cell possibilities.
+            // if in the pursuite of finding a "responsible" cell for a notation of this one, we end up in this one,
+            // (i.e. all cells with ambiguity-creating notations have their row/col sums assigned and have no unique notation)
+            // there is ambiguity for that value and we should assign one of its values, the board will have more than one solution
+            else if (candidate.getNotationSize() == 2) {
+                // call function to find responsible for undoing ambiguity
+                boolean success = false;
+
+                int[][] visited = new int[rows][columns];
+                for (int i = 0; !success && i < 9; i++)  //only two iterations are actually useful
+                    if (candidate.isNotationChecked(i+1))
+                        success = ambiguitySolver(coord.first, coord.second, i+1, visited);
+
+                if (success) {
+                    // let's check if our cell now has value
+                    if (!workingBoard.isEmpty(coord.first, coord.second)) {
+                        notationsQueue.removeOrderedCell(coord.first, coord.second);
+                        continue; // ambiguity solved
+                    } else {
+                        System.out.println("Wasnt avoided but did success... shouldnt happen at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
+                    }
+                }
+            }
+            // seems like a possible ambiguity
+            if (workingBoard.isEmpty(coord.first, coord.second)) {
+                WhiteCell currentFirstElem = notationsQueue.getFirstElement();
+                if (currentFirstElem.equals(candidate)) {
+                    notationsQueue.hideFirstElement();
+                } else if (candidate.getNotationSize() == currentFirstElem.getNotationSize()) {
+                    notationsQueue.hideElement(coord.first, coord.second);
+                }
+                possibleAmbiguities.add(new Coordinates(coord.first, coord.second));
+            } else {
+                notationsQueue.removeOrderedCell(coord.first, coord.second);
+            }
+        }
     }
 
     private void defineBlackCellSums() {
@@ -944,19 +1160,34 @@ public class Generator {
             TreeSet<Integer> rowSumCandidates = new TreeSet<>();
             TreeSet<Integer> rowSumCandidatesRepeated = new TreeSet<>();
             for (int i = 0; i < 9; i++) {
-                if (interestedValues[i]) {
+                if (workingBoard.cellHasNotation(r, c, i+1)) {
                     rowValues[i] = true;
                     ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(rowSize[rowID], rowValues);
+
+                    for (int k = possibilities.size()-1; k >= 0; k--) {
+                        ArrayList<Integer> p = possibilities.get(k).second;
+                        ArrayList<WhiteCell> containingCells = new ArrayList<>();
+                        for (int it = firstRowCoord[rowID].c; it < firstRowCoord[rowID].c+rowSize[rowID]; it++) {
+                            for (int digit : p) {
+                                if ((!workingBoard.isEmpty(r, it) && workingBoard.getValue(r, it) == digit) || workingBoard.cellHasNotation(r, it, digit)) {
+                                    containingCells.add((WhiteCell)workingBoard.getCell(r, it));
+                                    break;
+                                }
+                            }
+                        }
+                        if (!isCombinationPossible(p, containingCells)) possibilities.remove(k);
+                    }
+
                     for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
                         boolean foundCandidate = true;
                         if (!uniqueNotations[i]) { //if i is a unique notation, any combination that contains it is useful
                             for (int p : poss.second) {
                                 // if candidate combination includes a value in notations other than the one we need it's not useful
-                                if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                                if (workingBoard.cellHasNotation(r, c, p) && p-1 != i) foundCandidate = false;
                             }
                         }
                         if (foundCandidate) {
-                            if (rowSumCandidates.contains(poss.first)) rowSumCandidatesRepeated.add(poss.first);
+                            if (rowSumCandidates.contains(poss.first) || !interestedValues[i]) rowSumCandidatesRepeated.add(poss.first);
                             else rowSumCandidates.add(poss.first);
                         }
                     }
@@ -980,6 +1211,7 @@ public class Generator {
                     boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
                     boolean[] modifiedCols = new boolean[colLineSize]; //default to false
                     success = rowSumAssignation(r, c, rowSumCand, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    if (success) success = !workingBoard.isEmpty(r, c);
                     if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                     else break;
                 }
@@ -991,19 +1223,34 @@ public class Generator {
             TreeSet<Integer> colSumCandidates = new TreeSet<>();
             TreeSet<Integer> colSumCandidatesRepeated = new TreeSet<>();
             for (int i = 0; i < 9; i++) {
-                if (interestedValues[i]) {
+                if (workingBoard.cellHasNotation(r, c, i+1)) {
                     colValues[i] = true;
                     ArrayList<Pair<Integer, ArrayList<Integer>>> possibilities = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(colSize[colID], colValues);
+
+                    for (int k = possibilities.size()-1; k >= 0; k--) {
+                        ArrayList<Integer> p = possibilities.get(k).second;
+                        ArrayList<WhiteCell> containingCells = new ArrayList<>();
+                        for (int it = firstColCoord[colID].r; it < firstColCoord[colID].r+colSize[colID]; it++) {
+                            for (int digit : p) {
+                                if ((!workingBoard.isEmpty(it, c) && workingBoard.getValue(it, c) == digit) || workingBoard.cellHasNotation(it, c, digit)) {
+                                    containingCells.add((WhiteCell)workingBoard.getCell(it, c));
+                                    break;
+                                }
+                            }
+                        }
+                        if (!isCombinationPossible(p, containingCells)) possibilities.remove(k);
+                    }
+
                     for (Pair<Integer, ArrayList<Integer>> poss : possibilities) {
                         boolean foundCandidate = true;
                         if (!uniqueNotations[i]) { //if i is a unique notation, any combination that contains it is useful
                             for (int p : poss.second) {
                                 // if candidate combination includes a value in notations other than the one we need it's not useful
-                                if (interestedValues[p-1] && p-1 != i) foundCandidate = false;
+                                if (workingBoard.cellHasNotation(r, c, p) && p-1 != i) foundCandidate = false;
                             }
                         }
                         if (foundCandidate) {
-                            if (colSumCandidates.contains(poss.first)) colSumCandidatesRepeated.add(poss.first);
+                            if (colSumCandidates.contains(poss.first) || !interestedValues[i]) colSumCandidatesRepeated.add(poss.first);
                             else colSumCandidates.add(poss.first);
                         }
                     }
@@ -1027,6 +1274,7 @@ public class Generator {
                     boolean[] modifiedRows = new boolean[rowLineSize]; //default to false
                     boolean[] modifiedCols = new boolean[colLineSize]; //default to false
                     success = colSumAssignation(r, c, colSumCand, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols);
+                    if (success) success = !workingBoard.isEmpty(r, c);
                     if (!success) rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack);
                     else break;
                 }
@@ -1050,7 +1298,7 @@ public class Generator {
             }
 
             if (shouldCreateStartingPoint) {
-                return generateStartingPoint(r, c);
+                return generateStartingPoint(r, c, interestedValues);
             } else {
                 // some values are assigned, take them into consideration in the search
 
@@ -1121,7 +1369,7 @@ public class Generator {
                             }
                         }
 
-                        if (uniqueCrossValuePos >= 0) {
+                        if (uniqueCrossValuePos >= 0 && interestedValues[uniqueCrossValuePos]) {
                             uniqueSumCombination.add(new Pair<> (rowSumOpt, colSumOpt));
                         }
                     }
@@ -1161,42 +1409,48 @@ public class Generator {
         return uniqueNotations;
     }
 
-    private boolean ambiguitySolver(int r, int c, boolean[][] visited, final int init_r, final int init_c, final boolean[] interestNotations, boolean isRow) {
-        if (visited[r][c]) return false; //already seen this and didn't solve anything
-        visited[r][c] = true;
-        boolean success;
-        // check row/col
-        ArrayList<Coordinates> checkCross = new ArrayList<>();
-        int ID = isRow ? rowLine[r][c] : colLine[r][c];
-        int firstPos = isRow ? firstRowCoord[ID].c : firstColCoord[ID].r;
-        int size = isRow ? rowSize[ID] : colSize[ID];
-        for (int it = firstPos; it < firstPos+size; it++) {
-            if ((isRow && visited[r][it]) || (!isRow && visited[it][c])) continue;
-            boolean[] itNotations = isRow ? workingBoard.getCellNotations(r, it) : workingBoard.getCellNotations(it, c);
-            for (int i = 0; i < 9; i++) {
-                if (interestNotations[i] && itNotations[i]) {
-                    boolean isOfInterest = isRow ? colSums[colLine[r][it]] == 0 : rowSums[rowLine[it][c]] == 0;
-                    if (isOfInterest) {
-                        int rowA = isRow ? r : it;
-                        int colA = isRow ? it : c;
-                        boolean[] assignmentAttempt = new boolean[9];
-                        assignmentAttempt[i] = true;
-                        success = valueBiasedSumAssignation(rowA, colA, assignmentAttempt);
-                        if (!workingBoard.isEmpty(init_r, init_c)) return true; //ambiguity was successfuly solved
-                        else if (success) {
-                            // there was an assignation that didn't solve the ambiguity but made changes
-                            return ambiguitySolver(r, c, visited, init_r, init_c, interestNotations, !isRow);
-                            // FIXME: I'm not too sure this is the correct thing to do, or just return false.
+    // to call when only two values are possible and want to get rid of one of them, interest is in [1..9]
+    private boolean ambiguitySolver(int r, int c, int interest, int[][] visited) {
+        if (((visited[r][c] >> interest-1) & 1) > 0) return false; // already seen this and didn't solve anything
+        visited[r][c] |= (1 << interest-1);
+        int rowID = rowLine[r][c];
+        // check both row and column for new value
+        for (int it = firstRowCoord[rowID].c; it < firstRowCoord[rowID].c+rowSize[rowID]; it++) {
+            if (it != c && workingBoard.cellHasNotation(r, it, interest)) {
+                // try to assign it the interest value
+                if (colSums[colLine[r][it]] == 0 && rowSums[rowLine[r][it]] != 0) {
+                    boolean[] assignmentAttempt = new boolean[9];
+                    assignmentAttempt[interest-1] = true;
+                    if (valueBiasedSumAssignation(r, it, assignmentAttempt)) return true;
+                }
+                // if it has 2 notations, look for the other one and try to make another cell take that other value.
+                if (workingBoard.getCellNotationSize(r, it) == 2) {
+                    for (int i = 0; i < 9; i++) {
+                        if (workingBoard.cellHasNotation(r, it, i+1) && i+1!=interest) {
+                            if (ambiguitySolver(r, it, i+1, visited)) return true;
                         }
-                    } else {
-                        checkCross.add(isRow ? new Coordinates(r, it) : new Coordinates(it, c));
                     }
                 }
             }
         }
-        for(Coordinates coord : checkCross) {
-            success = ambiguitySolver(coord.r, coord.c, visited, init_r, init_c, interestNotations, !isRow);
-            if (success) return true;
+        int colID = colLine[r][c];
+        for (int it = firstColCoord[colID].r; it < firstColCoord[colID].r+colSize[colID]; it++) {
+            if (it != r && workingBoard.cellHasNotation(it, c, interest)) {
+                // try to assign it the interest value
+                if (rowSums[rowLine[it][c]] == 0 && colSums[colLine[it][c]] != 0) {
+                    boolean[] assignmentAttempt = new boolean[9];
+                    assignmentAttempt[interest-1] = true;
+                    if (valueBiasedSumAssignation(it, c, assignmentAttempt)) return true;
+                }
+                // if it has 2 notations, look for the other one and try to make another cell take that other value.
+                if (workingBoard.getCellNotationSize(it, c) == 2) {
+                    for (int i = 0; i < 9; i++) {
+                        if (workingBoard.cellHasNotation(it, c, i+1) && i+1!=interest) {
+                            if (ambiguitySolver(it, c, i+1, visited)) return true;
+                        }
+                    }
+                }
+            }
         }
         return false;
     }
