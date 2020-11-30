@@ -36,7 +36,6 @@ public class Solver {
 
         rowLine = new int[board.getHeight()][board.getWidth()];
         rowSums = new int[board.getHeight()][board.getWidth()];
-
         colLine = new int[board.getHeight()][board.getWidth()];
         colSums = new int[board.getHeight()][board.getWidth()];
     }
@@ -48,7 +47,6 @@ public class Solver {
     public int solve() {
         preprocessRows();
         preprocessCols();
-
         preprocessSums();
 
         solve(0, 0, 0, new int[board.getWidth()]);
@@ -79,7 +77,6 @@ public class Solver {
             if (size > 0) { // last rowLine in row if we have seen whiteCells
                 sizes.add(size);
                 size = 0;
-
                 rowLineID++; //prepare for next rowLine
             }
         }
@@ -94,9 +91,8 @@ public class Solver {
         }
 
         rowSize = new int[rowLineID];
-        for (int i = 0; i < rowLineID; i++) {
+        for (int i = 0; i < rowLineID; i++)
             rowSize[i] = sizes.get(i);
-        }
     }
 
     private void preprocessCols() {
@@ -137,9 +133,8 @@ public class Solver {
         }
 
         colSize = new int[colLineID];
-        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+        for (int i = 0; i < colLineID; i++)
             colSize[i] = sizes.get(i);
-        }
     }
 
     private void preprocessSums() {
@@ -160,13 +155,15 @@ public class Solver {
 
     private int getPossibleValues(int row, int col) {
         // Get options for each row and column
-        ArrayList<Integer> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                rowSize[rowLine[row][col]], rowSums[row][col], rowValuesUsed[rowLine[row][col]]);
-        ArrayList<Integer> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                colSize[colLine[row][col]], colSums[row][col], colValuesUsed[colLine[row][col]]);
-
+        int rowID = rowLine[row][col];
+        int colID = colLine[row][col];
         int hAvailable = 0;
         int vAvailable = 0;
+
+        ArrayList<Integer> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
+                rowSize[rowID], rowSums[row][col], rowValuesUsed[rowID]);
+        ArrayList<Integer> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
+                colSize[colID], colSums[row][col], colValuesUsed[colID]);
 
         // Calculate available options for this row
         for (Integer i : hOptions)
@@ -177,9 +174,9 @@ public class Solver {
             vAvailable |= i;
 
         // Do the intersection
-        return hAvailable & vAvailable               // A value is available if it is available in both row & col...
-                & ~colValuesUsed[colLine[row][col]]  // ...and it is not used in the current column...
-                & ~rowValuesUsed[rowLine[row][col]]; // ...nor in the current row.
+        return hAvailable & vAvailable   // A value is available if it is available in both row & col...
+                & ~colValuesUsed[colID]  // ...and it is not used in the current column...
+                & ~rowValuesUsed[rowID]; // ...nor in the current row.
     }
 
     private void solve(int row, int col, int rowSum, int[] colSum) {

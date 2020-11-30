@@ -120,10 +120,10 @@ public class WhiteCell extends Cell {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
 
-        if(checked)
-            notations |= (1 << (value - 1));
-        else
-            notations ^= (1 << (value - 1));
+        int mask = 1 << (value - 1);
+        int flag = checked ? 1 : 0;
+
+        notations ^= (-flag ^ notations) & mask;
     }
 
     /**
