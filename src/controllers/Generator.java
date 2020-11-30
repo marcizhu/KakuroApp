@@ -382,6 +382,19 @@ public class Generator {
         }
 
         cellValueRollBack.add(new Coordinates(r, c)); //if rollback we clear this coordinates and insert in notationsQueue
+        if (workingBoard.getCellNotationSize(r, c) > 1) { //cell notations should be removed (important in ambiguity checking), this won't be checked before then.
+            boolean[] cellNotations = workingBoard.getCellNotations(r, c);
+            boolean[] rollbackNotations = new boolean[9]; // IMPORTANT! rollback notations should be a new object
+            // because cellNotations might get modified if we have to erase, rollback holds the original values
+            ArrayList<Integer> toErase = new ArrayList<>(); //new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                rollbackNotations[i] = cellNotations[i];
+                if(i+1 != value && cellNotations[i]) toErase.add(i + 1); // if it's not the value
+            }
+            if (notationsQueue.isHiding(r, c)) hidingCellNotationsRollBack.add(new RollbackNotations(r, c, rollbackNotations));
+            else cellNotationsRollBack.add(new RollbackNotations(r, c, rollbackNotations));
+            notationsQueue.eraseNotationsFromCell(r, c, toErase);
+        }
         notationsQueue.removeOrderedCell(r, c); // removes it from queue but notations are mantained
         workingBoard.setCellValue(r, c, value);
         rowValuesUsed[rowID][value-1] = true;
@@ -711,7 +724,7 @@ public class Generator {
             int end = num_cells-1;
             while (end >= ini && size[end] > length) end--;
 
-            if (end - ini +1 < length || end == num_cells-1) continue;
+            if (end - ini +1 < length) continue;
 
             int[] indices = new int[length];
             for (int j = 0; j < length; j++) {
@@ -895,6 +908,8 @@ public class Generator {
         TreeSet<Coordinates> possibleAmbiguities = new TreeSet<>();
         resolveEnqueuedCellValues(possibleAmbiguities);
 
+        //System.out.println("Before ambiguity check");
+        //printNotations();
         // After assigning as many cells as possible we check for existing ambiguities and resolve them
         TreeSet<Coordinates> forcedValues = new TreeSet<>();
         TreeSet<Coordinates> realAmbiguities = new TreeSet<>(); // should never be used if everything is okay
@@ -929,6 +944,8 @@ public class Generator {
             }
             if (!notationsQueue.isEmpty()) resolveEnqueuedCellValues(possibleAmbiguities);
         }
+        //System.out.println("After ambiguity check");
+        //printNotations();
 
         if (realAmbiguities.size() > 0) { // this should never happen
             System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
@@ -985,6 +1002,9 @@ public class Generator {
         int iter = 0;
         while (!notationsQueue.isEmpty()) {
             iter++;
+            //System.out.println("Notations at iter: " + iter);
+            //printNotations();
+            //System.out.println();
             // then we have elements with no known value so we must do an assignation
             WhiteCell candidate = notationsQueue.getFirstElement(); //should never return a cell with value
             Pair<Integer, Integer> coord = candidate.getCoordinates();
@@ -994,7 +1014,6 @@ public class Generator {
             // its notations that given the current values in the row and column there is a unique value for a
             // certain sum assignation
             if (!isRowSumAssigned || !isColSumAssigned) {
-                //if (iter == 41) printNotations();
                 boolean success = valueBiasedSumAssignation(coord.first, coord.second, workingBoard.getCellNotations(coord.first, coord.second));
                 if (success) {
                     if (workingBoard.isEmpty(coord.first, coord.second)) { // if function above is working perfectly this shouldn't happen
