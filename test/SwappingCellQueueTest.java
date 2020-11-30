@@ -1,9 +1,9 @@
 package test;
 
 import org.junit.jupiter.api.Test;
-import src.controllers.SwappingCellQueue;
-import src.domain.Board;
-import src.domain.WhiteCell;
+import src.domain.controllers.SwappingCellQueue;
+import src.domain.entities.Board;
+import src.domain.entities.WhiteCell;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,8 +1,8 @@
 package src;
 
-import src.controllers.Solver;
-import src.controllers.Reader;
-import src.domain.Board;
+import src.domain.controllers.Solver;
+import src.domain.controllers.Reader;
+import src.domain.entities.Board;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

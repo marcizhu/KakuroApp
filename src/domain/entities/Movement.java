@@ -1,4 +1,4 @@
-package src.domain;
+package src.domain.entities;
 
 public class Movement {
     private int index, previous, next;

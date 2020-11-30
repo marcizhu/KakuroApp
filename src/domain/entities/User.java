@@ -1,4 +1,4 @@
-package src.domain;
+package src.domain.entities;
 
 public class User {
     private final String name;

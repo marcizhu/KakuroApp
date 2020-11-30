@@ -1,9 +1,9 @@
-package src.controllers;
+package src.domain.controllers;
 
-import src.domain.BlackCell;
-import src.domain.Board;
-import src.domain.Cell;
-import src.domain.WhiteCell;
+import src.domain.entities.BlackCell;
+import src.domain.entities.Board;
+import src.domain.entities.Cell;
+import src.domain.entities.WhiteCell;
 
 import java.io.IOException;
 import java.nio.file.Files;

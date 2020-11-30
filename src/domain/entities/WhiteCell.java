@@ -1,4 +1,4 @@
-package src.domain;
+package src.domain.entities;
 
 /**
  * Class that represents a white cell

@@ -1,6 +1,5 @@
-package src.domain;
+package src.domain.entities;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 
 public class GameFinished extends Game{

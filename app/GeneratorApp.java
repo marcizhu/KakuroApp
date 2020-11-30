@@ -1,8 +1,8 @@
 package app;
 
-import src.controllers.Generator;
-import src.domain.Board;
-import src.domain.Difficulty;
+import src.domain.controllers.Generator;
+import src.domain.entities.Board;
+import src.domain.entities.Difficulty;
 
 public class GeneratorApp {
     public static void main(String[] args) {

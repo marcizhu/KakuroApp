@@ -1,4 +1,4 @@
-package src.domain;
+package src.domain.entities;
 
 import src.utils.Pair;
 

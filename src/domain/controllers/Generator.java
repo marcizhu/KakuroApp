@@ -1,6 +1,6 @@
-package src.controllers;
+package src.domain.controllers;
 
-import src.domain.*;
+import src.domain.entities.*;
 import src.utils.Pair;
 
 import java.util.*;

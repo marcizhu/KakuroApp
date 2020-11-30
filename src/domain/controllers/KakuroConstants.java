@@ -1,6 +1,6 @@
-package src.controllers;
+package src.domain.controllers;
 
-import src.domain.Difficulty;
+import src.domain.entities.Difficulty;
 import src.utils.Pair;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package src.domain;
+package src.domain.entities;
 
 public class GameInProgress extends Game{
     private Board board;

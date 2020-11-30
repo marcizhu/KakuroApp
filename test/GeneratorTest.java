@@ -1,10 +1,10 @@
 package test;
 
 import org.junit.jupiter.api.Test;
-import src.controllers.Generator;
-import src.controllers.Solver;
-import src.domain.Board;
-import src.domain.Difficulty;
+import src.domain.controllers.Generator;
+import src.domain.controllers.Solver;
+import src.domain.entities.Board;
+import src.domain.entities.Difficulty;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

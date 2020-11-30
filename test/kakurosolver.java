@@ -1,6 +1,6 @@
-import src.controllers.Reader;
-import src.controllers.Solver;
-import src.domain.Board;
+import src.domain.controllers.Reader;
+import src.domain.controllers.Solver;
+import src.domain.entities.Board;
 
 import java.util.Scanner;
 

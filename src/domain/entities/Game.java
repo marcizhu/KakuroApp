@@ -1,9 +1,5 @@
-package src.domain;
+package src.domain.entities;
 
-import src.domain.Kakuro;
-import src.domain.User;
-
-import java.sql.Time;
 import java.sql.Timestamp;
 
 public abstract class Game {

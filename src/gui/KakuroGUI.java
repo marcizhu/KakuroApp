@@ -1,8 +1,8 @@
 package src.gui;
 
-import src.domain.Board;
-import src.domain.Cell;
-import src.domain.BlackCell;
+import src.domain.entities.Board;
+import src.domain.entities.Cell;
+import src.domain.entities.BlackCell;
 
 import java.awt.*;
 import java.awt.event.*;

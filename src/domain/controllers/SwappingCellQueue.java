@@ -1,7 +1,7 @@
-package src.controllers;
+package src.domain.controllers;
 
-import src.domain.Board;
-import src.domain.WhiteCell;
+import src.domain.entities.Board;
+import src.domain.entities.WhiteCell;
 
 import java.util.ArrayList;
 

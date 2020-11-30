@@ -4,9 +4,9 @@ import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import src.controllers.Reader;
-import src.controllers.Solver;
-import src.domain.Board;
+import src.domain.controllers.Reader;
+import src.domain.controllers.Solver;
+import src.domain.entities.Board;
 
 public class SolverApp {
     private static final Scanner scanner = new Scanner(new BufferedInputStream(System.in));
