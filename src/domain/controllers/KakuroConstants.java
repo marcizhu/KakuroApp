@@ -85,73 +85,63 @@ public class KakuroConstants {
      * @param diff     Difficulty of the kakuro being generated
      * @return an ArrayList of values unique in that cell
      */
-    // TODO: as it is, it always returns the possibilities in a specific order for the same input, maybe should apply some randomness to the order of the partial solutions
+    // TODO: as it is, it always returns the possibilities in a specific order for the same input, maybe should apply
+    //       some randomness to the order of the partial solutions
     public ArrayList<int[]> getUniqueCrossValues(int rowSpace, int colSpace, Difficulty diff) {
-        ArrayList<int[]> result = new ArrayList<>(); // all int[] will have 3 values: {rowSum, colSum, uniqueValueInCommon}
+        ArrayList<int[]> result = new ArrayList<>(); // every element has 3 values: {rowSum, colSum, uniqueValueInCommon}
         if (rowSpace < 1 || rowSpace > 9 || colSpace < 1 || colSpace > 9) return result;
 
-        int rowNumOfSums = numOfSumsAtSpace[rowSpace-1], colNumOfSums = numOfSumsAtSpace[colSpace-1];
+        int rowNumOfSums = numOfSumsAtSpace[rowSpace-1];
+        int colNumOfSums = numOfSumsAtSpace[colSpace-1];
 
-        ArrayList<int[]> partialEasy = new ArrayList<>();
-        ArrayList<int[]> partialMedium = new ArrayList<>();
-        ArrayList<int[]> partialHard = new ArrayList<>();
+        ArrayList<int[]> partialEasy    = new ArrayList<>();
+        ArrayList<int[]> partialMedium  = new ArrayList<>();
+        ArrayList<int[]> partialHard    = new ArrayList<>();
         ArrayList<int[]> partialExtreme = new ArrayList<>();
 
         for (int rowIdx = 0; rowIdx < rowNumOfSums; rowIdx++) {
             // How many times is a certain value seen for a given space and a given sum in the row
             int rowSum = firstSumAtSpace[rowSpace-1]+rowIdx;
             ArrayList<Integer> rowOptions = cases.get(rowSpace).get(rowSum);
-            boolean[] rowValuesSeen = { false, false, false, false, false, false, false, false, false };
-            for (Integer rowOption : rowOptions) {
-                for (int i = 0; i < 9; i++) {
-                    if(((rowOption >> i) & 1) == 1) rowValuesSeen[i] = true;
-                }
-            }
+
+            int rowValuesSeen = 0;
+            for (Integer rowOption : rowOptions)
+                rowValuesSeen |= rowOption;
 
             for (int colIdx = 0; colIdx < colNumOfSums; colIdx++) {
                 // How many times is a certain value seen for a given space and a given sum in the col
                 int colSum = firstSumAtSpace[colSpace-1]+colIdx;
                 ArrayList<Integer> colOptions = cases.get(colSpace).get(colSum);
-                boolean[] colValuesSeen = { false, false, false, false, false, false, false, false, false };
-                for (Integer colOption : colOptions) {
-                    for (int i = 0; i < 9; i++) {
-                        if(((colOption >> i) & 1) == 1) colValuesSeen[i] = true;
-                    }
-                }
 
-                int uniqueCrossValuePos = -1;
-                for (int i = 0; i < 9 && uniqueCrossValuePos != -2; i++) {
-                    if (rowValuesSeen[i] && colValuesSeen[i]) {
-                        if (uniqueCrossValuePos == -1) uniqueCrossValuePos = i; // there is one value in common
-                        else uniqueCrossValuePos = -2; // there is more than one value in common
-                    }
-                }
+                int colValuesSeen = 0;
+                for (Integer colOption : colOptions)
+                    colValuesSeen |= colOption;
 
-                if (uniqueCrossValuePos >= 0) {
+                int uniqueCrossValuePos = rowValuesSeen & colValuesSeen;
+
+                if(Integer.bitCount(uniqueCrossValuePos) == 1) {
+                    // Math trick: get first set bit :D
+                    uniqueCrossValuePos = (int)(Math.log(uniqueCrossValuePos) / Math.log(2)) + 1;
+
                     // Depending on the rowIdx and colIdx we consider them more or less difficult options
-                    int rowOptDiff;
-                    if (rowIdx+1 > rowNumOfSums*3/8 && rowIdx+1 < rowNumOfSums*5/8) rowOptDiff = 5;
-                    else if (rowIdx+1 > rowNumOfSums/4 && rowIdx+1 < rowNumOfSums*3/4) rowOptDiff = 3;
-                    else if (rowIdx+1 > rowNumOfSums/8 && rowIdx+1 < rowNumOfSums*7/8) rowOptDiff = 1;
-                    else rowOptDiff = 0;
+                    int rowOptDiff = 0;
+                    /**/ if (rowIdx + 1 > rowNumOfSums * 3 / 8 && rowIdx + 1 < rowNumOfSums * 5 / 8) rowOptDiff = 5;
+                    else if (rowIdx + 1 > rowNumOfSums     / 4 && rowIdx + 1 < rowNumOfSums * 3 / 4) rowOptDiff = 3;
+                    else if (rowIdx + 1 > rowNumOfSums     / 8 && rowIdx + 1 < rowNumOfSums * 7 / 8) rowOptDiff = 1;
 
-                    int colOptDiff;
-                    if (colIdx > colNumOfSums*3/8 && colIdx < colNumOfSums*5/8) colOptDiff = 5;
-                    else if (colIdx > colNumOfSums/4 && colIdx < colNumOfSums*3/4) colOptDiff = 3;
-                    else if (colIdx > colNumOfSums/8 && colIdx < colNumOfSums*7/8) colOptDiff = 1;
-                    else colOptDiff = 0;
+                    int colOptDiff = 0;
+                    /**/ if (colIdx > colNumOfSums * 3 / 8 && colIdx < colNumOfSums * 5 / 8) colOptDiff = 5;
+                    else if (colIdx > colNumOfSums     / 4 && colIdx < colNumOfSums * 3 / 4) colOptDiff = 3;
+                    else if (colIdx > colNumOfSums     / 8 && colIdx < colNumOfSums * 7 / 8) colOptDiff = 1;
 
                     /* Depending on the difficulty of the options we assign it to its partial solution, so we can
-                     *   return all the options ordered in the difficulty asked for.
-                     * */
+                     * return all the options ordered in the difficulty asked for. */
                     int diffValue = rowOptDiff + colOptDiff;
-                    if (diffValue > 7) // EXTREME
-                        partialExtreme.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
-                    else if (diffValue > 4) // HARD
-                        partialHard.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
-                    else if (diffValue > 1) // MEDIUM
-                        partialMedium.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
-                    else // EASY
+
+                    /**/ if (diffValue > 7) partialExtreme.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else if (diffValue > 4) partialHard.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else if (diffValue > 1) partialMedium.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
+                    else
                         partialEasy.add(new int[] { rowSum, colSum, uniqueCrossValuePos+1 });
                 }
             }
