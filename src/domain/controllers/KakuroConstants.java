@@ -45,21 +45,11 @@ public class KakuroConstants {
      * @return an ArrayList of Integers containing all possible cases for this row or column (without permutations)
      */
     public ArrayList<Integer> getPossibleCasesWithValues(int space, int sum, int values) {
-        ArrayList<Integer> result = new ArrayList<>();
         ArrayList<Integer> possible = cases.get(space).get(sum);
-
-        if (values == 0) return (ArrayList<Integer>) possible.clone(); // if no values are specified, it will return all possibilities
+        ArrayList<Integer> result = new ArrayList<>();
 
         for (Integer p : possible) {
-            boolean noValuesFound = true;
-            for (int i = 0; i < 9 && noValuesFound; i++) {
-                if(((p >> i) & 1) == 1) continue;
-
-                // if there is a value in use and not in an option p, the option is not valid
-                noValuesFound = !((values >> i & 1) == 1);
-            }
-
-            if (noValuesFound) result.add(p); // otherwise we add p to the array of valid options "result"
+            if ((values & ~p) == 0) result.add(p);
         }
 
         return result;
