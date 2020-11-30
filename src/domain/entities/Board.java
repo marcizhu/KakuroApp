@@ -145,7 +145,7 @@ public class Board {
      * @param col Column of the cell from which to get the notations
      * @return the notations of the requested cell
      */
-    public boolean[] getCellNotations(int row, int col) {
+    public int getCellNotations(int row, int col) {
         return cells[row][col].getNotations();
     }
 

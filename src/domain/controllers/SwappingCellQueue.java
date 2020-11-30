@@ -92,12 +92,12 @@ public class SwappingCellQueue {
             insertOrderedCell(r, c);
             pos = findCell(r, c, notSize);
         }
-        boolean [] cellNotations = workingBoard.getCellNotations(r, c);
+        int cellNotations = workingBoard.getCellNotations(r, c);
         for (int i : toErase) {
             if (i<1 || i>9) continue;
-            if (cellNotations[i-1]) { // if there was such notation we erase it
+            if ((cellNotations & (1<<(i-1))) != 0) { // if there was such notation we erase it
                 workingBoard.setCellNotation(r, c, i, false);
-                cellNotations[i-1] = false;
+                cellNotations &= ~(1<<(i-1));
                 // swap cells in array to preserve order
                 WhiteCell swap = orderedCells[startPos[notSize]];
                 orderedCells[startPos[notSize]] = orderedCells[pos];
@@ -123,7 +123,7 @@ public class SwappingCellQueue {
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
         if (pos == endElement || toAdd.size() == 0) return notSize; // we didn't find the element, we didn't erase any notations
-        boolean [] cellNotations = workingBoard.getCellNotations(r, c);
+        int cellNotations = workingBoard.getCellNotations(r, c);
         // if somehow this cell had no notations (no possible values, may happen if we need to do rollback)
         // we need to previously find it and insert it into a valid position of size 1
         if (notSize == 0 && startPos[0]>0) {
@@ -136,9 +136,9 @@ public class SwappingCellQueue {
         }
         for (int i : toAdd) {
             if (i<1 || i>9) continue;
-            if (!cellNotations[i-1]) { // if there was not such notation we add it
+            if ((cellNotations & (1<<(i-1))) == 0) { // if there was not such notation we add it
                 workingBoard.setCellNotation(r, c, i, true);
-                cellNotations[i-1] = true;
+                cellNotations |= 1 << (i-1);
                 // swap cells in array to preserve order
                 WhiteCell swap = orderedCells[startPos[notSize+1]-1];
                 orderedCells[startPos[notSize+1]-1] = orderedCells[pos];
@@ -185,9 +185,9 @@ public class SwappingCellQueue {
         int pos = findCell(r, c, notSize);
         if (pos != endElement) {
             if (workingBoard.equalsCell(r, c, orderedCells[pos])) {
-                boolean[] notations = workingBoard.getCellNotations(r, c);
+                int notations = workingBoard.getCellNotations(r, c);
                 ArrayList<Integer> toRemove = new ArrayList<>();
-                for (int j = 0; j < 9; j++) if (notations[j]) toRemove.add(j+1);
+                for (int j = 0; j < 9; j++) if ((notations & (1<<j)) != 0) toRemove.add(j+1);
                 eraseNotationsFromCell(r, c, toRemove);
                 for (int j : toRemove)
                     workingBoard.setCellNotation(r, c, j, true);
@@ -200,11 +200,9 @@ public class SwappingCellQueue {
         for (int i = firstElement-1; !elementFound &&  i >= 0; i--) {
             if (workingBoard.equalsCell(r, c, orderedCells[i])) {
                 elementFound = true;
-                boolean[] notations = workingBoard.getCellNotations(r, c);
+                int notations = workingBoard.getCellNotations(r, c);
                 ArrayList<Integer> toAdd = new ArrayList<>();
-                for (int j = 0; j < 9; j++) {
-                    if (notations[j]) toAdd.add(j+1);
-                }
+                for (int j = 0; j < 9; j++) if ((notations & (1<<j)) != 0) toAdd.add(j+1);
                 workingBoard.clearCellNotations(r, c);
                 addNotationsToCell(r, c, toAdd);
             }

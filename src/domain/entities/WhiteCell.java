@@ -82,13 +82,14 @@ public class WhiteCell extends Cell {
      * Get notations of this cell
      * @return the notations of this cell
      */
-    public boolean[] getNotations() {
-        boolean[] ret = new boolean[9];
+    public int getNotations() {
+        return notations;
+        /*boolean[] ret = new boolean[9];
 
         for(int i = 0; i < 9; i++)
             ret[i] = ((notations & (1 << i)) != 0);
 
-        return ret;
+        return ret;*/
     }
 
     /**
@@ -108,7 +109,7 @@ public class WhiteCell extends Cell {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
 
-        return (notations & (1 << (value - 1))) == 1;
+        return (notations & (1 << (value - 1))) != 0;
     }
 
     /**

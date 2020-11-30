@@ -1,4 +1,4 @@
-package src.presentation;
+package src.presentation.controllers;
 
 import src.presentation.screens.LoginScreen;
 import src.presentation.screens.Screen;

@@ -65,7 +65,7 @@ public abstract class Cell {
      * Get notations of this cell
      * @return the notations of this cell
      */
-    public boolean[] getNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
+    public int getNotations() { throw new RuntimeException("Invalid call to clearValue()"); }
 
     /**
      * Get the number of notations of this cell

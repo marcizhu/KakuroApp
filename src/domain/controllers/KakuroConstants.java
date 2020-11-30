@@ -102,7 +102,7 @@ public class KakuroConstants {
             boolean[] rowValuesSeen = { false, false, false, false, false, false, false, false, false };
             for (Integer rowOption : rowOptions) {
                 for (int i = 0; i < 9; i++) {
-                    if(((rowOption >> i) & 1) == 1) rowValuesSeen[i - 1] = true;
+                    if(((rowOption >> i) & 1) == 1) rowValuesSeen[i] = true;
                 }
             }
 
@@ -113,7 +113,7 @@ public class KakuroConstants {
                 boolean[] colValuesSeen = { false, false, false, false, false, false, false, false, false };
                 for (Integer colOption : colOptions) {
                     for (int i = 0; i < 9; i++) {
-                        if(((colOption >> i) & 1) == 1) colValuesSeen[i - 1] = true;
+                        if(((colOption >> i) & 1) == 1) colValuesSeen[i] = true;
                     }
                 }
 
