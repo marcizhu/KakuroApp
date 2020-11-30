@@ -33,7 +33,7 @@ public class KakuroConstants {
      * @return an ArrayList of ArrayList containing all possible cases for this row or column (without permutations)
      */
     public ArrayList<Integer> getPossibleCases(int space, int sum) {
-        return (ArrayList<Integer>) cases.get(space).get(sum).clone();
+        return new ArrayList<>(cases.get(space).get(sum));
     }
 
     /**
@@ -46,7 +46,7 @@ public class KakuroConstants {
      */
     public ArrayList<Integer> getPossibleCasesWithValues(int space, int sum, int values) {
         ArrayList<Integer> possible = cases.get(space).get(sum);
-        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> result = new ArrayList<>(possible.size());
 
         for (Integer p : possible) {
             if ((values & ~p) == 0) result.add(p);
@@ -64,14 +64,16 @@ public class KakuroConstants {
     public ArrayList<Pair<Integer, Integer>> getPossibleCasesUnspecifiedSum(int space, int values) {
         ArrayList<Pair<Integer, Integer>> result = new ArrayList<>();
         if (space < 1 || space > 9) return result;
-        if (Integer.bitCount(values) > space) return result; //if there are more values than space available there is no possibility to add any more numbers
+        //if there are more values than space available there is no possibility to add any more numbers
+        if (Integer.bitCount(values) > space) return result;
 
-        int numOfSums = numOfSumsAtSpace[space-1];
+        int numOfSums = numOfSumsAtSpace[space - 1];
 
         for (int i = 0; i < numOfSums; i++) {
-            int sum = firstSumAtSpace[space-1]+i;
+            int sum = firstSumAtSpace[space - 1] + i;
             ArrayList<Integer> possibilities = getPossibleCasesWithValues(space, sum, values);
-            for (Integer p : possibilities) result.add(new Pair<>(sum, p));
+            for (Integer p : possibilities)
+                result.add(new Pair<>(sum, p));
         }
         return result;
     }
@@ -204,29 +206,20 @@ public class KakuroConstants {
     }
 
     private ArrayList<Integer> findCombinations(int space, int sum) {
-        ArrayList<Integer> result = new ArrayList<>();
-
-        boolean[] values = { false, false, false, false, false, false, false, false, false };
-        backtrackingFindCombinations(1, space, sum, 0, 0, values, result);
-
+        ArrayList<Integer> result = new ArrayList<>(numOfSumsAtSpace[space - 1]);
+        backtrackingFindCombinations(1, space, sum, 0, 0, 0, result);
         return result;
     }
 
-    private void backtrackingFindCombinations(int idx, int space, int sum, int currentSpace, int currentSum, boolean[] values, ArrayList<Integer> found) {
+    private void backtrackingFindCombinations(int idx, int space, int sum, int currentSpace, int currentSum, int values, ArrayList<Integer> found) {
         if (idx > 9 || currentSpace >= space) return;
-        if (idx + currentSum == sum && currentSpace == space-1) {
-            values[idx-1] = true;
-            int solution = 0;
-            for (int i = 0; i < 9; i++) if (values[i]) solution |= (1 << i);
-            found.add(solution);
-            values[idx-1] = false;
+        if (idx + currentSum == sum && currentSpace == space - 1) {
+            found.add(values | (1 << (idx - 1)));
             return;
         }
-        if (idx + currentSum < sum) {
-            values[idx-1] = true;
-            backtrackingFindCombinations(idx+1, space, sum, currentSpace+1, currentSum+idx, values, found);
-            values[idx-1] = false;
-            backtrackingFindCombinations(idx+1, space, sum, currentSpace, currentSum, values, found);
-        }
+
+        int n = values | (1 << (idx - 1));
+        backtrackingFindCombinations(idx+1, space, sum, currentSpace+1, currentSum+idx, n, found);
+        backtrackingFindCombinations(idx+1, space, sum, currentSpace, currentSum, values, found);
     }
 }
