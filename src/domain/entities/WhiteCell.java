@@ -8,7 +8,7 @@ package src.domain.entities;
 
 public class WhiteCell extends Cell {
     private int value;
-    private boolean[] notations;
+    private int notations;
 
     /**
      * Default constructor.
@@ -25,11 +25,7 @@ public class WhiteCell extends Cell {
      */
     public WhiteCell(WhiteCell c) {
         this.value = c.value;
-        notations = new boolean[9];
-        boolean[] n = c.notations;
-        for (int i = 0; i < 9; i++) {
-            notations[i] = n[i];
-        }
+        this.notations = c.notations;
     }
 
     /**
@@ -86,8 +82,14 @@ public class WhiteCell extends Cell {
      * Get notations of this cell
      * @return the notations of this cell
      */
-    public boolean[] getNotations() {
+    public int getNotations() {
         return notations;
+        /*boolean[] ret = new boolean[9];
+
+        for(int i = 0; i < 9; i++)
+            ret[i] = ((notations & (1 << i)) != 0);
+
+        return ret;*/
     }
 
     /**
@@ -95,10 +97,7 @@ public class WhiteCell extends Cell {
      * @return the number of notations of this cell (in the range [0, 9])
      */
     public int getNotationSize() {
-        int size = 0;
-        for (int i = 0; i < 9; i++)
-            if (notations[i]) size++;
-        return size;
+        return Integer.bitCount(notations);
     }
 
     /**
@@ -109,7 +108,8 @@ public class WhiteCell extends Cell {
     public boolean isNotationChecked(int value) {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
-        return notations[value-1];
+
+        return (notations & (1 << (value - 1))) != 0;
     }
 
     /**
@@ -120,14 +120,18 @@ public class WhiteCell extends Cell {
     public void setNotation(int value, boolean checked) {
         if (value > 9 || value < 1)
             throw new IllegalArgumentException("Value is out of range");
-        notations[value-1] = checked;
+
+        int mask = 1 << (value - 1);
+        int flag = checked ? 1 : 0;
+
+        notations ^= (-flag ^ notations) & mask;
     }
 
     /**
      * Clear all notations for this cell
      */
     public void clearAllNotations() {
-        for (int i = 0; i < 9; i++) notations[i] = false;
+        notations = 0;
     }
 
     /**
@@ -154,6 +158,6 @@ public class WhiteCell extends Cell {
     }
 
     private void initAllNotations(boolean b) {
-        notations = new boolean[] { b, b, b, b, b, b, b, b, b };
+        notations = b ? 0b111111111 : 0b000000000;
     }
 }

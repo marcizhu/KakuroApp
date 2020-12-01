@@ -18,12 +18,12 @@ public class Solver {
     private final int[][] rowLine;
     private final int[][] rowSums; // TODO: migrate this so that it uses rowLine
     private int[] rowSize;
-    private boolean[][] rowValuesUsed;
+    private int[] rowValuesUsed;
 
     private final int[][] colLine;
     private final int[][] colSums; // TODO: migrate this so that it uses rowLine
     private int[] colSize;
-    private boolean[][] colValuesUsed;
+    private int[] colValuesUsed;
 
     /**
      * Constructor.
@@ -36,7 +36,6 @@ public class Solver {
 
         rowLine = new int[board.getHeight()][board.getWidth()];
         rowSums = new int[board.getHeight()][board.getWidth()];
-
         colLine = new int[board.getHeight()][board.getWidth()];
         colSums = new int[board.getHeight()][board.getWidth()];
     }
@@ -48,7 +47,6 @@ public class Solver {
     public int solve() {
         preprocessRows();
         preprocessCols();
-
         preprocessSums();
 
         solve(0, 0, 0, new int[board.getWidth()]);
@@ -79,24 +77,22 @@ public class Solver {
             if (size > 0) { // last rowLine in row if we have seen whiteCells
                 sizes.add(size);
                 size = 0;
-
                 rowLineID++; //prepare for next rowLine
             }
         }
 
-        rowValuesUsed = new boolean[rowLineID][9];
+        rowValuesUsed = new int[rowLineID];
         for (int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
                 if (board.isWhiteCell(i, j) && !board.isEmpty(i, j)) {
-                    rowValuesUsed[rowLine[i][j]][board.getValue(i, j) - 1] = true;
+                    rowValuesUsed[rowLine[i][j]] |= (1 << (board.getValue(i, j) - 1));
                 }
             }
         }
 
         rowSize = new int[rowLineID];
-        for (int i = 0; i < rowLineID; i++) {
+        for (int i = 0; i < rowLineID; i++)
             rowSize[i] = sizes.get(i);
-        }
     }
 
     private void preprocessCols() {
@@ -127,19 +123,18 @@ public class Solver {
             }
         }
 
-        colValuesUsed = new boolean[colLineID][9];
+        colValuesUsed = new int[colLineID];
         for (int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {
                 if (board.isWhiteCell(j, i) && !board.isEmpty(j, i)) {
-                    colValuesUsed[colLine[j][i]][board.getValue(j, i) - 1] = true;
+                    colValuesUsed[colLine[j][i]] |= (1 << (board.getValue(j, i) - 1));
                 }
             }
         }
 
         colSize = new int[colLineID];
-        for (int i = 0; i < colLineID; i++) { //initialize data at default values
+        for (int i = 0; i < colLineID; i++)
             colSize[i] = sizes.get(i);
-        }
     }
 
     private void preprocessSums() {
@@ -158,39 +153,30 @@ public class Solver {
         }
     }
 
-    private ArrayList<Integer> getPossibleValues(int row, int col) {
+    private int getPossibleValues(int row, int col) {
         // Get options for each row and column
-        ArrayList<ArrayList<Integer>> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                rowSize[rowLine[row][col]], rowSums[row][col], rowValuesUsed[rowLine[row][col]]);
-        ArrayList<ArrayList<Integer>> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                colSize[colLine[row][col]], colSums[row][col], colValuesUsed[colLine[row][col]]);
+        int rowID = rowLine[row][col];
+        int colID = colLine[row][col];
+        int hAvailable = 0;
+        int vAvailable = 0;
 
-        boolean[] hAvailable = { false, false, false, false, false, false, false, false, false };
-        boolean[] vAvailable = { false, false, false, false, false, false, false, false, false };
+        ArrayList<Integer> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
+                rowSize[rowID], rowSums[row][col], rowValuesUsed[rowID]);
+        ArrayList<Integer> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
+                colSize[colID], colSums[row][col], colValuesUsed[colID]);
 
         // Calculate available options for this row
-        for (ArrayList<Integer> hOpt : hOptions)
-            for (Integer i : hOpt)
-                hAvailable[i - 1] = true;
+        for (Integer i : hOptions)
+            hAvailable |= i;
 
         // Calculate available options for this column
-        for (ArrayList<Integer> vOpt : vOptions)
-            for (Integer i : vOpt)
-                vAvailable[i - 1] = true;
+        for (Integer i : vOptions)
+            vAvailable |= i;
 
         // Do the intersection
-        ArrayList<Integer> availableValues = new ArrayList<>(9);
-
-        for(int i = 0; i < 9; i++) {
-            if(hAvailable[i] && vAvailable[i] // A value is available if it is available in both row & col...
-                && !colValuesUsed[colLine[row][col]][i]  // ...and it is not used in the current column...
-                && !rowValuesUsed[rowLine[row][col]][i]) // ...nor in the current row.
-            {
-                availableValues.add(i + 1);
-            }
-        }
-
-        return availableValues;
+        return hAvailable & vAvailable   // A value is available if it is available in both row & col...
+                & ~colValuesUsed[colID]  // ...and it is not used in the current column...
+                & ~rowValuesUsed[rowID]; // ...nor in the current row.
     }
 
     private void solve(int row, int col, int rowSum, int[] colSum) {
@@ -234,17 +220,19 @@ public class Solver {
             return;
         }
 
-        ArrayList<Integer> possibleValues = getPossibleValues(row, col);
+        int possibleValues = getPossibleValues(row, col);
 
-        for (int i : possibleValues) {
+        for (int i = 1; i <= 9; i++) {
+            if(((possibleValues >> (i - 1)) & 1) == 0) continue; // if n-th bit is 0, skip
+
             board.setCellValue(row, col, i);
-            rowValuesUsed[rowLine[row][col]][i-1] = true;
-            colValuesUsed[colLine[row][col]][i-1] = true;
+            rowValuesUsed[rowLine[row][col]] |= (1 << (i-1));
+            colValuesUsed[colLine[row][col]] |= (1 << (i-1));
             colSum[col] += i;
             solve(row, col + 1, rowSum + i, colSum);
             board.clearCellValue(row, col);
-            rowValuesUsed[rowLine[row][col]][i-1] = false;
-            colValuesUsed[colLine[row][col]][i-1] = false;
+            rowValuesUsed[rowLine[row][col]] &= ~(1 << (i-1));
+            colValuesUsed[colLine[row][col]] &= ~(1 << (i-1));
             colSum[col] -= i;
             if (solutions.size() > 1) return;
         }

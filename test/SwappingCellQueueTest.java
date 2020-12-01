@@ -8,6 +8,7 @@ import src.domain.entities.WhiteCell;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SwappingCellQueueTest {
@@ -38,7 +39,7 @@ public class SwappingCellQueueTest {
         //should remove the 3 values and should have 4 notations total
         scq.eraseNotationsFromCell(ROWS/2, COLUMNS/3, new ArrayList<>(Arrays.asList(1, 2, 3)));
 
-        assertTrue(Arrays.equals(new boolean[]{ false, false, false, true, false, true, true, true, false }, board.getCellNotations(ROWS/2, COLUMNS/3)));
+        assertEquals(0b011101000, board.getCellNotations(ROWS/2, COLUMNS/3));
     }
 
     @Test
@@ -78,7 +79,7 @@ public class SwappingCellQueueTest {
 
         scq.insertOrderedCell(0, 0);
         scq.eraseNotationsFromCell(0, 0, new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5)));
-        assertTrue(Arrays.equals(new boolean[]{ false, false, false, false, false, true, true, true, true }, board.getCellNotations(0, 0)));
+        assertTrue(0b111100000 == board.getCellNotations(0, 0));
     }
 
     @Test
