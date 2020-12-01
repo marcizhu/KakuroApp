@@ -1,5 +1,5 @@
 import src.domain.controllers.Reader;
-import src.domain.controllers.Solver;
+import src.domain.algorithms.Solver;
 import src.domain.entities.Board;
 
 import java.util.Scanner;

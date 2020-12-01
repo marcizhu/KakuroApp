@@ -1,13 +1,9 @@
 package src;
 
-import src.domain.controllers.KakuroConstants;
 import src.domain.entities.Board;
-import src.domain.controllers.Generator;
-import src.domain.entities.Difficulty;
 import src.presentation.controllers.PresentationCtrl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Main {
 	public static void main(String[] args) throws IOException {

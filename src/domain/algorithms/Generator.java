@@ -1,5 +1,7 @@
-package src.domain.controllers;
+package src.domain.algorithms;
 
+import src.domain.algorithms.helpers.KakuroConstants;
+import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.*;
 import src.utils.Pair;
 

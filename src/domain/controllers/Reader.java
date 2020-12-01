@@ -8,6 +8,7 @@ import src.domain.entities.WhiteCell;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,7 @@ public class Reader {
      * @throws IOException if the file could not be opened
      */
     public static Board fromFile(String path) throws IOException {
-        String data = Files.readString(Path.of(path));
+        String data = new String(Files.readAllBytes(Paths.get(path)));
         return fromString(data);
     }
 

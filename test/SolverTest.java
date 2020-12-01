@@ -7,11 +7,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import src.domain.entities.Board;
 import src.domain.controllers.Reader;
-import src.domain.controllers.Solver;
+import src.domain.algorithms.Solver;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class SolverTest {
@@ -30,7 +31,8 @@ public class SolverTest {
 
             File expectedOutput = new File(expectedOutputFiles[i]);
 
-            String s1 = Files.readString(expectedOutput.toPath()).replace("\r","");
+            String s1 = new String(Files.readAllBytes(expectedOutput.toPath())).replace("\r","");
+
             String s2 = solution.toString() + "\n";
 
             assertEquals(s1, s2);

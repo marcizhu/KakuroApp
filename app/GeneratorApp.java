@@ -1,6 +1,6 @@
 package app;
 
-import src.domain.controllers.Generator;
+import src.domain.algorithms.Generator;
 import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
 

@@ -1,5 +1,6 @@
-package src.domain.controllers;
+package src.domain.algorithms;
 
+import src.domain.algorithms.helpers.KakuroConstants;
 import src.domain.entities.Board;
 
 import java.util.ArrayList;

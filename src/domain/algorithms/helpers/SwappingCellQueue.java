@@ -1,4 +1,4 @@
-package src.domain.controllers;
+package src.domain.algorithms.helpers;
 
 import src.domain.entities.Board;
 import src.domain.entities.WhiteCell;

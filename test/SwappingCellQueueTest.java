@@ -1,7 +1,7 @@
 package test;
 
 import org.junit.jupiter.api.Test;
-import src.domain.controllers.SwappingCellQueue;
+import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.Board;
 import src.domain.entities.WhiteCell;
 
