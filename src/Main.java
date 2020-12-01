@@ -1,6 +1,8 @@
 package src;
 
+import src.domain.algorithms.Generator;
 import src.domain.entities.Board;
+import src.domain.entities.Difficulty;
 import src.presentation.controllers.PresentationCtrl;
 
 import java.io.IOException;
@@ -25,7 +27,7 @@ public class Main {
 		long t = System.currentTimeMillis();
 		gen.generate();
 		t = System.currentTimeMillis() - t;
-		System.out.println("Uses seed: " + gen.getUsedSeed());
+		System.out.println("Uses seed: " + gen.getUsedSeed() + " and it was generated in: " + t + " ms");
 		System.out.println("\n"+gen.getGeneratedBoard().toString()+"\n");
 
 		Solver solver = new Solver(gen.getGeneratedBoard());
