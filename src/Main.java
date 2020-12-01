@@ -1,6 +1,7 @@
 package src;
 
 import src.domain.algorithms.Generator;
+import src.domain.algorithms.QuickSolver;
 import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
 import src.presentation.controllers.PresentationCtrl;
@@ -22,14 +23,25 @@ public class Main {
 		// From here on are testing and debugging purposes
 
 		// Program to generate a board and send it to solver to check the solutions
+		// Zero solutions generated with param: 100, 100, HARD, -1003457041328273474, true... pendant to investigate
+		//long seed = -880248852092571402l;
 		/*
-		Generator gen = new Generator(12, 12, Difficulty.EXTREME,  true);
+		Generator gen = new Generator(100, 100, Difficulty.MEDIUM,   true);
 		long t = System.currentTimeMillis();
 		gen.generate();
 		t = System.currentTimeMillis() - t;
 		System.out.println("Uses seed: " + gen.getUsedSeed() + " and it was generated in: " + t + " ms");
-		System.out.println("\n"+gen.getGeneratedBoard().toString()+"\n");
 
+		QuickSolver qSolver = new QuickSolver(gen.getGeneratedBoard());
+		t = System.currentTimeMillis();
+		int sol = qSolver.solve();
+		t = System.currentTimeMillis() - t;
+		System.out.println("Found " + sol + " solutions, in time: " + t + " ms");
+		if (sol > 0) System.out.println(qSolver.getSolutions().get(0).toString());
+
+
+		//System.out.println("\n"+gen.getGeneratedBoard().toString()+"\n");
+/*
 		Solver solver = new Solver(gen.getGeneratedBoard());
 		solver.solve();
 
