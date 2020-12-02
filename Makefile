@@ -26,7 +26,7 @@ test/GeneratorTest.class: test/GeneratorTest.java src/domain/algorithms/Generato
 	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar test/GeneratorTest.java
 
 # Make kakurosolver.tar.gz
-kakurosolver:
+kakurosolver: clean
 	cp test/kakurosolver.java kakurosolver.java
 	tar zcf kakurosolver.tar.gz src/* kakurosolver.java
 	rm kakurosolver.java
