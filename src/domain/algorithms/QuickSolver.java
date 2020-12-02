@@ -223,13 +223,12 @@ public class QuickSolver {
             solutions.add(solvedBoard);
             return 1;
         }
-
         //System.out.println("Board has multiple solutions, to be implemented using old solver. Remaining cells to be assigned: " + (notationsQueue.endElement - notationsQueue.firstElement));
 
         Solver s = new Solver(solvedBoard);
         s.solve();
         solutions.addAll(s.getSolutions());
-        return 2;
+        return solutions.size();
     }
 
     private void initializeAssigFunctions() {
@@ -328,5 +327,39 @@ public class QuickSolver {
                 return notationsQueue;
             }
         });
+    }
+
+    // FIXME: DEBUGGING PURPOSES
+    private void printNotations() {
+        System.out.println();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (workingBoard.isWhiteCell(i, j)) {
+                    if (workingBoard.isEmpty(i, j)) {
+                        int b = workingBoard.getCellNotations(i, j);
+                        System.out.print("[");
+                        for (int k = 0; k < 9; k++) {
+                            if ((b&(1<<k)) != 0) System.out.print((k+1)+"");
+                            else System.out.print("-");
+                        }
+                        System.out.print("] ");
+                    } else {
+                        System.out.print("[++++" + workingBoard.getValue(i,j) + "++++] ");
+                    }
+                }
+                else {
+                    int hs = workingBoard.getHorizontalSum(i, j);
+                    if (rowLine[i][j] != -1) hs = rowSums[rowLine[i][j]];
+                    int vs = workingBoard.getVerticalSum(i, j);
+                    if (colLine[i][j] != -1) vs = colSums[colLine[i][j]];
+                    if (hs / 10 > 0) System.out.print("[*" + hs + "*-*");
+                    else System.out.print("[**" + hs + "*-*");
+                    if (vs / 10 > 0) System.out.print(vs + "*] ");
+                    else System.out.print("*" + vs + "*] ");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }

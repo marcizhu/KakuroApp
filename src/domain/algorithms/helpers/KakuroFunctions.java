@@ -207,12 +207,13 @@ public class KakuroFunctions {
         if (master.getWorkingBoard().getCellNotationSize(r, c) > 1) { //cell notations should be removed (important in ambiguity checking), this won't be checked before then.
             int cellNotations = master.getWorkingBoard().getCellNotations(r, c);
             // because cellNotations might get modified if we have to erase, rollback holds the original values
-            ArrayList<Integer> toErase = new ArrayList<>(); //new ArrayList<>();
-            for (int i = 0; i < 9; i++)
-                if(i+1 != value && (cellNotations & (1<<i)) != 0) toErase.add(i + 1); // if it's not the value
+            // FIXME DEBUGGING
+            //ArrayList<Integer> toErase = new ArrayList<>(); //new ArrayList<>();
+            //for (int i = 0; i < 9; i++)
+            //    if(i+1 != value && (cellNotations & (1<<i)) != 0) toErase.add(i + 1); // if it's not the value
             if (master.getNotationsQueue().isHiding(r, c)) hidingCellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             else cellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
-            master.getNotationsQueue().eraseNotationsFromCell(r, c, toErase);
+            master.getNotationsQueue().eraseNotationsFromCell(r, c, (cellNotations & ~(1<<(value-1))));
         }
         master.getNotationsQueue().removeOrderedCell(r, c); // removes it from queue but notations are mantained
         master.getWorkingBoard().setCellValue(r, c, value);
@@ -275,10 +276,10 @@ public class KakuroFunctions {
         int commonRowNotations = rowOptions & ~master.getRowValuesUsed(r, c);
         boolean superPermissive = commonRowNotations == 0b111111111;
 
-        ArrayList<ArrayList<Integer>> allToErase = new ArrayList<>();
+        ArrayList<Integer> allToErase = new ArrayList<>();
         int minRowNotSize = 10;
         for(int it = 0; it < master.getRowSize(r, c); it++) {
-            allToErase.add(it, new ArrayList<>());
+            allToErase.add(it, 0);
             if (master.getWorkingBoard().isEmpty(r, it+master.getFirstRowCoord(r, c).second)){
                 int s = master.getWorkingBoard().getCellNotationSize(r, it+master.getFirstRowCoord(r, c).second);
                 if (s < minRowNotSize) minRowNotSize = s;
@@ -310,18 +311,15 @@ public class KakuroFunctions {
             if (master.getWorkingBoard().isEmpty(r, it)) { //value not set
                 int cellNotations = master.getWorkingBoard().getCellNotations(r, it);
                 // because cellNotations might get modified if we have to erase, rollback holds the original values
-                ArrayList<Integer> toErase = allToErase.get(it - master.getFirstRowCoord(r, c).second); //new ArrayList<>();
-                int valuesToErase = cellNotations & ~commonRowNotations;
-                for (int i = 0; i < 9; i++)
-                    if((valuesToErase & (1<<i)) != 0) toErase.add(i + 1); // if it isn't part of the validated possible notations for the row
+                int valuesToErase = (cellNotations & ~commonRowNotations) | allToErase.get(it - master.getFirstRowCoord(r, c).second);
 
-                if (toErase.size() > 0) { // we need to erase some notations
+                if (valuesToErase != 0) { // we need to erase some notations
                     modifiedRows[master.getRowID(r, c)] = true;
                     modifiedCols[master.getColID(r, it)] = true;
                     affectedColumns.add(it);
                     if (master.getNotationsQueue().isHiding(r, it)) hidingCellNotationsRollBack.add(new RollbackNotations(r, it, cellNotations));
                     else cellNotationsRollBack.add(new RollbackNotations(r, it, cellNotations));
-                    master.getNotationsQueue().eraseNotationsFromCell(r, it, toErase);
+                    master.getNotationsQueue().eraseNotationsFromCell(r, it, valuesToErase);
                 }
             }
         }
@@ -399,10 +397,10 @@ public class KakuroFunctions {
         int commonColNotations = colOptions & ~master.getColValuesUsed(r, c);
         boolean superPermissive = commonColNotations == 0b111111111;
 
-        ArrayList<ArrayList<Integer>> allToErase = new ArrayList<>();
+        ArrayList<Integer> allToErase = new ArrayList<>();
         int minColNotSize = 10;
         for(int it = 0; it < master.getColSize(r, c); it++) {
-            allToErase.add(it, new ArrayList<>());
+            allToErase.add(it, 0);
             if (master.getWorkingBoard().isEmpty(it + master.getFirstColCoord(r, c).first, c)){
                 int s = master.getWorkingBoard().getCellNotationSize(it + master.getFirstColCoord(r, c).first, c);
                 if (s < minColNotSize) minColNotSize = s;
@@ -415,14 +413,8 @@ public class KakuroFunctions {
             int[] insertPtrs = new int[num_cells];
             for(int it = 0; it < master.getColSize(r, c); it++) {
                 insertPtrs[it] = it;
-                size[it] = 0;
-                notations[it] = 0;
-                for (int i = 0; i < 9; i++) {
-                    if (master.getWorkingBoard().cellHasNotation(it + master.getFirstColCoord(r, c).first, c, i+1)) {
-                        notations[it] |= (1<<i);
-                        size[it]++;
-                    }
-                }
+                size[it] = master.getWorkingBoard().getCellNotationSize(it + master.getFirstColCoord(r, c).first, c);
+                notations[it] = master.getWorkingBoard().getCellNotations(it + master.getFirstColCoord(r, c).first, c);
             }
             deepNotationAnalysis(num_cells, size, notations, insertPtrs, allToErase);
         }
@@ -431,18 +423,15 @@ public class KakuroFunctions {
             if (master.getWorkingBoard().isEmpty(it, c)) { //value not set
                 int cellNotations = master.getWorkingBoard().getCellNotations(it, c);
                 // because cellNotations might get modified if we have to erase, rollback holds the original values
-                ArrayList<Integer> toErase = allToErase.get(it - master.getFirstColCoord(r, c).first);
-                int valuesToErase = cellNotations & ~commonColNotations;
-                for (int i = 0; i < 9; i++)
-                    if((valuesToErase & (1<<i)) != 0) toErase.add(i + 1); // if it isn't part of the validated possible notations for the row
+                int valuesToErase = (cellNotations & ~commonColNotations) | allToErase.get(it - master.getFirstColCoord(r, c).first);
 
-                if (toErase.size() > 0) { // we need to erase some notations
+                if (valuesToErase != 0) { // we need to erase some notations
                     modifiedRows[master.getRowID(it, c)] = true;
                     modifiedCols[master.getColID(r, c)] = true;
                     affectedRows.add(it);
                     if (master.getNotationsQueue().isHiding(it, c)) hidingCellNotationsRollBack.add(new RollbackNotations(it, c, cellNotations));
                     else cellNotationsRollBack.add(new RollbackNotations(it, c, cellNotations));
-                    master.getNotationsQueue().eraseNotationsFromCell(it, c, toErase);
+                    master.getNotationsQueue().eraseNotationsFromCell(it, c, valuesToErase);
                 }
             }
         }
@@ -471,7 +460,7 @@ public class KakuroFunctions {
     }
 
     // Pre: size, notations, insertPtrs and result have size num_cells, all arrays in results are declared.
-    private void deepNotationAnalysis(int num_cells, int[] size, int[] notations, int[] insertPtrs, ArrayList<ArrayList<Integer>> result) {
+    private void deepNotationAnalysis(int num_cells, int[] size, int[] notations, int[] insertPtrs, ArrayList<Integer> result) {
         if (num_cells == 0) return;
 
         // we order the cell info by size.
@@ -527,7 +516,7 @@ public class KakuroFunctions {
                             if (j != indices[kIdx]) {
                                 for (int val : toErase) {
                                     if ((notations[j] & (1<<val)) > 0) { // has a value to be erased
-                                        result.get(insertPtrs[j]).add(val+1); //mark it to erase
+                                        result.set(insertPtrs[j], (result.get(insertPtrs[j]) | (1<<val))); //mark it to erase
                                         notations[j] &= ~(1<<val); // erase from notations to calc.
                                         size[j]--;
                                         if (minLengthChanged == -1 || size[j] < minLengthChanged) minLengthChanged = size[j];
@@ -600,18 +589,12 @@ public class KakuroFunctions {
         // Cell notations
         // notice that it is important to first insert the cells if needed, because if we don't the datastructure
         // will not consider it as valid and it won't find it to add the notations
-        for (RollbackNotations n : cellNotationsRollBack) {
-            Pair<Integer, Integer> c = n.coord;
-            ArrayList<Integer> toAdd = new ArrayList<>();
-            for (int i = 0; i < 9; i++) if ((n.notations & (1<<i)) != 0) toAdd.add(i+1);
-            master.getNotationsQueue().addNotationsToCell(c.first, c.second, toAdd);
-        }
+        for (RollbackNotations n : cellNotationsRollBack)
+            master.getNotationsQueue().addNotationsToCell(n.coord.first, n.coord.second, n.notations);
+
         for (RollbackNotations n : hidingCellNotationsRollBack) {
-            Pair<Integer, Integer> c = n.coord;
-            ArrayList<Integer> toAdd = new ArrayList<>();
-            for (int i = 0; i < 9; i++) if ((n.notations & (1<<i)) != 0) toAdd.add(i+1);
-            master.getNotationsQueue().addNotationsToCell(c.first, c.second, toAdd);
-            master.getNotationsQueue().hideElement(c.first, c.second);
+            master.getNotationsQueue().addNotationsToCell(n.coord.first, n.coord.second, n.notations);
+            master.getNotationsQueue().hideElement(n.coord.first, n.coord.second);
         }
     }
 

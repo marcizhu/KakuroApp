@@ -45,7 +45,7 @@ public class PresentationCtrl {
         });
 
         // Dimensions and position
-        app.pack();
+        app.setSize(1200, 720); // default size
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int xLocation = (int) ((dimension.getWidth() - app.getWidth()) / 2);
         int yLocation = (int) ((dimension.getHeight() - app.getHeight()) / 2);

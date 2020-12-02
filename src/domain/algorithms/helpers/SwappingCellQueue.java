@@ -84,7 +84,7 @@ public class SwappingCellQueue {
     }
 
     // returns the new notation size
-    public int eraseNotationsFromCell(int r, int c, ArrayList<Integer> toErase) {
+    public int eraseNotationsFromCell(int r, int c, int toErase) {
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
         if (pos == endElement) return notSize; // we didn't find the element, we didn't erase any notations
@@ -93,8 +93,8 @@ public class SwappingCellQueue {
             pos = findCell(r, c, notSize);
         }
         int cellNotations = workingBoard.getCellNotations(r, c);
-        for (int i : toErase) {
-            if (i<1 || i>9) continue;
+        for (int i = 1; i <= 9; i++) {
+            if ((toErase & (1<<(i-1))) == 0) continue;
             if ((cellNotations & (1<<(i-1))) != 0) { // if there was such notation we erase it
                 workingBoard.setCellNotation(r, c, i, false);
                 cellNotations &= ~(1<<(i-1));
@@ -119,10 +119,10 @@ public class SwappingCellQueue {
     }
 
     // returns the new notation size
-    public int addNotationsToCell(int r, int c, ArrayList<Integer> toAdd) {
+    public int addNotationsToCell(int r, int c, int toAdd) {
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
-        if (pos == endElement || toAdd.size() == 0) return notSize; // we didn't find the element, we didn't erase any notations
+        if (pos == endElement || toAdd == 0) return notSize; // we didn't find the element, we didn't erase any notations
         int cellNotations = workingBoard.getCellNotations(r, c);
         // if somehow this cell had no notations (no possible values, may happen if we need to do rollback)
         // we need to previously find it and insert it into a valid position of size 1
@@ -134,8 +134,8 @@ public class SwappingCellQueue {
             pos = startPos[0]-1;
             startPos[0]--;
         }
-        for (int i : toAdd) {
-            if (i<1 || i>9) continue;
+        for (int i = 1; i <= 9; i++) {
+            if ((toAdd & (1<<(i-1))) == 0) continue;
             if ((cellNotations & (1<<(i-1))) == 0) { // if there was not such notation we add it
                 workingBoard.setCellNotation(r, c, i, true);
                 cellNotations |= 1 << (i-1);
@@ -186,11 +186,9 @@ public class SwappingCellQueue {
         if (pos != endElement) {
             if (workingBoard.equalsCell(r, c, orderedCells[pos])) {
                 int notations = workingBoard.getCellNotations(r, c);
-                ArrayList<Integer> toRemove = new ArrayList<>();
-                for (int j = 0; j < 9; j++) if ((notations & (1<<j)) != 0) toRemove.add(j+1);
-                eraseNotationsFromCell(r, c, toRemove);
-                for (int j : toRemove)
-                    workingBoard.setCellNotation(r, c, j, true);
+                eraseNotationsFromCell(r, c, notations);
+                for (int i = 0; i < 9; i++)
+                    workingBoard.setCellNotation(r, c, i+1, (notations & (1<<i)) != 0);
             }
         }
     }
@@ -201,10 +199,8 @@ public class SwappingCellQueue {
             if (workingBoard.equalsCell(r, c, orderedCells[i])) {
                 elementFound = true;
                 int notations = workingBoard.getCellNotations(r, c);
-                ArrayList<Integer> toAdd = new ArrayList<>();
-                for (int j = 0; j < 9; j++) if ((notations & (1<<j)) != 0) toAdd.add(j+1);
                 workingBoard.clearCellNotations(r, c);
-                addNotationsToCell(r, c, toAdd);
+                addNotationsToCell(r, c, notations);
             }
         }
     }

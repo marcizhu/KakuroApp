@@ -2,8 +2,10 @@ package src;
 
 import src.domain.algorithms.Generator;
 import src.domain.algorithms.QuickSolver;
+import src.domain.controllers.Reader;
 import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
+import src.gui.KakuroGUI;
 import src.presentation.controllers.PresentationCtrl;
 
 import java.io.IOException;
@@ -24,40 +26,33 @@ public class Main {
 
 		// Program to generate a board and send it to solver to check the solutions
 		// Zero solutions generated with param: 100, 100, HARD, -1003457041328273474, true... pendant to investigate
-		//long seed = -880248852092571402l;
+		// Prepared executions for DEMO: Unique solutions:
+		// 10 x 10 EXTREME 8675010256527143921l
+		// 11 x 11 EXTREME 373967908810262340l
+		// 20 x 20 EXTREME 740358272252751180l
+		// 40 x 40 HARD 2425207246797915929l
+		// 60 x 60 MEDIUM -880248852092571402l
+		// 100 x 100 EASY -1669241887847317670l
+		// 150 x 150 EASY 734881683158643490l
 		/*
-		Generator gen = new Generator(100, 100, Difficulty.MEDIUM,   true);
+		long seed = 8675010256527143921l;
+		Generator gen = new Generator(10, 10, Difficulty.EXTREME, seed,  true);
 		long t = System.currentTimeMillis();
 		gen.generate();
 		t = System.currentTimeMillis() - t;
 		System.out.println("Uses seed: " + gen.getUsedSeed() + " and it was generated in: " + t + " ms");
+		System.out.println(gen.getGeneratedBoard().toString());
 
 		QuickSolver qSolver = new QuickSolver(gen.getGeneratedBoard());
-		t = System.currentTimeMillis();
+		long t2 = System.currentTimeMillis();
 		int sol = qSolver.solve();
-		t = System.currentTimeMillis() - t;
-		System.out.println("Found " + sol + " solutions, in time: " + t + " ms");
-		if (sol > 0) System.out.println(qSolver.getSolutions().get(0).toString());
-
-
-		//System.out.println("\n"+gen.getGeneratedBoard().toString()+"\n");
-/*
-		Solver solver = new Solver(gen.getGeneratedBoard());
-		solver.solve();
-
-
-		int size = solver.getSolutions().size();
-		if (size == 1) {
-			System.out.println("Solution is unique!!!");
-			System.out.println(solver.getSolutions().get(0).toString());
-		} else {
-			System.out.println("Didn't get one solution (" + size + "), something is wrong");
-			for (int i = 0; i < size; i++) {
-				System.out.println();
-				System.out.println(solver.getSolutions().get(i).toString());
-			}
-		}*/
-
+		t2 = System.currentTimeMillis() - t2;
+		System.out.println("Found " + sol + " solutions, in time: " + t2 + " ms");
+		if (sol > 0) {
+			System.out.println(qSolver.getSolutions().get(0).toString());
+			System.out.println("\n"+gen.getGeneratedBoard().toString()+"\n");
+		}
+		*/
 
 		// This is to make sure UniqueCrossValues generates the correct unique values, could be useful to rethink Difficulty implementation
 		/*
