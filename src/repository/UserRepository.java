@@ -2,6 +2,10 @@ package src.repository;
 
 import src.domain.User;
 
+import java.io.IOException;
+
 public interface UserRepository {
-    User getUserByName(String name);
+    User getUser (String userName) throws IOException;
+    void deleteUser (User user) throws IOException;
+    void saveUser (User user) throws IOException;
 }

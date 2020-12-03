@@ -1,8 +1,12 @@
 package src.repository;
 
 import com.google.gson.reflect.TypeToken;
+
 import src.domain.User;
 import src.domain.Board;
+import src.domain.GameFinished;
+import src.domain.GameInProgress;
+import src.domain.Kakuro;
 
 import java.io.File;
 import java.lang.reflect.Type;
