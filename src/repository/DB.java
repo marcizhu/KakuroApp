@@ -72,6 +72,25 @@ public class DB {
         System.err.println("Class " + obj.getClass().getName() + " has no entry in the database");
     }
 
+    public void deleteObject(Object obj) throws IOException{
+        if (obj.getClass() == User.class) {
+            User user = (User)obj;
+            ArrayList<User> users = getAllUsers();
+
+            for (int i = 0; i<users.size(); i++) if (users.get(i).getName().equals(user.getName())) {
+                users.remove(i);
+                writeToFile(users, "user");
+                return;
+            }
+
+            // Object was not in the db
+            System.out.println("User " + user.getName() + " has no entry in the database");
+            return;
+        }
+
+        System.err.println("Class " + obj.getClass().getName() + " has no entry in the database");
+    }
+
     private ArrayList<User> getAllUsers() throws IOException{
         Gson gson = new Gson();
         String fileContents = Files.readString(Path.of("data/DB/user.json"));
