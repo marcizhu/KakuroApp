@@ -1,7 +1,6 @@
 package src.repository;
 
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.nio.file.NoSuchFileException;
 import java.io.FileWriter;

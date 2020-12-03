@@ -102,6 +102,7 @@ public class Main {
 		}*/
 	}
 
+
 	// For debugging purposes only
 	public static void printBoard(Board b) {
 		for (int i = 0; i<b.getHeight() ; i++) {
