@@ -2,10 +2,13 @@ package src.presentation.controllers;
 
 import src.presentation.screens.LoginScreen;
 import src.presentation.screens.Screen;
+import src.presentation.views.KakuroView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class PresentationCtrl {
     private JFrame app;
@@ -39,7 +42,7 @@ public class PresentationCtrl {
         app.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                currentScreen.onResize(app.getWidth(), app.getHeight());
+                currentScreen.onResize(app.getWidth(), app.getHeight()-40);
                 super.componentResized(e);
             }
         });
@@ -52,7 +55,14 @@ public class PresentationCtrl {
         app.setLocation(xLocation, yLocation);
 
         // Contents
-        currentScreen.build(app.getWidth(), app.getHeight());
+        currentScreen.build(app.getWidth(), app.getHeight()-40);
+        /*try {
+            System.out.println("Adding KakuroView");
+            app.setBackground(Color.BLUE);
+            app.add(new KakuroView(new String(Files.readAllBytes(Paths.get("data/kakuros/unsolved/sample.kak"))), true));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }*/
         app.setContentPane(currentScreen.getContents());
 
         // Make it visible
@@ -64,7 +74,7 @@ public class PresentationCtrl {
     public void setScreen(Screen nextScreen) {
         currentScreen.onDestroy();
         currentScreen = nextScreen;
-        currentScreen.build(app.getWidth(), app.getHeight());
+        currentScreen.build(app.getWidth(), app.getHeight()-60);
         app.setContentPane(currentScreen.getContents());
     }
 

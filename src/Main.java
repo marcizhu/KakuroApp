@@ -8,6 +8,7 @@ import src.domain.entities.Difficulty;
 import src.gui.KakuroGUI;
 import src.presentation.controllers.PresentationCtrl;
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class Main {
@@ -21,7 +22,7 @@ public class Main {
 						ctrl.initializePresentationCtrl();
 					}
 				}
-		);
+		);//*/
 		// From here on are testing and debugging purposes
 
 		// Program to generate a board and send it to solver to check the solutions
@@ -34,6 +35,11 @@ public class Main {
 		// 60 x 60 MEDIUM -880248852092571402l
 		// 100 x 100 EASY -1669241887847317670l
 		// 150 x 150 EASY 734881683158643490l
+		// REAL UNIQUENESS KAKUROS
+		// 20 20 EXTREME -6603847958217156480l
+		// 30 30 HARD -4159141052615465705l
+		// 40 40 MEDIUM -6235487559481337477l
+		// 60 60 EASY -4148994457283065265l --- not very good
 		/*
 		long seed = 8675010256527143921l;
 		Generator gen = new Generator(10, 10, Difficulty.EXTREME, seed,  true);
