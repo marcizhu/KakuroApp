@@ -12,12 +12,15 @@ public class KakuroView extends JPanel {
     public static final int BLACK_SECTION_BOTTOM = 2;
     public static final int BLACK_SECTION_LEFT = 3;
     public static final int BLACK_SECTION_RIGHT = 4;
+    private Color blackCellColor;
 
     private BoardView boardView;
 
     private BoardMouseEventListener listener;
 
     public KakuroView(String board, boolean showValues) {
+        blackCellColor = Color.BLACK;
+
         Matcher m = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$").matcher("");
         String[] rows = board.split("\\n");
         String[] line1 = rows[0].split(",");
@@ -78,7 +81,6 @@ public class KakuroView extends JPanel {
         this.setLayout(new GridBagLayout());
         boardView.setCells(cells);
         this.add(boardView);
-        setBorder(BorderFactory.createLineBorder(Color.GREEN));
         this.setVisible(true);
     }
 
@@ -93,6 +95,22 @@ public class KakuroView extends JPanel {
         this.listener = l;
     }
 
+    public void setWhiteCellValue(int r, int c, int value) {
+        if (boardView == null) return;
+        boardView.setWhiteCellValue(r, c, value);
+    }
+    public void setWhiteCellNotations(int r, int c, int notations) {
+        if (boardView == null) return;
+        boardView.setWhiteCellNotations(r, c, notations);
+    }
+    public void setBlackCellValue(int r, int c, int value, int section) {
+        if (boardView == null) return;
+        boardView.setBlackCellValue(r, c, value, section);
+    }
+    public void setBlackCellColor(Color c) {
+        blackCellColor = c;
+    }
+
     private class BoardView extends JPanel {
         private int rows, columns, cellSideSize;
         private JPanel[][] cells;
@@ -102,7 +120,6 @@ public class KakuroView extends JPanel {
             this.columns = columns;
             computeCellSideSize(getWidth(), getHeight());
             setLayout(new GridLayout(rows, columns));
-            setBorder(BorderFactory.createLineBorder(Color.BLACK));
             setVisible(true);
         }
 
@@ -146,6 +163,19 @@ public class KakuroView extends JPanel {
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(this.columns*this.cellSideSize, this.rows*this.cellSideSize);
+        }
+
+        public void setWhiteCellValue(int r, int c, int value) {
+            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+            if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setValue(value);
+        }
+        public void setWhiteCellNotations(int r, int c, int notations) {
+            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+            if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setNotations(notations);
+        }
+        public void setBlackCellValue(int r, int c, int value, int section) {
+            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+            if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(value, section);
         }
     }
 
@@ -244,26 +274,25 @@ public class KakuroView extends JPanel {
             int bottomLeftX = 0, bottomLeftY = getHeight();
             int bottomRightX = getWidth(), bottomRightY = getHeight();
             if (topToPaint) {
-                // FIXME: Hardcoded primary color, might want to make it a variable that can change
-                g.setColor(new Color(20,145,20));
+                g.setColor(blackCellColor);
                 g.fillPolygon(new int[] { topLeftX, topRightX, centerX }, new int[] { topLeftY, topRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topLeftX, topRightX, centerX }, new int[] { topLeftY, topRightY, centerY }, 3);
             }
             if (bottomToPaint) {
-                g.setColor(new Color(20,145,20));
+                g.setColor(blackCellColor);
                 g.fillPolygon(new int[] { bottomLeftX, bottomRightX, centerX }, new int[] { bottomLeftY, bottomRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { bottomLeftX, bottomRightX, centerX }, new int[] { bottomLeftY, bottomRightY, centerY }, 3);
             }
             if (leftToPaint) {
-                g.setColor(new Color(20,145,20));
+                g.setColor(blackCellColor);
                 g.fillPolygon(new int[] { topLeftX, bottomLeftX, centerX }, new int[] { topLeftY, bottomLeftY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topLeftX, bottomLeftX, centerX }, new int[] { topLeftY, bottomLeftY, centerY }, 3);
             }
             if (rightToPaint) {
-                g.setColor(new Color(20,145,20));
+                g.setColor(blackCellColor);
                 g.fillPolygon(new int[] { topRightX, bottomRightX, centerX }, new int[] { topRightY, bottomRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topRightX, bottomRightX, centerX }, new int[] { topRightY, bottomRightY, centerY }, 3);
@@ -272,9 +301,25 @@ public class KakuroView extends JPanel {
             paintComponents(g);
         }
 
-        public void setTopSectionValue(int value) {
-            topToPaint = value != 0;
-            //topLbl
+        public void setSectionValue(int value, int section) {
+            switch(section) {
+                case BLACK_SECTION_TOP:
+                    topToPaint = value != 0;
+                    topLbl.setText(value == 0 ? "" : ""+value);
+                    break;
+                case BLACK_SECTION_BOTTOM:
+                    bottomToPaint = value != 0;
+                    bottomLbl.setText(value == 0 ? "" : ""+value);
+                    break;
+                case BLACK_SECTION_LEFT:
+                    leftToPaint = value != 0;
+                    leftLbl.setText(value == 0 ? "" : ""+value);
+                    break;
+                case BLACK_SECTION_RIGHT:
+                    rightToPaint = value != 0;
+                    rightLbl.setText(value == 0 ? "" : ""+value);
+                    break;
+            }
         }
     }
 
@@ -345,11 +390,19 @@ public class KakuroView extends JPanel {
         }
 
         public void setValue(int value) {
-            this.value = value;
+            if (this.value != value) {
+                this.value = value;
+                resetLayout();
+            }
         }
 
         public void setNotations(int notations) {
-            this.notations = notations;
+            if (this.value == 0 && this.notations != notations) {
+                this.notations = notations;
+                resetLayout();
+            } else {
+                this.notations = notations;
+            }
         }
     }
 
@@ -360,7 +413,6 @@ public class KakuroView extends JPanel {
         void onWhiteCellViewEntered(int row, int col);
         void onCellInBoardPressed(int row, int col);
         void onCellInBoardReleased(int row, int col);
-
         void onListenerDetached();
     }
 }
