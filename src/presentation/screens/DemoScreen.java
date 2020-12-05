@@ -8,19 +8,19 @@ import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class DemoScreen extends Screen{
+public class DemoScreen extends AbstractScreen {
 
     KakuroView kak;
     JLabel leftContent, rightContent;
 
-    public DemoScreen(PresentationCtrl ctrl) {
+    public DemoScreen(DemoScreenCtrl ctrl) {
         super(ctrl);
     }
 
     @Override
     public void build(int width, int height) {
         super.build(width, height);
-        System.out.println("Login: build()");
+        System.out.println("Demo: build()");
         contents = new JPanel();
         contents.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();

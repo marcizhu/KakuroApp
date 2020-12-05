@@ -4,13 +4,13 @@ import src.presentation.controllers.PresentationCtrl;
 
 import javax.swing.*;
 
-public abstract class Screen {
-    protected PresentationCtrl ctrl;
+public abstract class AbstractScreen { //UI related stuff
+    protected AbstractScreenCtrl ctrl;
     protected JPanel contents;
 
     private int previousWidth, previousHeight;
 
-    public Screen(PresentationCtrl ctrl) {
+    public AbstractScreen(AbstractScreenCtrl ctrl) {
         this.ctrl = ctrl;
         previousWidth = 0;
         previousHeight = 0;
