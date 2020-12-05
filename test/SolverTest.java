@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import src.domain.algorithms.QuickSolver;
 import src.domain.entities.Board;
 import src.domain.controllers.Reader;
 import src.domain.algorithms.Solver;
@@ -21,8 +22,10 @@ public class SolverTest {
     @MethodSource("testArguments")
     public void testSolveSample(String inputFile, String[] expectedOutputFiles) throws IOException {
         Board b = Reader.fromFile(inputFile);
-        Solver solver = new Solver(b);
+        QuickSolver solver = new QuickSolver(b);
         int numSolutions = solver.solve();
+        int numSolutions2 = solver.getSolutions().size();
+        assertEquals(numSolutions, numSolutions2);
         int expectedNumSolutions = expectedOutputFiles.length;
         assertEquals(expectedNumSolutions, numSolutions);
 
