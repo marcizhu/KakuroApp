@@ -27,7 +27,14 @@ import com.google.gson.Gson;
 
 // Database invariable: all Objects are stored as a json array
 public class DB {
-    public void DB() {}
+    private final String path;
+    public DB() {
+        this.path = "data/DB/";
+    }
+
+    public DB (String path) {
+        this.path = path;
+    }
 
     public Object readObject(Class objectClass, Object primaryKey) throws IOException{
 
@@ -45,7 +52,7 @@ public class DB {
         String fileContents;
         Gson gson = new Gson();
         try {
-            fileContents = Files.readString(Path.of("data/DB/" + objectClass.getSimpleName() + ".json"));
+            fileContents = Files.readString(Path.of(path + objectClass.getSimpleName() + ".json"));
         } catch (NoSuchFileException e) {
             System.err.println("Class " + objectClass.getSimpleName() + " has no entry in the database");
             e.printStackTrace();
@@ -97,16 +104,18 @@ public class DB {
 
     private ArrayList<User> getAllUsers() throws IOException{
         Gson gson = new Gson();
-        String fileContents = Files.readString(Path.of("data/DB/user.json"));
+        String fileContents = Files.readString(Path.of(path + "user.json"));
 
         Type collectionType = new TypeToken<Collection<User>>(){}.getType();
-        return gson.fromJson(fileContents, collectionType);
+        ArrayList<User> users = gson.fromJson(fileContents, collectionType);
+        if (users != null) return users;
+        return new ArrayList<User>();
     }
 
     private void writeToFile(Collection<?> col, String fileName) throws IOException {
         Gson g = new Gson();
         String rawJSON = g.toJson(col);
-        FileWriter writer = new FileWriter("data/DB/" + fileName + ".json");
+        FileWriter writer = new FileWriter(path + fileName + ".json");
 
         writer.write(rawJSON);
         writer.close();
