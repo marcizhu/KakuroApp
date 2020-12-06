@@ -1,10 +1,6 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
-import src.presentation.screens.AbstractScreenCtrl;
-import src.presentation.screens.DemoScreen;
-import src.presentation.screens.AbstractScreen;
-import src.presentation.screens.DemoScreenCtrl;
 
 import javax.swing.*;
 import java.awt.*;

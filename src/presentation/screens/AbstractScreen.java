@@ -1,6 +1,6 @@
 package src.presentation.screens;
 
-import src.presentation.controllers.PresentationCtrl;
+import src.presentation.controllers.AbstractScreenCtrl;
 
 import javax.swing.*;
 

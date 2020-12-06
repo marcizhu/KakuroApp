@@ -22,28 +22,32 @@ public class KakuroInfoCardView extends JPanel {
     private JPanel kakuroInfoAndButtons;
 
     public KakuroInfoCardView(String board, final String name, String difficulty, String timesPlayed, String ownerName, String date, String recordTime, int state) {
-        setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        //setLayout(new GridBagLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Main kakuro view
         kakuroView = new KakuroView(board, false);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(kakuroView, constraints);
+        add(kakuroView);
 
         kakuroInfoAndButtons = new JPanel();
         kakuroInfoAndButtons.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(3,10,2,10);
 
         // Lower left info content
         JLabel nameLbl = new JLabel(name);
+        nameLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+        nameLbl.setForeground(Color.BLACK);
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.WEST;
         constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.BOTH;
         kakuroInfoAndButtons.add(nameLbl, constraints);
 
         JLabel difficultyLbl = new JLabel("Difficulty: "+difficulty);
+        difficultyLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+        difficultyLbl.setForeground(Color.BLACK);
         constraints.gridy = 1;
         kakuroInfoAndButtons.add(difficultyLbl, constraints);
 
@@ -52,32 +56,71 @@ public class KakuroInfoCardView extends JPanel {
         int boardHeight = Integer.parseInt(line1[0].trim());
         int boardWidth  = Integer.parseInt(line1[1].trim());
         JLabel sizeLbl = new JLabel("Size: "+boardWidth+","+boardHeight);
+        sizeLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        sizeLbl.setForeground(Color.BLACK);
         constraints.gridy = 2;
         kakuroInfoAndButtons.add(sizeLbl, constraints);
 
         JLabel recordLbl = new JLabel("BEST TIME: "+recordTime);
+        recordLbl.setHorizontalTextPosition(SwingConstants.LEFT);
+        recordLbl.setForeground(Color.BLACK);
         constraints.gridy = 3;
         kakuroInfoAndButtons.add(recordLbl, constraints);
 
         // Lower right info content
         JLabel timesPlayedLbl = new JLabel("Times played: "+timesPlayed);
+        timesPlayedLbl.setHorizontalTextPosition(SwingConstants.RIGHT);
+        timesPlayedLbl.setForeground(Color.BLACK);
         constraints.gridx = 6;
         constraints.gridy = 0;
+        constraints.anchor = GridBagConstraints.EAST;
         constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.BOTH;
         kakuroInfoAndButtons.add(timesPlayedLbl, constraints);
 
         JLabel ownerLbl = new JLabel("Owner: "+ownerName);
+        ownerLbl.setHorizontalTextPosition(SwingConstants.RIGHT);
+        ownerLbl.setForeground(Color.BLACK);
         constraints.gridy = 1;
         kakuroInfoAndButtons.add(ownerLbl, constraints);
 
         JLabel creationLbl = new JLabel("Creation date: " + date);
+        creationLbl.setHorizontalTextPosition(SwingConstants.RIGHT);
+        creationLbl.setForeground(Color.BLACK);
         constraints.gridy = 2;
         kakuroInfoAndButtons.add(creationLbl, constraints);
 
             // Flag and buttons
         if (state != STATE_NEUTRAL) {
-
+            String flag;
+            Color flagColor;
+            switch (state) {
+                case STATE_UNFINISHED:
+                    flag = "U";
+                    flagColor = Color.YELLOW;
+                    break;
+                case STATE_SOLVED:
+                    flag = "S";
+                    flagColor = Color.GREEN;
+                    break;
+                case STATE_SURRENDERED:
+                    flag = "X";
+                    flagColor = Color.RED;
+                    break;
+                default:
+                    flag = "";
+                    flagColor = new Color(0,0,0,0);
+            }
+            JLabel flagLbl = new JLabel(flag);
+            flagLbl.setBackground(flagColor);
+            flagLbl.setOpaque(true);
+            flagLbl.setHorizontalTextPosition(SwingConstants.CENTER);
+            flagLbl.setForeground(Color.BLACK);
+            constraints.gridx = 4;
+            constraints.gridy = 3;
+            constraints.gridwidth = 1;
+            constraints.fill = GridBagConstraints.NONE;
+            kakuroInfoAndButtons.add(flagLbl, constraints);
         }
 
         JButton exportBtn = new JButton("=");
@@ -87,6 +130,8 @@ public class KakuroInfoCardView extends JPanel {
                 if (listener != null) listener.onExportClicked(name);
             }
         });
+        exportBtn.setForeground(Color.BLACK);
+        exportBtn.setFocusable(false);
         constraints.gridx = 5;
         constraints.gridy = 3;
         constraints.gridwidth = 1;
@@ -106,6 +151,8 @@ public class KakuroInfoCardView extends JPanel {
                 if (listener != null) listener.onPlayClicked(name);
             }
         });
+        playBtn.setForeground(Color.BLACK);
+        playBtn.setFocusable(false);
         constraints.gridx = 6;
         constraints.gridy = 3;
         constraints.gridwidth = 2;
@@ -120,21 +167,34 @@ public class KakuroInfoCardView extends JPanel {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         kakuroInfoAndButtons.add(separator, constraints);
 
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        add(kakuroInfoAndButtons, constraints);
-
         kakuroInfoAndButtons.setBackground(Color.GRAY);
+        add(kakuroInfoAndButtons);
+
         setBackground(Color.LIGHT_GRAY);
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     @Override
     public void setSize(int width, int height) {
-        super.setSize(width, height);
         kakuroView.setSize(width, height - kakuroInfoAndButtons.getHeight());
+        int maxWidth = kakuroInfoAndButtons.getWidth() > kakuroView.getWidth() ? kakuroInfoAndButtons.getWidth() : kakuroView.getWidth();
+        super.setSize(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        int maxWidth = kakuroInfoAndButtons.getWidth() > kakuroView.getWidth() ? kakuroInfoAndButtons.getWidth() : kakuroView.getWidth();
+        if (maxWidth < kakuroInfoAndButtons.getMinimumSize().width) maxWidth = kakuroInfoAndButtons.getMinimumSize().width;
+        return new Dimension(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
     }
 
     public void setListener(InfoCardButtonsClickListener l) {

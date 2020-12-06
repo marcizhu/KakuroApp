@@ -14,7 +14,9 @@ public class KakuroView extends JPanel {
     public static final int BLACK_SECTION_RIGHT = 4;
     private Color blackCellColor;
 
-    private BoardView boardView;
+
+    private int rows, columns, cellSideSize;
+    private JPanel[][] cells;
 
     private BoardMouseEventListener listener;
 
@@ -30,8 +32,12 @@ public class KakuroView extends JPanel {
 
         assert(rows.length - 1 == height);
 
-        boardView = new BoardView(height+1, width+1);
-        JPanel[][] cells = new JPanel[height+1][width+1];
+        this.rows = height+1;
+        this.columns = width+1;
+        cells = new JPanel[height+1][width+1];
+
+        setLayout(new GridLayout(this.rows, this.columns));
+        computeCellSideSize(getWidth(), getHeight());
 
         int[] currColSums = new int[width];
         int currRowSum = 0;
@@ -46,11 +52,13 @@ public class KakuroView extends JPanel {
 
                 if (cols[j].equals("*")) {
                     cells[i][j] = new BlackCellView(i, j, currColSums[j], 0, currRowSum, 0, showValues);
+                    add(cells[i][j]);
                     currRowSum = 0;
                     currColSums[j] = 0;
                 }
                 else if(cols[j].equals("?")) {
                     cells[i][j] = new WhiteCellView(i, j, 0, 0, showValues);
+                    add(cells[i][j]);
                 }
                 else if(m.find()) {
                     int col = 0;
@@ -64,30 +72,61 @@ public class KakuroView extends JPanel {
                     }
 
                     cells[i][j] = new BlackCellView(i, j, currColSums[j], col, currRowSum, row, showValues);
+                    add(cells[i][j]);
                     currRowSum = row;
                     currColSums[j] = col;
                 } else {
                     int val = Integer.parseInt(cols[j]);
                     cells[i][j] = new WhiteCellView(i, j, val, 0, showValues);
+                    add(cells[i][j]);
                 }
             }
             cells[i][width] = new BlackCellView(i, width, 0, 0, currRowSum, 0, showValues);
+            add(cells[i][width]);
             currRowSum = 0;
         }
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < width; j++) {
             cells[height][j] = new BlackCellView(height, j, currColSums[j], 0, 0, 0, showValues);
+            add(cells[height][j]);
+        }
         cells[height][width] = new BlackCellView(height, width, 0, 0, 0, 0, showValues);
+        add(cells[height][width]);
 
-        this.setLayout(new GridBagLayout());
-        boardView.setCells(cells);
-        this.add(boardView);
+        this.setBackground(new Color(0,0,0,0));
         this.setVisible(true);
+    }
+
+    private void computeCellSideSize(int width, int height) {
+        if(width/columns < height/rows)// horizontally constrained
+            cellSideSize = width/columns;
+        else
+            cellSideSize = height/rows;
     }
 
     @Override
     public void setSize(int width, int height) {
-        super.setSize(width, height);
-        boardView.setSize(width, height);
+        computeCellSideSize(width, height);
+        super.setSize(cellSideSize*columns, cellSideSize*rows);
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                cells[r][c].setSize(cellSideSize, cellSideSize);
+            }
+        }
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(this.columns*this.cellSideSize, this.rows*this.cellSideSize);
     }
 
     public void setBoardMouseEventListener(BoardMouseEventListener l) {
@@ -96,87 +135,19 @@ public class KakuroView extends JPanel {
     }
 
     public void setWhiteCellValue(int r, int c, int value) {
-        if (boardView == null) return;
-        boardView.setWhiteCellValue(r, c, value);
+        if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+        if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setValue(value);
     }
     public void setWhiteCellNotations(int r, int c, int notations) {
-        if (boardView == null) return;
-        boardView.setWhiteCellNotations(r, c, notations);
+        if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+        if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setNotations(notations);
     }
     public void setBlackCellValue(int r, int c, int value, int section) {
-        if (boardView == null) return;
-        boardView.setBlackCellValue(r, c, value, section);
+        if (r < 0 || c < 0 || r >= rows || c >= columns) return;
+        if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(value, section);
     }
     public void setBlackCellColor(Color c) {
         blackCellColor = c;
-    }
-
-    private class BoardView extends JPanel {
-        private int rows, columns, cellSideSize;
-        private JPanel[][] cells;
-
-        public BoardView(int rows, int columns) {
-            this.rows = rows;
-            this.columns = columns;
-            computeCellSideSize(getWidth(), getHeight());
-            setLayout(new GridLayout(rows, columns));
-            setVisible(true);
-        }
-
-        private void computeCellSideSize(int width, int height) {
-            if(width/columns < height/rows)// horizontally constrained
-                cellSideSize = width/columns;
-            else
-                cellSideSize = height/rows;
-        }
-
-        public void setCells(JPanel[][] CC) {
-            cells = CC;
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    add(CC[r][c]);
-                }
-            }
-        }
-
-        @Override
-        public void setSize(int width, int height) {
-            computeCellSideSize(width, height);
-            super.setSize(cellSideSize*columns, cellSideSize*rows);
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    cells[r][c].setSize(cellSideSize, cellSideSize);
-                }
-            }
-        }
-
-        @Override
-        public Dimension getMinimumSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public Dimension getMaximumSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(this.columns*this.cellSideSize, this.rows*this.cellSideSize);
-        }
-
-        public void setWhiteCellValue(int r, int c, int value) {
-            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
-            if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setValue(value);
-        }
-        public void setWhiteCellNotations(int r, int c, int notations) {
-            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
-            if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setNotations(notations);
-        }
-        public void setBlackCellValue(int r, int c, int value, int section) {
-            if (r < 0 || c < 0 || r >= rows || c >= columns) return;
-            if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(value, section);
-        }
     }
 
     private class BlackCellView extends JPanel {
@@ -255,6 +226,8 @@ public class KakuroView extends JPanel {
                         listener.onBlackCellViewEntered(row, col);
                 }
             });
+
+            setBackground(new Color(0,0,0,0));
         }
 
         // FIXME: Ugly solution, I don't know if there's a better way to do this
@@ -265,8 +238,8 @@ public class KakuroView extends JPanel {
         }
 
         @Override
-        public void paint(Graphics g) {
-            super.paint(g);
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
             Color c = g.getColor();
             int centerX = getWidth()/2, centerY = getHeight()/2;
             int topLeftX = 0, topLeftY = 0;

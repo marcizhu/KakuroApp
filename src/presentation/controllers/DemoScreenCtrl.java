@@ -1,9 +1,11 @@
-package src.presentation.screens;
+package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
+import src.presentation.controllers.AbstractScreenCtrl;
 import src.presentation.controllers.PresentationCtrl;
+import src.presentation.screens.DemoScreen;
 
-public class DemoScreenCtrl extends AbstractScreenCtrl{
+public class DemoScreenCtrl extends AbstractScreenCtrl {
 
     public DemoScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);

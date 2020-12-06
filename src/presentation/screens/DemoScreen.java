@@ -1,8 +1,7 @@
 package src.presentation.screens;
 
-import src.presentation.controllers.PresentationCtrl;
+import src.presentation.controllers.DemoScreenCtrl;
 import src.presentation.views.KakuroInfoCardView;
-import src.presentation.views.KakuroView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,9 +33,8 @@ public class DemoScreen extends AbstractScreen {
         contents.add(leftContent, constraints);
         try {
             String boardStr = new String(Files.readAllBytes(Paths.get("data/kakuros/solved/jutge.kak")));
-            kak = new KakuroInfoCardView(boardStr,"Breakfast kakuro","HARD","12","Cesc","2020.3.1","1:23",0);//new KakuroView(new String(Files.readAllBytes(Paths.get("data/kakuros/solved/jutge.kak"))), true);
+            kak = new KakuroInfoCardView(boardStr,"Breakfast kakuro","HARD","12","Cesc","2020.3.1","1:23",KakuroInfoCardView.STATE_SURRENDERED);
             kak.setSize(width, height);
-            //kak.setBlackCellColor(new Color(20,120,20));
             constraints.fill = GridBagConstraints.VERTICAL;
             constraints.gridx = 1;
             constraints.gridy = 0;
@@ -57,13 +55,11 @@ public class DemoScreen extends AbstractScreen {
     @Override
     public void onShow() {
         System.out.println("Demo: onShow()");
-        //kak.setBlackCellColor(new Color(20,120,20));
     }
 
     @Override
     public void onHide() {
         System.out.println("Demo: onHide()");
-        //kak.setBlackCellColor(new Color(150,150,150));
     }
 
     @Override
@@ -75,11 +71,7 @@ public class DemoScreen extends AbstractScreen {
     public void onResize(int width, int height) {
         contents.setSize(width, height);
         int remainingWidth = width - leftContent.getWidth() - rightContent.getWidth();
-        int min = remainingWidth < height ? remainingWidth : height;
-        kak.setSize(min, min);
+        kak.setSize(remainingWidth, height);
         System.out.println("Demo: onResize("+width+","+height+")");
-
-        //if (min == remainingWidth) kak.setBlackCellColor(new Color(150,150,150));
-        //else kak.setBlackCellColor(new Color(20,120,20));
     }
 }
