@@ -1,5 +1,5 @@
 import src.domain.controllers.Reader;
-import src.domain.algorithms.QuickSolver;
+import src.domain.algorithms.Solver;
 import src.domain.entities.Board;
 
 import java.util.Scanner;
@@ -11,7 +11,7 @@ public class kakurosolver {
 
         Board b = Reader.fromString(input);
 
-        QuickSolver solver = new QuickSolver(b);
+        Solver solver = new Solver(b);
         int s = solver.solve();
 
         System.out.println(s);

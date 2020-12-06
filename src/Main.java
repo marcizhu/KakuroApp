@@ -1,14 +1,8 @@
 package src;
 
-import src.domain.algorithms.Generator;
-import src.domain.algorithms.QuickSolver;
-import src.domain.controllers.Reader;
 import src.domain.entities.Board;
-import src.domain.entities.Difficulty;
-import src.gui.KakuroGUI;
 import src.presentation.controllers.PresentationCtrl;
 
-import javax.swing.*;
 import java.io.IOException;
 
 public class Main {
@@ -49,7 +43,7 @@ public class Main {
 		System.out.println("Uses seed: " + gen.getUsedSeed() + " and it was generated in: " + t + " ms");
 		System.out.println(gen.getGeneratedBoard().toString());
 
-		QuickSolver qSolver = new QuickSolver(gen.getGeneratedBoard());
+		Solver qSolver = new Solver(gen.getGeneratedBoard());
 		long t2 = System.currentTimeMillis();
 		int sol = qSolver.solve();
 		t2 = System.currentTimeMillis() - t2;
