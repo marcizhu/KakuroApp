@@ -2,11 +2,7 @@ package src.repository;
 
 import com.google.gson.reflect.TypeToken;
 
-import src.domain.User;
-import src.domain.Board;
-import src.domain.GameFinished;
-import src.domain.GameInProgress;
-import src.domain.Kakuro;
+import src.domain.*;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -36,18 +32,6 @@ public class DB {
         this.path = path;
     }
 
-    public Object readObject(Class objectClass, Object primaryKey) throws IOException{
-
-        if (objectClass == User.class) {
-            ArrayList<User> users = getAllUsers();
-            for (User u: users) if (u.getName().equals(primaryKey)) return u;
-            return null; // No user with that PK found
-        }
-
-        System.err.println("Class " + objectClass.getName() + " has no entry in the database");
-        return null;
-    }
-
     public ArrayList<Object> readAll(Class objectClass) throws IOException {
         String fileContents;
         Gson gson = new Gson();
@@ -59,7 +43,7 @@ public class DB {
             return null;
         }
 
-        Type collectionType = new TypeToken<ArrayList<User>>(){}.getType();
+        Type collectionType = TypeToken.getParameterized(ArrayList.class, objectClass).getType(); // FIXME:
         return gson.fromJson(fileContents, collectionType);
     }
 
@@ -100,16 +84,6 @@ public class DB {
         }
 
         System.err.println("Class " + obj.getClass().getName() + " has no entry in the database");
-    }
-
-    private ArrayList<User> getAllUsers() throws IOException{
-        Gson gson = new Gson();
-        String fileContents = Files.readString(Path.of(path + "user.json"));
-
-        Type collectionType = new TypeToken<Collection<User>>(){}.getType();
-        ArrayList<User> users = gson.fromJson(fileContents, collectionType);
-        if (users != null) return users;
-        return new ArrayList<User>();
     }
 
     private void writeToFile(Collection<?> col, String fileName) throws IOException {
