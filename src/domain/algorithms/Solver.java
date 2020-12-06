@@ -2,6 +2,7 @@ package src.domain.algorithms;
 
 import src.domain.algorithms.helpers.KakuroConstants;
 import src.domain.entities.Board;
+import src.utils.Pair;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,7 @@ public class Solver {
         preprocessCols();
         preprocessSums();
 
-        solve(0, 0, 0, new int[board.getWidth()]);
+        //solve(0, 0, 0, new int[board.getWidth()]);
         return solutions.size();
     }
 
@@ -180,46 +181,18 @@ public class Solver {
                 & ~rowValuesUsed[rowID]; // ...nor in the current row.
     }
 
-    private void solve(int row, int col, int rowSum, int[] colSum) {
+    private void solve(ArrayList<Pair<Integer, Integer>> cells, int idx) {
+        int row = cells.get(idx).first;
+        int col = cells.get(idx).second;
         // Check if we found a solution
         if (row == board.getHeight() - 1 && col == board.getWidth()) {
-            if (rowSum != rowSums[row][col - 1]) return;
-            for (int i = 0; i < board.getWidth(); i++)
-                if (colSum[i] != colSums[row][i]) return;
-
             // At this point a solution has been found
             // Add a copy of this board to the list of solutions
             solutions.add(new Board(board));
             return;
         }
 
-        if (col >= board.getWidth()) {
-            if(rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
-
-            solve(row + 1, 0, 0, colSum);
-            return;
-        }
-
-        if (board.isBlackCell(row, col)) {
-            // If cell type is black, continue solving
-            if (col > 0 && rowSum != rowSums[row][col - 1]) return; // if row sum is not correct, return
-            if (row > 0 && colSum[col] != colSums[row - 1][col]) return; // if col sum is not correct, return
-
-            int colSumTemp = colSum[col];
-            colSum[col] = 0;
-            solve(row, col + 1, 0, colSum);
-            colSum[col] = colSumTemp;
-            return;
-        }
-
-        if (!board.isEmpty(row, col)) {
-            // If cell has a value, continue solving
-            int val = board.getValue(row, col);
-            colSum[col] += val;
-            solve(row, col + 1, rowSum + val, colSum);
-            colSum[col] -= val;
-            return;
-        }
+        if (!board.isEmpty(row, col)) return;
 
         int possibleValues = getPossibleValues(row, col);
 
@@ -229,12 +202,10 @@ public class Solver {
             board.setCellValue(row, col, i);
             rowValuesUsed[rowLine[row][col]] |= (1 << (i-1));
             colValuesUsed[colLine[row][col]] |= (1 << (i-1));
-            colSum[col] += i;
-            solve(row, col + 1, rowSum + i, colSum);
+            solve(cells, idx+1);
             board.clearCellValue(row, col);
             rowValuesUsed[rowLine[row][col]] &= ~(1 << (i-1));
             colValuesUsed[colLine[row][col]] &= ~(1 << (i-1));
-            colSum[col] -= i;
             if (solutions.size() > 1) return;
         }
     }
