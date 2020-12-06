@@ -18,17 +18,37 @@ public class UserRepositoryDB implements UserRepository {
     @Override
     public User getUser(String userName) throws IOException {
         // Returns null if user is not found
-        return (User)driver.readObject(User.class, userName);
+        ArrayList<User> users = getAllUsers();
+        for (User u : users) if (u.getName().equals(userName)) return u;
+
+        return null;
     }
 
     @Override
     public void deleteUser (User user) throws IOException {
-        driver.deleteObject(user);
+        ArrayList<User> usersList = this.getAllUsers();
+        for (int i = 0; i<usersList.size(); i++) {
+            if (usersList.get(i).getName().equals(user.getName())) {
+                usersList.remove(i);
+                driver.writeToFile(usersList, "user");
+                return;
+            }
+        }
     }
 
     @Override
     public void saveUser (User user) throws IOException {
-        driver.writeObject(user);
+        ArrayList<User> usersList = this.getAllUsers();
+        for (int i = 0; i<usersList.size(); i++) {
+            if (usersList.get(i).getName() == user.getName()) {
+                usersList.set(i, user);
+                driver.writeToFile(usersList, "user");
+                return;
+            }
+        }
+
+        usersList.add(user);
+        driver.writeToFile(usersList, "user");
     }
 
     @Override
