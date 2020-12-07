@@ -1,5 +1,6 @@
 package src.repository;
 
+import src.domain.Kakuro;
 import src.domain.User;
 import src.repository.DB;
 import src.repository.UserRepository;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 
 
 public class UserRepositoryDB implements UserRepository {
-    DB driver;
+    private final DB driver;
 
     public UserRepositoryDB(DB driver) {
         this.driver = driver;
@@ -39,8 +40,10 @@ public class UserRepositoryDB implements UserRepository {
     @Override
     public void saveUser (User user) throws IOException {
         ArrayList<User> usersList = this.getAllUsers();
+        System.out.println(usersList);
         for (int i = 0; i<usersList.size(); i++) {
-            if (usersList.get(i).getName() == user.getName()) {
+            if (usersList.get(i).getName().equals(user.getName())) {
+                System.out.println("Found match!!");
                 usersList.set(i, user);
                 driver.writeToFile(usersList, "user");
                 return;
@@ -53,14 +56,17 @@ public class UserRepositoryDB implements UserRepository {
 
     @Override
     public ArrayList<User> getAllUsers () throws IOException {
+        /*
         ArrayList<Object> o = driver.readAll(User.class);
-        System.out.println("List of all objects:" + o);
         ArrayList<User> res = new ArrayList<>();
         System.out.println(res.size());
         for (int i = 0; i<o.size(); i++) {
             res.add((User)o.get(i));
         }
 
-        return res;
+         */
+
+        //return res;
+        return (ArrayList<User>)(ArrayList<?>) driver.readAll(User.class);
     }
 }

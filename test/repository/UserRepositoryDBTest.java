@@ -70,6 +70,30 @@ public class UserRepositoryDBTest {
         verify(dbMock).readAll(User.class);
         verify(dbMock).writeToFile(expectedUsers, "user");
     }
+
+    @Test
+    public void testUpdateUser() throws IOException {
+        DB dbMock = mock(DB.class);
+        User user = new User("Larry");
+        user.setScore(420);
+
+        ArrayList<Object> expectedUsers = new ArrayList<>();
+        expectedUsers.add(user);
+
+        // DB returns Larry with a score of 420
+        when(dbMock.readAll(User.class)).thenReturn(expectedUsers);
+
+        UserRepository repo = new UserRepositoryDB(dbMock);
+        user.setScore(425);
+        // We increase Larry's score by 5 and save it
+        repo.saveUser(user);
+
+        expectedUsers.set(0, user);
+
+        verify(dbMock).readAll(User.class);
+        // Therefore, we expect the database to write the updated Larry with score 425
+        verify(dbMock).writeToFile(expectedUsers, "user");
+    }
 }
 
 

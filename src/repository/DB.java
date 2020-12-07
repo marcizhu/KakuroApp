@@ -37,14 +37,17 @@ public class DB {
         }
 
         Type collectionType = TypeToken.getParameterized(ArrayList.class, objectClass).getType(); // FIXME:
-        return gson.fromJson(fileContents, collectionType);
+        ArrayList<Object> res = gson.fromJson(fileContents, collectionType);
+        if (res == null) return new ArrayList<Object>();
+        return res;
     }
 
 
     public void writeToFile(Collection<?> col, String fileName) throws IOException {
+        System.out.println("To write: " + col);
         Gson g = new Gson();
         String rawJSON = g.toJson(col);
-        FileWriter writer = new FileWriter(path + fileName + ".json");
+        FileWriter writer = new FileWriter(path + fileName + ".json", false);
 
         writer.write(rawJSON);
         writer.close();
