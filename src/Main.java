@@ -77,6 +77,33 @@ public class Main {
 		System.out.println("Generated " + N + " EXTREME difficulty kakuros in: " + (System.currentTimeMillis()-time) + " ms");
 		*/
 
+		User u = new User("Jonny");
+		Board u2 = new Board(9, 7);
+		Kakuro k2 = new Kakuro(Difficulty.EXTREME, u2, u);
+
+		User v = new User("Sloot");
+		Board v2 = new Board(9, 7);
+		Kakuro k3 = new Kakuro(Difficulty.MEDIUM, v2, v);
+
+		User w = new User("Larry");
+		Board w2 = new Board(9, 7);
+		Kakuro k4 = new Kakuro(Difficulty.HARD, w2, w);
+
+		repo.saveKakuro(k);
+		repo.saveKakuro(k2);
+		repo.saveKakuro(k3);
+		repo.saveKakuro(k4);
+
+
+		ArrayList<Kakuro> kakuros = repo.getAllKakuros();
+		System.out.println(kakuros);
+
+		repo.deleteKakuro(k3);
+		repo.deleteKakuro(k2);
+		repo.deleteKakuro(k4);
+
+		ArrayList<Kakuro> kr = repo.getAllKakuros();
+		System.out.println(kr);
 
 		// Program to read a kakuro from a file and send it to solve, then save it to file.
 		/*

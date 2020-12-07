@@ -2,6 +2,8 @@ package src.domain.entities;
 
 import java.util.UUID;
 
+import java.util.UUID;
+
 /**
  * Class that represents a Kakuro board
  *
