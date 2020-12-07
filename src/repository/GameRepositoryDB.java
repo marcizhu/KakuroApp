@@ -9,6 +9,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/*
+    FIXME:
+    when deserializing games, Gson will try to instantiate them with the Game constructor,
+    which will throw an exception because Game is abstract and cannot be instantiated.
+    Here is the fix TODO: https://www.javacodegeeks.com/2012/04/json-with-gson-and-abstract-classes.html
+ */
+
 public class GameRepositoryDB implements GameRepository {
 
     private final DB driver;
@@ -19,16 +26,18 @@ public class GameRepositoryDB implements GameRepository {
 
     @Override
     public Game getGame(UUID gameId) throws IOException {
+        // TODO:
         return null;
     }
 
     @Override
     public void deleteGame(UUID gameId) throws IOException {
-
+        // TODO:
     }
 
     @Override
     public void saveGame(Game game) throws IOException {
+        // FIXME:
         ArrayList<Game> gamesList = this.getAllGames();
 
         for (int i = 0; i<gamesList.size(); i++) {
