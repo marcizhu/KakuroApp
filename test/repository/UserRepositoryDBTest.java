@@ -1,4 +1,4 @@
-package test;
+package test.repository;
 
 import org.junit.jupiter.api.Test;
 import src.domain.User;

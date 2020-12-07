@@ -1,4 +1,4 @@
-package test;
+package test.repository;
 
 import org.junit.jupiter.api.*;
 import src.repository.DB;
@@ -65,11 +65,24 @@ public class DBTest {
 
     @Test
     public void testWriteToFile() throws IOException {
-        System.out.println("TODO");
-        // TODO
+        // Initial state: file testobject.json is empty
+
+        ArrayList<Object> expectedObjects = new ArrayList<>();
+        expectedObjects.add(new TestObject(0, "0", false));
+        expectedObjects.add(new TestObject(1, "1", true));
+
+        String expectedFileContents = "[{\"a\":0,\"b\":\"0\",\"c\":false},{\"a\":1,\"b\":\"1\",\"c\":true}]";
+
+
+        testDB.writeToFile(expectedObjects, "testobject");
+
+        String fileContents = Files.readString(Path.of("test/database/testobject.json"));
+
+        assertTrue(fileContents.equals(expectedFileContents));
     }
 
     private class TestObject {
+        // This is a sample class whose instances will be written and read by the database driver just for testing purposes
         private int a;
         private String b;
         private boolean c;
