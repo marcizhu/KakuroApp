@@ -110,8 +110,10 @@ public class KakuroView extends JPanel {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 cells[r][c].setSize(cellSideSize, cellSideSize);
+                cells[r][c].revalidate();
             }
         }
+        revalidate();
     }
 
     @Override

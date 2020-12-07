@@ -175,9 +175,13 @@ public class KakuroInfoCardView extends JPanel {
 
     @Override
     public void setSize(int width, int height) {
+        kakuroInfoAndButtons.setSize(width, kakuroInfoAndButtons.getHeight());
         kakuroView.setSize(width, height - kakuroInfoAndButtons.getHeight());
         int maxWidth = kakuroInfoAndButtons.getWidth() > kakuroView.getWidth() ? kakuroInfoAndButtons.getWidth() : kakuroView.getWidth();
+        if (maxWidth < kakuroInfoAndButtons.getMinimumSize().width) maxWidth = kakuroInfoAndButtons.getMinimumSize().width;
+        if (maxWidth > kakuroInfoAndButtons.getWidth()) kakuroInfoAndButtons.setSize(maxWidth, kakuroInfoAndButtons.getHeight());
         super.setSize(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
+        revalidate();
     }
 
     @Override

@@ -30,12 +30,12 @@ public abstract class AbstractScreenCtrl { //Data handling and calls to Domain c
     public void onDestroy() { screen.onDestroy(); } // Called whenever a new screen is requested or the window is closed.
     public void onResize(int width, int height) { screen.onResize(width, height); }// Called whenever the window is resized.
 
-    public abstract void onFocusRegained();
+    public abstract void onFocusRegained(int width, int height);
 
-    public abstract void onDashboardMenuItemClicked();
-    public abstract void onKakuroListMenuItemClicked();
-    public abstract void onMyKakurosMenuItemClicked();
-    public abstract void onStatisticsMenuItemClicked();
-    public abstract void onRankingsMenuItemClicked();
-    public abstract void onLogOutMenuItemClicked();
+    public void onDashboardMenuItemClicked() {}
+    public void onKakuroListMenuItemClicked() {}
+    public void onMyKakurosMenuItemClicked() {}
+    public void onStatisticsMenuItemClicked() {}
+    public void onRankingsMenuItemClicked() {}
+    public void onLogOutMenuItemClicked() {}
 }

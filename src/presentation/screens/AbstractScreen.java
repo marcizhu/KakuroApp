@@ -25,7 +25,11 @@ public abstract class AbstractScreen { //UI related stuff
     public abstract void onDestroy(); // Called whenever a new screen is requested or the window is closed.
     public void onResize(int width, int height) { // Called whenever the window is resized.
         if (width != previousWidth || height != previousHeight) {
-            build(width, height);
+            if (contents == null) build(width, height);
+            else {
+                contents.setSize(width, height);
+                contents.revalidate();
+            }
             previousWidth = width;
             previousHeight = height;
         }

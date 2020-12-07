@@ -13,7 +13,7 @@ public class DemoScreenCtrl extends AbstractScreenCtrl {
     }
 
     @Override
-    public void onFocusRegained() {
+    public void onFocusRegained(int width, int height) {
         screen.onShow();
     }
 

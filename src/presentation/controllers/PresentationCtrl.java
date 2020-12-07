@@ -11,6 +11,8 @@ public class PresentationCtrl {
     private final int defaultHeight = 720;
     private final int windowBarHeight = 40;
 
+    private String userSessionId;
+
     // Domain controller
     private DomainCtrl domainCtrl;
 
@@ -25,6 +27,7 @@ public class PresentationCtrl {
     private AbstractScreenCtrl currentScreenCtrl;
     // List of all screen controllers to handle screen switching
     private DemoScreenCtrl demoScreenCtrl;
+    private MyKakurosScreenCtrl myKakurosScreenCtrl;
 
     public PresentationCtrl() {
         // Initialize JFrame;
@@ -33,6 +36,7 @@ public class PresentationCtrl {
         domainCtrl = new DomainCtrl();
         // Initialize screen controllers
         demoScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
+        myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -165,7 +169,7 @@ public class PresentationCtrl {
         currentScreenCtrl.onMyKakurosMenuItemClicked();
         for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
         menu.getComponent(2).setForeground(Color.BLUE);
-        //setScreen(myKakurosScreenCtrl);
+        setScreen(myKakurosScreenCtrl);
     }
     private void onStatisticsMenuItemClicked() {
         System.out.println("STATISTICS");
@@ -193,13 +197,23 @@ public class PresentationCtrl {
         currentScreenCtrl.onDestroy();
         currentScreenCtrl = nextScreen;
         if (!currentScreenCtrl.hasBeenBuilt()) currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
-        else currentScreenCtrl.onFocusRegained();
+        else currentScreenCtrl.onFocusRegained(app.getWidth(), app.getHeight()-2*windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
+        app.revalidate();
     }
 
     // Domain communication
     public boolean logIn(String name) {
-        // Call to domain controller, etc.
+        String result = domainCtrl.login(name);
+        if (!result.equals("denied")) {
+            userSessionId = result;
+            return true;
+        }
         return false;
+    }
+
+    public String getUserSessionId() {
+        if (userSessionId == null) return "";
+        return userSessionId;
     }
 }
