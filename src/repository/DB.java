@@ -43,6 +43,7 @@ public class DB {
 
 
     public void writeToFile(Collection<?> col, String fileName) throws IOException {
+        System.out.println("To write: " + col);
         Gson g = new Gson();
         String rawJSON = g.toJson(col);
         FileWriter writer = new FileWriter(path + fileName + ".json", false);
