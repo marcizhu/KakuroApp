@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class UserRepositoryDBTest {
+
     @Test
     public void testGetUser() throws IOException {
         DB dbMock = mock(DB.class);
@@ -84,11 +85,13 @@ public class UserRepositoryDBTest {
         when(dbMock.readAll(User.class)).thenReturn(expectedUsers);
 
         UserRepository repo = new UserRepositoryDB(dbMock);
-        user.setScore(425);
+
         // We increase Larry's score by 5 and save it
+        user.setScore(425);
         repo.saveUser(user);
 
-        expectedUsers.set(0, user);
+        expectedUsers = new ArrayList<>();
+        expectedUsers.add(user);
 
         verify(dbMock).readAll(User.class);
         // Therefore, we expect the database to write the updated Larry with score 425

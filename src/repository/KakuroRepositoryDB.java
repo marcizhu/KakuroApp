@@ -18,18 +18,39 @@ public class KakuroRepositoryDB implements KakuroRepository {
 
     @Override
     public Kakuro getKakuro(UUID id) throws IOException {
-        //TODO
+        // Returns null if kakuro is not found
+        ArrayList<Kakuro> kakuros = getAllKakuros();
+        for (Kakuro k : kakuros) if (k.getId().equals(id)) return k;
+
         return null;
     }
 
     @Override
     public void deleteKakuro(Kakuro kakuro) throws IOException {
-        // TODO
+        ArrayList<Kakuro> kakuroList = this.getAllKakuros();
+        for (int i = 0; i<kakuroList.size(); i++) {
+            if (kakuroList.get(i).getId().equals(kakuro.getId())) {
+                kakuroList.remove(i);
+                driver.writeToFile(kakuroList, "kakuro");
+                return;
+            }
+        }
     }
 
     @Override
     public void saveKakuro(Kakuro kakuro) throws IOException {
-        //TODO
+        ArrayList<Kakuro> kakuroList = this.getAllKakuros();
+
+        for (int i = 0; i<kakuroList.size(); i++) {
+            if (kakuroList.get(i).getId().equals(kakuro.getId())) {
+                kakuroList.set(i, kakuro);
+                driver.writeToFile(kakuroList, "kakuro");
+                return;
+            }
+        }
+
+        kakuroList.add(kakuro);
+        driver.writeToFile(kakuroList, "kakuro");
     }
 
     @Override
@@ -38,14 +59,20 @@ public class KakuroRepositoryDB implements KakuroRepository {
     }
 
     @Override
-    public ArrayList<Kakuro> getAllKakurosByUser(String userName) throws IOException {
-        // TODO
-        return null;
+    public ArrayList<Kakuro> getAllKakurosByUser(User user) throws IOException {
+        ArrayList<Kakuro> kakuros = getAllKakuros();
+        ArrayList<Kakuro> res = new ArrayList<>();
+        for (Kakuro k : kakuros) if (k.getUserName().equals(user.getName())) res.add(k);
+
+        return res;
     }
 
     @Override
     public ArrayList<Kakuro> getAllKakurosByDifficulty(Difficulty difficulty) throws IOException {
-        // TODO
-        return null;
+        ArrayList<Kakuro> kakuros = getAllKakuros();
+        ArrayList<Kakuro> res = new ArrayList<>();
+        for (Kakuro k : kakuros) if (k.getDifficulty().equals(difficulty)) res.add(k);
+
+        return res;
     }
 }

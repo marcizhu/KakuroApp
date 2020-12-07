@@ -21,16 +21,6 @@ public class User {
         this.score = score;
     }
 
-    public int getPlayedGames() {
-        // TODO: data repository is needed to implement
-        return 0;
-    }
-
-    public int getKakurosCreaed() {
-        // TODO: data repository is needed to implement
-        return 0;
-    }
-
     public String toString() {
         return "name: " + name + ", score: " + score;
     }

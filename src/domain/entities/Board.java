@@ -1,5 +1,7 @@
 package src.domain.entities;
 
+import java.util.UUID;
+
 /**
  * Class that represents a Kakuro board
  *
@@ -7,6 +9,7 @@ package src.domain.entities;
  */
 
 public class Board {
+    private final UUID id;
     private final int width;
     private final int height;
     private Cell[][] cells;
@@ -15,6 +18,7 @@ public class Board {
      * Default constructor. Creates an empty board.
      */
     public Board() {
+        this.id = UUID.randomUUID();
         width = 0;
         height = 0;
     }
@@ -25,6 +29,7 @@ public class Board {
      * @param height The height of the board
      */
     public Board(int width, int height) {
+        this.id = UUID.randomUUID();
         this.width = width;
         this.height = height;
         cells = new Cell[height][width]; // Reminder: cells is declared but no cells are created.
@@ -38,6 +43,7 @@ public class Board {
      * @param c      Cell to fill the board
      */
     public Board(int width, int height, Cell c) {
+        this.id = UUID.randomUUID();
         this.width = width;
         this.height = height;
         this.cells = new Cell[height][width];
@@ -57,6 +63,7 @@ public class Board {
      * @param b Board to copy
      */
     public Board(Board b) {
+        this.id = b.getId();
         width = b.getWidth();
         height = b.getHeight();
         cells = new Cell[height][width];
@@ -71,6 +78,14 @@ public class Board {
                 cells[i][j].setCoordinates(i, j);
             }
         }
+    }
+
+    /**
+     * Get id of the board
+     * @return unique identifier of the board
+     */
+    public UUID getId() {
+        return id;
     }
 
     /**
