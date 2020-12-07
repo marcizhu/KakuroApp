@@ -20,18 +20,12 @@ public abstract class Game {
         this.timeSpent = 0;
     }
 
-    public Kakuro getKakuro() {
-        return this.kakuro;
-    }
+    public UUID getId () { return this.id; }
 
     public UUID getId () { return this.id; }
 
     public float getTimeSpent() {
         return this.timeSpent;
-    }
-
-    public User getPlayer() {
-        return this.player;
     }
 
     public Timestamp getStartTime() {
