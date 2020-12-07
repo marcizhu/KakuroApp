@@ -1,30 +1,27 @@
 package src.domain.entities;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 public abstract class Game {
-    private final User player;
-    private final Kakuro kakuro;
-    private final float timeSpent;
+    private final UUID id;
+    private final String playerName;
+    private final UUID kakuroId;
+    private float timeSpent;
     private final Timestamp startTime;
 
     public Game(User player, Kakuro kakuro) {
-        this.player = player;
-        this.kakuro = kakuro;
+        this.id = UUID.randomUUID();
+        this.playerName = player.getName();
+        this.kakuroId = kakuro.getId();
         this.startTime = new Timestamp(System.currentTimeMillis());
         this.timeSpent = 0;
     }
 
-    public Kakuro getKakuro() {
-        return this.kakuro;
-    }
+    public UUID getId () { return this.id; }
 
     public float getTimeSpent() {
         return this.timeSpent;
-    }
-
-    public User getPlayer() {
-        return this.player;
     }
 
     public Timestamp getStartTime() {
