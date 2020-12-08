@@ -3,10 +3,11 @@ package src.domain.entities;
 import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class GameInProgress extends Game{
-
-    private Board board;
+    private UUID boardId;
+    private Board board; // TODO: remove this?
     private ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
 
     public GameInProgress(User player, Kakuro kakuro) {
@@ -18,6 +19,10 @@ public class GameInProgress extends Game{
         super(player, kakuro);
         this.board = board;
         movements = new ArrayList<>();
+    }
+
+    public UUID getBoardId() {
+        return this.boardId;
     }
 
     public void insertMovement(Movement move) {
