@@ -1,6 +1,6 @@
 package src.repository;
 
-import src.domain.User;
+import src.domain.entities.User;
 
 import java.io.IOException;
 import java.util.ArrayList;

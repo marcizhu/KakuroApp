@@ -1,10 +1,10 @@
 package test.repository;
 
 import org.junit.jupiter.api.Test;
-import src.domain.Board;
-import src.domain.Difficulty;
-import src.domain.Kakuro;
-import src.domain.User;
+import src.domain.entities.Board;
+import src.domain.entities.Difficulty;
+import src.domain.entities.Kakuro;
+import src.domain.entities.User;
 import src.repository.*;
 
 import java.io.IOException;

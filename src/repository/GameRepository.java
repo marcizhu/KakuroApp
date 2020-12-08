@@ -1,8 +1,8 @@
 package src.repository;
 
-import src.domain.Game;
-import src.domain.GameFinished;
-import src.domain.GameInProgress;
+import src.domain.entities.Game;
+import src.domain.entities.GameFinished;
+import src.domain.entities.GameInProgress;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package src.repository;
 
-import src.domain.Difficulty;
-import src.domain.Kakuro;
-import src.domain.User;
+import src.domain.entities.Difficulty;
+import src.domain.entities.Kakuro;
+import src.domain.entities.User;
 
 import java.io.IOException;
 import java.util.ArrayList;

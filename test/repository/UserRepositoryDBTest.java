@@ -1,7 +1,7 @@
 package test.repository;
 
 import org.junit.jupiter.api.Test;
-import src.domain.User;
+import src.domain.entities.User;
 import src.repository.DB;
 import src.repository.UserRepositoryDB;
 import src.repository.UserRepository;

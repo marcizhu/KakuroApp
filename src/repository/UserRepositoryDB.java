@@ -1,7 +1,7 @@
 package src.repository;
 
-import src.domain.Kakuro;
-import src.domain.User;
+import src.domain.entities.Kakuro;
+import src.domain.entities.User;
 import src.repository.DB;
 import src.repository.UserRepository;
 
