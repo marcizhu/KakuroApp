@@ -216,4 +216,13 @@ public class PresentationCtrl {
         if (userSessionId == null) return "";
         return userSessionId;
     }
+
+    public void startNewGame(String kakuroID) {
+        currentScreenCtrl.onDestroy();
+        currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
+        ((GameScreenCtrl)currentScreenCtrl).setUpGame(domainCtrl.newGameInstance(userSessionId, kakuroID));
+        currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
+        app.setContentPane(currentScreenCtrl.getContents());
+        app.revalidate();
+    }
 }

@@ -1,5 +1,8 @@
 package src.domain.controllers;
 
+import src.domain.entities.Difficulty;
+import src.domain.entities.Kakuro;
+import src.domain.entities.User;
 import src.presentation.views.KakuroInfoCardView;
 
 import java.util.ArrayList;
@@ -39,5 +42,19 @@ public class DomainCtrl {
         }
 
         return result;
+    }
+
+    //More testing purposes, start a new game
+    public GameCtrl newGameInstance(String sessionID, String kakuroID) {
+        User user = new User(sessionID);
+        Kakuro kakuro;
+        try {
+            kakuro = new Kakuro(Difficulty.HARD, Reader.fromFile("data/kakuros/unsolved/jutge.kak"));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return new GameCtrl(user, kakuro);
     }
 }

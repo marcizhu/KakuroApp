@@ -1,12 +1,16 @@
 package src.domain.entities;
 
-public class Movement {
-    private int index, previous, next;
+import src.utils.Pair;
 
-    public Movement(int index, int previous, int next) {
+public class Movement {
+    private int index, previous, next, rowIdx, colIdx;
+
+    public Movement(int index, int previous, int next, int r, int c) {
         this.index = index;
         this.previous = previous;
         this.next = next;
+        this.rowIdx = r;
+        this.colIdx = c;
     }
 
     public int getIndex() {
@@ -20,4 +24,6 @@ public class Movement {
     public int getNext() {
         return this.next;
     }
+
+    public Pair<Integer, Integer> getCoordinates() { return new Pair<>(rowIdx, colIdx); }
 }

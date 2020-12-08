@@ -7,6 +7,12 @@ public class Kakuro {
     private final Difficulty difficulty;
     private final Board board;
 
+    public Kakuro(Difficulty difficulty, Board board) {
+        this.id = UUID.randomUUID();
+        this.difficulty = difficulty;
+        this.board = board;
+    }
+
     public Kakuro (Difficulty difficulty, int width, int height) {
         // TODO
         this.id = UUID.randomUUID();

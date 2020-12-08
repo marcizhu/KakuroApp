@@ -50,5 +50,6 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
     }
     public void onPlayKakuroClicked(String id) {
         System.out.println("Play: " + id);
+        presentationCtrl.startNewGame(id);
     }
 }

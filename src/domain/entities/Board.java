@@ -269,4 +269,24 @@ public class Board {
         String header = height + "," + width + "\n";
         return header + String.join("\n", row);
     }
+
+    /**
+     * Converts a board's notations to string
+     * @return A string that represents this board's notations
+     */
+    public String notationsToString() {
+        String[] row = new String[height];
+        String[] col = new String[width];
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (cells[i][j] instanceof BlackCell) col[j] = "*";
+                else col[j] = ""+cells[i][j].getNotations();
+            }
+            row[i] = String.join(",", col);
+        }
+
+        String header = height + "," + width + "\n";
+        return header + String.join("\n", row);
+    }
 }
