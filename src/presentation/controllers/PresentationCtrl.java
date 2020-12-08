@@ -28,6 +28,7 @@ public class PresentationCtrl {
     // List of all screen controllers to handle screen switching
     private DemoScreenCtrl demoScreenCtrl;
     private MyKakurosScreenCtrl myKakurosScreenCtrl;
+    private LoginScreenCtrl loginScreenCtrl;
 
     public PresentationCtrl() {
         // Initialize JFrame;
@@ -37,11 +38,12 @@ public class PresentationCtrl {
         // Initialize screen controllers
         demoScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
+        loginScreenCtrl = new LoginScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
         // Define the initial screen
-        currentScreenCtrl = demoScreenCtrl;
+        currentScreenCtrl = loginScreenCtrl;
         //Window related event listeners
         app.addWindowListener(new WindowAdapter() {
             @Override
