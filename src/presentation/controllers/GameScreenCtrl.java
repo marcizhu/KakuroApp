@@ -30,6 +30,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         this.game = gameInstance;
         boardToDisplay = game.gameSetUp(this);
         notationsMode = false;
+        conflictiveCoord = new ArrayList<>();
         selectedPos = new Pair<>(-1, -1);
     }
 
@@ -39,9 +40,9 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         super.build(width, height);
     }
 
-
     public void kakuroSolvedCorrectly() {
         // show alert indicating kakuro solved, the time, top 3 or whatever
+        System.out.println("SOLVED!!!");
     }
 
     public String getBoardToDisplay() {
@@ -56,9 +57,24 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
     public void setConflictiveCoord(ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflicts) {
         // erase previous conflicts, mark new conflicts
+        unselectConflictiveCoord();
+        for (Pair<Pair<Integer, Integer>, Integer> cc : conflicts) {
+            ((GameScreen)screen).selectConflictive(cc.first.first, cc.first.second, cc.second);
+        }
+        conflictiveCoord = conflicts;
+    }
+    private void unselectConflictiveCoord() {
+        for (Pair<Pair<Integer, Integer>, Integer> cc : conflictiveCoord) {
+            if (cc.second == WHITE_CELL) {
+                ((GameScreen)screen).unselectWhiteCell(cc.first.first, cc.first.second);
+            } else {
+                ((GameScreen)screen).unselectBlackCell(cc.first.first, cc.first.second, cc.second);
+            }
+        }
     }
     public void setSelectedPos(int row, int col) {
         System.out.println("Selecting: " + row + ", "+ col);
+        unselectConflictiveCoord();
         if (selectedPos.first != -1) ((GameScreen)screen).unselectWhiteCell(selectedPos.first, selectedPos.second);
         selectedPos.first = row; selectedPos.second = col;
         ((GameScreen)screen).selectWhiteCell(selectedPos.first, selectedPos.second);
@@ -66,15 +82,28 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
 
     public void valueClicked(int value) {
         if (selectedPos.first == -1) return;
+        unselectConflictiveCoord();
         if (notationsMode) {
             int response = game.toggleNotation(selectedPos.first, selectedPos.second, value);
             if (response == -1) return;
-            // set notations
+            ((GameScreen)screen).setNotationWhiteCell(selectedPos.first, selectedPos.second, response);
         } else {
-            if (game.playMove(selectedPos.first, selectedPos.second, value)) {
-                // set new value to selected cell.
+            int response = game.playMove(selectedPos.first, selectedPos.second, value);
+            if (response != -1) {
+                ((GameScreen)screen).setValueWhiteCell(selectedPos.first, selectedPos.second, response);
             }
         }
+    }
+
+    public void toggleNotationsMode() {
+        notationsMode = !notationsMode;
+    }
+
+    public void clearWhiteCell() {
+        if (selectedPos.first == -1) return;
+        if (!game.clearWhiteCell(selectedPos.first, selectedPos.second)) return;
+        ((GameScreen)screen).setValueWhiteCell(selectedPos.first, selectedPos.second, 0);
+        ((GameScreen)screen).setNotationWhiteCell(selectedPos.first, selectedPos.second, 0);
     }
 
 

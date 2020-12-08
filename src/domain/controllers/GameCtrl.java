@@ -81,7 +81,7 @@ public class GameCtrl {
                     }
                     if (j+1 < columns && currentGame.getBoard().isWhiteCell(i, j+1)) {
                         rowIDs[i][j] = rowLineID; //black cell is responsible for next rowLine
-                        coord.add(new Pair<Integer, Integer>(i, j+1));
+                        coord.add(new Pair<>(i, j+1));
                     } else {
                         rowIDs[i][j] = -1; //black cell is not responsible for any rowLine
                     }
@@ -138,7 +138,7 @@ public class GameCtrl {
                     }
                     if (j+1 < rows && currentGame.getBoard().isWhiteCell(j+1, i)) {
                         colIDs[j][i] = colLineID; //black cell is responsible for next colLine
-                        coord.add(new Pair<Integer, Integer>(j+1, i));
+                        coord.add(new Pair<>(j+1, i));
                     } else {
                         colIDs[j][i] = -1; //black cell is not responsible for any colLine
                     }
@@ -173,10 +173,21 @@ public class GameCtrl {
     }
 
     // returns if move was valid.
-    public boolean playMove(int r, int c, int value) {
-        if (currentGame.getBoard().isBlackCell(r, c)) return false;
+    public int playMove(int r, int c, int value) {
+        if (currentGame.getBoard().isBlackCell(r, c) || value == 0) return -1;
         int rowID = rowIDs[r][c];
         int colID = colIDs[r][c];
+        int previousValue = currentGame.getBoard().getValue(r, c);
+        if (previousValue == value) {
+            movementCount++;
+            currentGame.insertMovement(new Movement(movementCount, value, 0, r, c));
+            rowValuesUsed[rowID] &= ~(1<<(value-1));
+            currentRowSums[rowID] -= value;
+            colValuesUsed[colID] &= ~(1<<(value-1));
+            currentColSums[colID] -= value;
+            currentNumberWhiteCellsAssigned--;
+            return 0;
+        }
         boolean valid = true;
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflicting = new ArrayList<>();
         if ((rowValuesUsed[rowID] & (1<<(value-1))) != 0) {
@@ -192,8 +203,8 @@ public class GameCtrl {
             conflicting.add(new Pair<>(new Pair<>(confRow, c), GameScreenCtrl.WHITE_CELL));
         }
         int numRowValuesUsed = Integer.bitCount(rowValuesUsed[rowID]);
-        if (kakuro.getBoard().getHorizontalSum(r, firstRowCoord[rowID].second-1) < currentRowSums[rowID]+value ||
-                (numRowValuesUsed + 1 == rowSize[rowID] && kakuro.getBoard().getHorizontalSum(r, firstRowCoord[rowID].second-1) != currentRowSums[rowID]+value)) {
+        if (kakuro.getBoard().getHorizontalSum(r, firstRowCoord[rowID].second-1) < currentRowSums[rowID]-previousValue+value ||
+                (numRowValuesUsed + (previousValue == 0 ? 1 : 0) == rowSize[rowID] && kakuro.getBoard().getHorizontalSum(r, firstRowCoord[rowID].second-1) != currentRowSums[rowID]-previousValue+value)) {
             valid = false;
             // select both left and right cells as conflicting
             int colLeft = firstRowCoord[rowID].second-1;
@@ -202,28 +213,36 @@ public class GameCtrl {
             conflicting.add(new Pair<>(new Pair<>(r, colRight), GameScreenCtrl.BLACK_SECTION_LEFT));
         }
         int numColValuesUsed = Integer.bitCount(colValuesUsed[colID]);
-        if (kakuro.getBoard().getVerticalSum(firstColCoord[colID].first-1, c) < currentColSums[colID]+value ||
-                (numColValuesUsed + 1 == colSize[colID] && kakuro.getBoard().getVerticalSum(firstColCoord[colID].first-1, c) != currentColSums[colID]+value)) {
+        if (kakuro.getBoard().getVerticalSum(firstColCoord[colID].first-1, c) < currentColSums[colID]-previousValue+value ||
+                (numColValuesUsed + (previousValue == 0 ? 1 : 0) == colSize[colID] && kakuro.getBoard().getVerticalSum(firstColCoord[colID].first-1, c) != currentColSums[colID]-previousValue+value)) {
             valid = false;
             // select both top and bottom cells as conflicting
             int rowTop = firstColCoord[colID].first-1;
-            int rowBottom = firstColCoord[colID].second + colSize[colID];
+            int rowBottom = firstColCoord[colID].first + colSize[colID];
             conflicting.add(new Pair<>(new Pair<>(rowTop, c), GameScreenCtrl.BLACK_SECTION_BOTTOM));
             conflicting.add(new Pair<>(new Pair<>(rowBottom, c), GameScreenCtrl.BLACK_SECTION_TOP));
         }
 
         if (valid) {
             movementCount++;
-            currentGame.insertMovement(new Movement(movementCount, currentGame.getBoard().getValue(r, c), value, r, c));
+            currentGame.insertMovement(new Movement(movementCount, previousValue, value, r, c));
             rowValuesUsed[rowID] |= (1<<(value-1));
+            currentRowSums[rowID] += value;
             colValuesUsed[colID] |= (1<<(value-1));
-            currentNumberWhiteCellsAssigned++;
+            currentColSums[colID] += value;
+            if (previousValue == 0) currentNumberWhiteCellsAssigned++;
+            else {
+                rowValuesUsed[rowID] &= ~(1<<(previousValue-1));
+                currentRowSums[rowID] -= previousValue;
+                colValuesUsed[colID] &= ~(1<<(previousValue-1));
+                currentColSums[colID] -= previousValue;
+            }
             if (currentNumberWhiteCellsAssigned == totalNumberWhiteCells) validateKakuro();
         } else {
             viewCtrl.setConflictiveCoord(conflicting);
         }
 
-        return valid;
+        return valid ? value : previousValue;
     }
 
     public int toggleNotation(int r, int c, int value) {
@@ -231,6 +250,24 @@ public class GameCtrl {
         boolean hadNotation = currentGame.getBoard().cellHasNotation(r, c, value);
         currentGame.getBoard().setCellNotation(r, c, value, !hadNotation);
         return currentGame.getBoard().getCellNotations(r, c);
+    }
+
+    public boolean clearWhiteCell(int r, int c) {
+        if (currentGame.getBoard().isBlackCell(r, c)) return false;
+        // if it's a forced initial value don't clear it
+        if (!kakuro.getBoard().isEmpty(r, c)) return false;
+        int prevValue = currentGame.getBoard().getValue(r, c);
+        movementCount++;
+        currentGame.insertMovement(new Movement(movementCount, currentGame.getBoard().getValue(r, c), 0, r, c));
+        currentGame.getBoard().clearCellNotations(r, c);
+        if (prevValue != 0) {
+            rowValuesUsed[rowIDs[r][c]] &= ~(1<<(prevValue-1));
+            currentRowSums[rowIDs[r][c]] -= prevValue;
+            colValuesUsed[colIDs[r][c]] &= ~(1<<(prevValue-1));
+            currentColSums[colIDs[r][c]] -= prevValue;
+            currentNumberWhiteCellsAssigned--;
+        }
+        return true;
     }
 
     private int colPositionOfValueInRow (int r, int c, int value) {

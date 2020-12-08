@@ -35,7 +35,8 @@ public class GameInProgress extends Game{
             rebuildBoardFromMovements();
         } else {
             Pair<Integer, Integer> coord = move.getCoordinates();
-            board.setCellValue(coord.first, coord.second, move.getNext());
+            if (move.getNext() == 0) board.clearCellValue(coord.first, coord.second);
+            else board.setCellValue(coord.first, coord.second, move.getNext());
         }
     }
 

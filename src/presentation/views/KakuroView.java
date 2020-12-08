@@ -191,14 +191,17 @@ public class KakuroView extends JPanel {
             bottomColor = blackCellColor;
             bottomLbl = new JLabel("", JLabel.CENTER);
             bottomLbl.setForeground(Color.WHITE);
+            bottomLbl.setOpaque(false);
             leftToPaint = left!=0;
             leftColor = blackCellColor;
             leftLbl = new JLabel("", JLabel.CENTER);
             leftLbl.setForeground(Color.WHITE);
+            leftLbl.setOpaque(false);
             rightToPaint = right!=0;
             rightColor = blackCellColor;
             rightLbl = new JLabel("", JLabel.CENTER);
             rightLbl.setForeground(Color.WHITE);
+            rightLbl.setOpaque(false);
             if (showValues) {
                 if (topToPaint) topLbl.setText(""+top);
                 if (bottomToPaint) bottomLbl.setText(""+bottom);
@@ -442,18 +445,21 @@ public class KakuroView extends JPanel {
                 notationFontColor = brightness > 150 ? Color.GRAY : Color.LIGHT_GRAY;
             }
             if (value != 0) {
+                removeAll();
                 setLayout(new BorderLayout());
                 JLabel valueLbl = new JLabel(""+value);
                 valueLbl.setForeground(valueFontColor);
-                valueLbl.setOpaque(true);
+                valueLbl.setOpaque(false);
                 valueLbl.setHorizontalAlignment(SwingConstants.CENTER);
                 add(valueLbl);
-            } else if (notations != 0) {
+            } else {
+                System.out.println("Removing all");
+                removeAll();
                 setLayout(new GridLayout(3,3));
                 for (int i = 0; i < 9; i++) {
                     JLabel notationLbl = new JLabel();
                     notationLbl.setForeground(notationFontColor);
-                    notationLbl.setOpaque(true);
+                    notationLbl.setOpaque(false);
                     notationLbl.setHorizontalAlignment(SwingConstants.CENTER);
                     if ((notations & (1<<i)) != 0) notationLbl.setText(""+(i+1));
                     add(notationLbl);
