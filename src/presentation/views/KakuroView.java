@@ -453,7 +453,6 @@ public class KakuroView extends JPanel {
                 valueLbl.setHorizontalAlignment(SwingConstants.CENTER);
                 add(valueLbl);
             } else {
-                System.out.println("Removing all");
                 removeAll();
                 setLayout(new GridLayout(3,3));
                 for (int i = 0; i < 9; i++) {
@@ -485,7 +484,6 @@ public class KakuroView extends JPanel {
         }
 
         public void setSelectedColor(Color color) {
-            System.out.println("Arrived selection at " + row + ", " + col);
             selectedColor = color;
             setBackground(selectedColor);
             resetLayout();

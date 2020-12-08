@@ -219,6 +219,7 @@ public class PresentationCtrl {
 
     public void startNewGame(String kakuroID) {
         currentScreenCtrl.onDestroy();
+        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
         currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
         ((GameScreenCtrl)currentScreenCtrl).setUpGame(domainCtrl.newGameInstance(userSessionId, kakuroID));
         currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);

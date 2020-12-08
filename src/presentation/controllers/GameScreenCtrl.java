@@ -18,7 +18,6 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     private GameCtrl game;
     private String boardToDisplay;
     private boolean notationsMode;
-    private String notationsToDisplay;
     private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictiveCoord;
     private Pair<Integer, Integer> selectedPos;
 
@@ -49,8 +48,17 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         return boardToDisplay;
     }
 
-    public void setBoardToDisplay(String board) {
-        // change values in view
+    public ArrayList<Pair<Integer, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>> getMovementList() {
+        return game.getMovementList();
+    }
+
+    public void setBoardToDisplay(ArrayList<Pair<Pair<Integer, Integer>, Integer>> whiteCellValues) {
+        Pair<Integer, Integer> boardSize = game.getBoardSize();
+        for (int i = 0; i < boardSize.first; i++)
+            for (int j = 0; j < boardSize.second; j++)
+                ((GameScreen)screen).setValueWhiteCell(i, j, 0);
+        for (Pair<Pair<Integer, Integer>, Integer> p : whiteCellValues)
+            ((GameScreen)screen).setValueWhiteCell(p.first.first, p.first.second, p.second);
     }
     public void setNotationsToDisplay(String board) {
         // change notations in view
@@ -73,11 +81,26 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         }
     }
     public void setSelectedPos(int row, int col) {
-        System.out.println("Selecting: " + row + ", "+ col);
         unselectConflictiveCoord();
         if (selectedPos.first != -1) ((GameScreen)screen).unselectWhiteCell(selectedPos.first, selectedPos.second);
         selectedPos.first = row; selectedPos.second = col;
         ((GameScreen)screen).selectWhiteCell(selectedPos.first, selectedPos.second);
+    }
+    public void selectMovement(int moveIdx) {
+        if (game.selectMove(moveIdx)) {
+            ((GameScreen)screen).updateMovesPanel(moveIdx);
+        }
+    }
+    public void undoMovement() {
+        if (game.undoMove()) ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
+    }
+    public void redoMovement() {
+        if (game.redoMove()) ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
+    }
+    public void resetGame() {
+        game.resetGame();
+        unselectConflictiveCoord();
+        ((GameScreen)screen).updateMovesPanel(0);
     }
 
     public void valueClicked(int value) {
@@ -90,6 +113,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         } else {
             int response = game.playMove(selectedPos.first, selectedPos.second, value);
             if (response != -1) {
+                ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
                 ((GameScreen)screen).setValueWhiteCell(selectedPos.first, selectedPos.second, response);
             }
         }
@@ -106,6 +130,9 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         ((GameScreen)screen).setNotationWhiteCell(selectedPos.first, selectedPos.second, 0);
     }
 
+    public void toggleMark() {
+        ((GameScreen)screen).toggleMovementMark(game.getCurrentMoveIdx());
+    }
 
     @Override
     public void onFocusRegained(int width, int height) {

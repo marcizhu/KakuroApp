@@ -1,10 +1,7 @@
 package src.domain.controllers;
 
 import src.domain.algorithms.Generator;
-import src.domain.entities.GameInProgress;
-import src.domain.entities.Kakuro;
-import src.domain.entities.Movement;
-import src.domain.entities.User;
+import src.domain.entities.*;
 import src.presentation.controllers.GameScreenCtrl;
 import src.utils.Pair;
 
@@ -17,6 +14,7 @@ public class GameCtrl {
     GameInProgress currentGame;
     GameScreenCtrl viewCtrl;
     private int movementCount;
+    private int currentMovement;
 
     private int totalNumberWhiteCells;
     private int currentNumberWhiteCellsAssigned;
@@ -39,12 +37,15 @@ public class GameCtrl {
         this.user = user;
         this.kakuro = kakuro;
         movementCount = 0;
+        currentMovement = 0;
         // First we check if there's a game in progress for this kakuro and this userName, if not we create a new game.
         ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = dades.getAllGamesInProgress(user.getName());
         boolean shouldCreateNewGame = true;
         for (GameInProgress g : allGamesInProgress) {
             if (g.getKakuro().getId().toString().equals(kakuro.getId().toString())) {
                 currentGame = g;
+                movementCount = currentGame.getMovements().size();
+                currentMovement = movementCount;
                 shouldCreateNewGame = false;
                 break;
             }
@@ -62,9 +63,32 @@ public class GameCtrl {
         return currentGame.getBoard().toString();
     }
 
+    public Pair<Integer, Integer> getBoardSize() {
+        return new Pair<>(currentGame.getBoard().getHeight(), currentGame.getBoard().getWidth());
+    }
+
+    public int getCurrentMoveIdx() {
+        return currentMovement;
+    }
+    public boolean selectMove(int moveIdx) {
+        if (moveIdx > movementCount) return false;
+        if (moveIdx == currentMovement) return false;
+        currentMovement = moveIdx;
+        sendRebuiltBoardUpToMove(currentMovement);
+        return true;
+    }
+    public ArrayList<Pair<Integer, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>> getMovementList() {
+        ArrayList<Pair<Integer, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>> response = new ArrayList<>();
+        for (Movement move : currentGame.getMovements()) {
+            response.add(new Pair<>(move.getIndex(), new Pair<>(move.getCoordinates(), new Pair<>(move.getPrevious(), move.getNext()))));
+        }
+        return response;
+    }
+
     private void preprocessRows() {
         int rows = currentGame.getBoard().getHeight();
         int columns = currentGame.getBoard().getWidth();
+        totalNumberWhiteCells = 0;
         rowIDs = new int[rows][columns];
         int size = 0;
         int rowLineID = 0;
@@ -172,15 +196,34 @@ public class GameCtrl {
         }
     }
 
+    private void sendRebuiltBoardUpToMove(int toMove) {
+        Board b = new Board(kakuro.getBoard());
+        ArrayList<Movement> allMoves = currentGame.getMovements();
+        for (int i = 0; i < toMove; i++) {
+            Movement m = allMoves.get(i);
+            if (m.getNext() == 0) b.clearCellValue(m.getCoordinates().first, m.getCoordinates().second);
+            else b.setCellValue(m.getCoordinates().first, m.getCoordinates().second, m.getNext());
+        }
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> message = new ArrayList<>();
+        for (int i = 0; i < b.getHeight(); i++) {
+            for (int j = 0; j < b.getWidth(); j++) {
+                if (b.isWhiteCell(i, j) && !b.isEmpty(i,j)) message.add(new Pair<>(new Pair<>(i, j), b.getValue(i, j)));
+            }
+        }
+        viewCtrl.setBoardToDisplay(message);
+    }
+
     // returns if move was valid.
     public int playMove(int r, int c, int value) {
+        if (currentMovement < movementCount) recreateGameUpToCurrentMove();
         if (currentGame.getBoard().isBlackCell(r, c) || value == 0) return -1;
         int rowID = rowIDs[r][c];
         int colID = colIDs[r][c];
         int previousValue = currentGame.getBoard().getValue(r, c);
         if (previousValue == value) {
             movementCount++;
-            currentGame.insertMovement(new Movement(movementCount, value, 0, r, c));
+            currentMovement = movementCount;
+            currentGame.insertMovement(new Movement(currentMovement, value, 0, r, c));
             rowValuesUsed[rowID] &= ~(1<<(value-1));
             currentRowSums[rowID] -= value;
             colValuesUsed[colID] &= ~(1<<(value-1));
@@ -225,7 +268,8 @@ public class GameCtrl {
 
         if (valid) {
             movementCount++;
-            currentGame.insertMovement(new Movement(movementCount, previousValue, value, r, c));
+            currentMovement = movementCount;
+            currentGame.insertMovement(new Movement(currentMovement, previousValue, value, r, c));
             rowValuesUsed[rowID] |= (1<<(value-1));
             currentRowSums[rowID] += value;
             colValuesUsed[colID] |= (1<<(value-1));
@@ -245,6 +289,53 @@ public class GameCtrl {
         return valid ? value : previousValue;
     }
 
+    private void recreateGameUpToCurrentMove() {
+        int rows = currentGame.getBoard().getHeight();
+        int cols = currentGame.getBoard().getWidth();
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (currentGame.getBoard().isWhiteCell(i, j) && kakuro.getBoard().isEmpty(i, j)) {
+                    currentGame.getBoard().clearCellValue(i, j);
+                }
+            }
+        }
+
+        preprocessRows();
+        preprocessCols();
+        movementCount = 0;
+
+        int currMove = currentMovement;
+        currentMovement = 0;
+        if (currMove == 0) return;
+        ArrayList<Movement> allMoves = (ArrayList<Movement>) currentGame.getMovements().clone();
+        for (int i = 0; i < currMove; i++) {
+            Movement m = allMoves.get(i);
+            playMove(m.getCoordinates().first, m.getCoordinates().second, m.getNext());
+        }
+    }
+
+    public boolean undoMove() {
+        if (currentMovement <= 0) return false;
+        currentMovement--;
+        sendRebuiltBoardUpToMove(currentMovement);
+        return true;
+    }
+
+    public boolean redoMove() {
+        if (currentMovement >= movementCount) return false;
+        currentMovement++;
+        sendRebuiltBoardUpToMove(currentMovement);
+        return true;
+    }
+
+    public void resetGame() {
+        currentMovement = 0;
+        recreateGameUpToCurrentMove();
+        currentGame.getMovements().clear();
+        sendRebuiltBoardUpToMove(currentMovement);
+    }
+
     public int toggleNotation(int r, int c, int value) {
         if (currentGame.getBoard().isBlackCell(r, c)) return -1;
         boolean hadNotation = currentGame.getBoard().cellHasNotation(r, c, value);
@@ -253,12 +344,14 @@ public class GameCtrl {
     }
 
     public boolean clearWhiteCell(int r, int c) {
+        if (currentMovement < movementCount) recreateGameUpToCurrentMove();
         if (currentGame.getBoard().isBlackCell(r, c)) return false;
         // if it's a forced initial value don't clear it
         if (!kakuro.getBoard().isEmpty(r, c)) return false;
         int prevValue = currentGame.getBoard().getValue(r, c);
         movementCount++;
-        currentGame.insertMovement(new Movement(movementCount, currentGame.getBoard().getValue(r, c), 0, r, c));
+        currentMovement = movementCount;
+        currentGame.insertMovement(new Movement(currentMovement, currentGame.getBoard().getValue(r, c), 0, r, c));
         currentGame.getBoard().clearCellNotations(r, c);
         if (prevValue != 0) {
             rowValuesUsed[rowIDs[r][c]] &= ~(1<<(prevValue-1));
