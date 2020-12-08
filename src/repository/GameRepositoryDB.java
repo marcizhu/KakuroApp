@@ -3,7 +3,6 @@ package src.repository;
 import src.domain.entities.Game;
 import src.domain.entities.GameFinished;
 import src.domain.entities.GameInProgress;
-import src.domain.entities.User;
 
 import java.io.IOException;
 import java.util.ArrayList;

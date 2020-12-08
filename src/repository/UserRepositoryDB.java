@@ -1,9 +1,6 @@
 package src.repository;
 
-import src.domain.entities.Kakuro;
 import src.domain.entities.User;
-import src.repository.DB;
-import src.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
