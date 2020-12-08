@@ -1,20 +1,16 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
-import src.presentation.screens.DemoScreen;
+import src.presentation.screens.LoginScreen;
 
-public class DemoScreenCtrl extends AbstractScreenCtrl {
-
-    public DemoScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
+public class LoginScreenCtrl extends AbstractScreenCtrl {
+    public LoginScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
-        screen = new DemoScreen(this);
+        screen = new LoginScreen(this);
     }
 
     @Override
-    public void onFocusRegained(int width, int height) {
-        screen.onShow();
-    }
-
+    public void onFocusRegained(int width, int height) {}
     @Override
     public void onDashboardMenuItemClicked() {}
     @Override

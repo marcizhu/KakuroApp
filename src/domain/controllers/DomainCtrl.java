@@ -3,7 +3,6 @@ package src.domain.controllers;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
-import src.presentation.views.KakuroInfoCardView;
 
 import java.util.ArrayList;
 
@@ -12,8 +11,6 @@ public class DomainCtrl {
     public String login(String userName) {
         return "faefzcx";
     }
-
-
 
     // Just for testing purposes:
     // One string array per kakuro with the following strings:
