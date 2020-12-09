@@ -46,7 +46,6 @@ public class LoginScreen extends AbstractScreen {
 
         registerTitle = new JLabel("Create new profile");
         registerTitle.setForeground(Color.BLACK);
-        userListPane = new JScrollPane(userListLayout);
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
         constraints.gridy = 2;
