@@ -1,9 +1,12 @@
 package src.presentation.screens;
 
 import src.presentation.controllers.AbstractScreenCtrl;
+import src.presentation.controllers.LoginScreenCtrl;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -58,6 +61,12 @@ public class LoginScreen extends AbstractScreen {
         contents.add(registerUsernameInput, constraints);
 
         registerButton = new JButton("Register");
+        registerButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                ((LoginScreenCtrl)ctrl).login();
+            }
+        });
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
         constraints.gridy = 3;

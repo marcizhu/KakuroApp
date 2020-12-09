@@ -9,6 +9,10 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
         screen = new LoginScreen(this);
     }
 
+    public void login() {
+        presentationCtrl.logIn("");
+    }
+
     @Override
     public void onFocusRegained(int width, int height) {}
     @Override

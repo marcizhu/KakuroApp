@@ -80,8 +80,6 @@ public class PresentationCtrl {
         // Contents
         // TODO: When initializing we should set the screen to LogInScreenCtrl, which hasn't got any menu bar
         //  the menu bar is left here in purpose to showcase it at the demo.
-        buildMenuBar();
-        app.setJMenuBar(menu);
         currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
 
@@ -95,7 +93,7 @@ public class PresentationCtrl {
         menu.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = 0;
-        addMenuButton(menu, constraints, "DASHBARD", 0, 2, new MouseAdapter() {
+        addMenuButton(menu, constraints, "DASHBOARD", 0, 2, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onDashboardMenuItemClicked();
@@ -192,6 +190,7 @@ public class PresentationCtrl {
         currentScreenCtrl.onLogOutMenuItemClicked();
         // This one behaves differently because the login screen doesn't have the menu bar and we have to
         // warn domain that the user is logging out, etc.
+        logOut();
     }
 
     // Screen management
@@ -209,9 +208,20 @@ public class PresentationCtrl {
         String result = domainCtrl.login(name);
         if (!result.equals("denied")) {
             userSessionId = result;
+            buildMenuBar();
+            app.setJMenuBar(menu);
+            // TODO: when dashboard is implemented switch to dashboard screen
+            //  for now we leave this:
+            setScreen(myKakurosScreenCtrl);
             return true;
         }
         return false;
+    }
+
+    public void logOut() {
+        userSessionId = "";
+        app.setJMenuBar(null);
+        setScreen(loginScreenCtrl);
     }
 
     public String getUserSessionId() {

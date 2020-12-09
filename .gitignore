@@ -4,3 +4,4 @@ out/*
 *.class
 .DS_Store
 kakurosolver.tar.gz
+test/database/*.json
