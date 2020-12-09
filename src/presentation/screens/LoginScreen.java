@@ -70,7 +70,18 @@ public class LoginScreen extends AbstractScreen {
         registerButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ((LoginScreenCtrl)ctrl).register(registerUsernameInput.getText());
+                String username = registerUsernameInput.getText();
+                ((LoginScreenCtrl)ctrl).register(username);
+
+                JLabel profile = new JLabel(username);
+                profile.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        ((LoginScreenCtrl)ctrl).login(username);
+                    }
+                });
+                userListLayout.add(profile);
+                userListLayout.revalidate();
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
