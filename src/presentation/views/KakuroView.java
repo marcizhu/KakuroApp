@@ -2,6 +2,8 @@ package src.presentation.views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
@@ -408,6 +410,14 @@ public class KakuroView extends JPanel {
             setBackground(Color.WHITE);
             setVisible(true);
 
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    super.componentResized(e);
+                    resetLayout();
+                }
+            });
+
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -451,6 +461,15 @@ public class KakuroView extends JPanel {
                 valueLbl.setForeground(valueFontColor);
                 valueLbl.setOpaque(false);
                 valueLbl.setHorizontalAlignment(SwingConstants.CENTER);
+
+                int stringWidth = valueLbl.getFontMetrics(valueLbl.getFont()).stringWidth(""+value);
+                double widthRatio = (double)this.getWidth() / (double)stringWidth;
+
+                // Pick a new font size so it will not be larger than the height of label.
+                int fontSizeToUse = (int)Math.min(valueLbl.getFont().getSize() * widthRatio, this.getHeight() * 0.6);
+
+                // Set the label's font size to the newly determined size.
+                valueLbl.setFont(new Font(valueLbl.getFont().getName(), Font.PLAIN, fontSizeToUse));
                 add(valueLbl);
             } else {
                 removeAll();
