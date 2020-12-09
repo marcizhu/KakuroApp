@@ -35,10 +35,16 @@ public class LoginScreen extends AbstractScreen {
         contents.add(userListTitle, constraints);
 
         // TODO: remove this, i coded this only for testing purposes
-        ArrayList<String> users = new ArrayList<>(Arrays.asList("Alex", "Cesc", "Xavi", "Marc"));
+        ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUsers();
         userListLayout = new JPanel(new GridLayout(1, users.size()));
         for (String user: users) {
             JLabel profile = new JLabel(user);
+            profile.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    ((LoginScreenCtrl)ctrl).login(user);
+                }
+            });
             userListLayout.add(profile);
         }
         userListPane = new JScrollPane(userListLayout);
@@ -64,7 +70,7 @@ public class LoginScreen extends AbstractScreen {
         registerButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ((LoginScreenCtrl)ctrl).login();
+                ((LoginScreenCtrl)ctrl).register(registerUsernameInput.getText());
             }
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
