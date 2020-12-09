@@ -34,7 +34,8 @@ public class DomainCtrl {
     public Pair<Boolean, String> login(String username) {
         try {
             boolean userExists = loginCtrl.checkUserExist(username);
-            return new Pair<>(userExists, null);
+            if (!userExists) return new Pair<>(false, "Invalid user");
+            return new Pair<>(true, null);
         } catch (IOException e) {
             return new Pair<>(null, "Database error");
         }
@@ -43,7 +44,8 @@ public class DomainCtrl {
     public Pair<Boolean, String> register(String username) {
         try {
             boolean result = loginCtrl.registerUser(username);
-            return new Pair<>(result, null);
+            if (!result) return new Pair<>(false, "User already exists");
+            return new Pair<>(true, null);
         } catch (IOException e) {
             return new Pair<>(null, "Database error");
         }
