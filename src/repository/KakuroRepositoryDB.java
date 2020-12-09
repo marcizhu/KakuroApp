@@ -31,7 +31,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.remove(i);
-                driver.writeToFile(kakuroList, "kakuro");
+                driver.writeToFile(kakuroList, "Kakuro");
                 return;
             }
         }
@@ -44,13 +44,13 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.set(i, kakuro);
-                driver.writeToFile(kakuroList, "kakuro");
+                driver.writeToFile(kakuroList, "Kakuro");
                 return;
             }
         }
 
         kakuroList.add(kakuro);
-        driver.writeToFile(kakuroList, "kakuro");
+        driver.writeToFile(kakuroList, "Kakuro");
     }
 
     @Override

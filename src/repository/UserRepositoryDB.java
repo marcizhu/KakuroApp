@@ -28,7 +28,7 @@ public class UserRepositoryDB implements UserRepository {
         for (int i = 0; i<usersList.size(); i++) {
             if (usersList.get(i).getName().equals(user.getName())) {
                 usersList.remove(i);
-                driver.writeToFile(usersList, "user");
+                driver.writeToFile(usersList, "User");
                 return;
             }
         }
@@ -41,13 +41,13 @@ public class UserRepositoryDB implements UserRepository {
         for (int i = 0; i<usersList.size(); i++) {
             if (usersList.get(i).getName().equals(user.getName())) {
                 usersList.set(i, user);
-                driver.writeToFile(usersList, "user");
+                driver.writeToFile(usersList, "User");
                 return;
             }
         }
 
         usersList.add(user);
-        driver.writeToFile(usersList, "user");
+        driver.writeToFile(usersList, "User");
     }
 
     @Override

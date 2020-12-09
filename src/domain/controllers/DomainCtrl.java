@@ -3,13 +3,52 @@ package src.domain.controllers;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
+import src.repository.DB;
+import src.repository.UserRepository;
+import src.repository.UserRepositoryDB;
+import src.utils.Pair;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class DomainCtrl {
+    DB driver;
+    UserRepository userRepository;
+    LoginCtrl loginCtrl;
 
-    public String login(String userName) {
-        return "faefzcx";
+    public DomainCtrl() {
+        driver = new DB();
+        userRepository = new UserRepositoryDB(driver);
+        loginCtrl = new LoginCtrl(userRepository);
+    }
+
+    public Pair<ArrayList<String>, String> getUsers() {
+        try {
+            ArrayList<String> userList = loginCtrl.getUserList();
+            return new Pair<>(userList, null);
+        } catch (IOException e) {
+            return new Pair<>(null, "Database error");
+        }
+    }
+
+    public Pair<Boolean, String> login(String username) {
+        try {
+            boolean userExists = loginCtrl.checkUserExist(username);
+            if (!userExists) return new Pair<>(false, "Invalid user");
+            return new Pair<>(true, null);
+        } catch (IOException e) {
+            return new Pair<>(null, "Database error");
+        }
+    }
+
+    public Pair<Boolean, String> register(String username) {
+        try {
+            boolean result = loginCtrl.registerUser(username);
+            if (!result) return new Pair<>(false, "User already exists");
+            return new Pair<>(true, null);
+        } catch (IOException e) {
+            return new Pair<>(null, "Database error");
+        }
     }
 
     // Just for testing purposes:
