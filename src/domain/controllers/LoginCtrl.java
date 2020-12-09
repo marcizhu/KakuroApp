@@ -15,7 +15,7 @@ public class LoginCtrl {
 
     public ArrayList<String> getUserList() throws IOException {
         ArrayList<User> userList = userRepository.getAllUsers();
-        ArrayList<String> usernameList = new ArrayList<String>();
+        ArrayList<String> usernameList = new ArrayList<>();
         for (User user : userList) {
             usernameList.add(user.getName());
         }
