@@ -38,11 +38,13 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
                     "Unable to register new user: " + ret.second,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+        } else {
+            login(user);
         }
     }
 
     @Override
-    public void onFocusRegained(int width, int height) {}
+    public void onFocusRegained(int width, int height) { screen.build(width, height); }
     @Override
     public void onDashboardMenuItemClicked() {}
     @Override
