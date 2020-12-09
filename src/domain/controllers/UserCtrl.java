@@ -6,10 +6,10 @@ import src.repository.UserRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class LoginCtrl {
+public class UserCtrl {
     UserRepository userRepository;
 
-    public LoginCtrl(UserRepository userRepository) {
+    public UserCtrl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -22,7 +22,7 @@ public class LoginCtrl {
         return usernameList;
     }
 
-    public boolean checkUserExist(String username) throws IOException {
+    public boolean loginUser(String username) throws IOException {
         User user = userRepository.getUser(username);
         return user != null;
     }

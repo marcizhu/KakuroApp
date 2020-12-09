@@ -3,9 +3,7 @@ package src.domain.controllers;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
-import src.repository.DB;
-import src.repository.UserRepository;
-import src.repository.UserRepositoryDB;
+import src.repository.*;
 import src.utils.Pair;
 
 import java.io.IOException;
@@ -14,26 +12,26 @@ import java.util.ArrayList;
 public class DomainCtrl {
     DB driver;
     UserRepository userRepository;
-    LoginCtrl loginCtrl;
+    UserCtrl userCtrl;
 
     public DomainCtrl() {
         driver = new DB();
         userRepository = new UserRepositoryDB(driver);
-        loginCtrl = new LoginCtrl(userRepository);
+        userCtrl = new UserCtrl(userRepository);
     }
 
-    public Pair<ArrayList<String>, String> getUsers() {
+    public Pair<ArrayList<String>, String> getUserList() {
         try {
-            ArrayList<String> userList = loginCtrl.getUserList();
+            ArrayList<String> userList = userCtrl.getUserList();
             return new Pair<>(userList, null);
         } catch (IOException e) {
             return new Pair<>(null, "Database error");
         }
     }
 
-    public Pair<Boolean, String> login(String username) {
+    public Pair<Boolean, String> loginUser(String username) {
         try {
-            boolean userExists = loginCtrl.checkUserExist(username);
+            boolean userExists = userCtrl.loginUser(username);
             if (!userExists) return new Pair<>(false, "Invalid user");
             return new Pair<>(true, null);
         } catch (IOException e) {
@@ -41,9 +39,9 @@ public class DomainCtrl {
         }
     }
 
-    public Pair<Boolean, String> register(String username) {
+    public Pair<Boolean, String> registerUser(String username) {
         try {
-            boolean result = loginCtrl.registerUser(username);
+            boolean result = userCtrl.registerUser(username);
             if (!result) return new Pair<>(false, "User already exists");
             return new Pair<>(true, null);
         } catch (IOException e) {

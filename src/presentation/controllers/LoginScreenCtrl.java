@@ -15,7 +15,7 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
         screen = new LoginScreen(this);
     }
 
-    public void login(String user) {
+    public void loginUser(String user) {
         if(!presentationCtrl.logIn(user)){
             JOptionPane.showMessageDialog(
                     null,
@@ -25,13 +25,13 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
         }
     }
 
-    public ArrayList<String> getUsers() {
-        Pair<ArrayList<String>, String> ret = domainCtrl.getUsers();
+    public ArrayList<String> getUserList() {
+        Pair<ArrayList<String>, String> ret = domainCtrl.getUserList();
         return ret.first;
     }
 
     public void register(String user) {
-        Pair<Boolean, String> ret = domainCtrl.register(user);
+        Pair<Boolean, String> ret = domainCtrl.registerUser(user);
         if(!ret.first) {
             JOptionPane.showMessageDialog(
                     null,
@@ -39,7 +39,7 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
-            login(user);
+            loginUser(user);
         }
     }
 

@@ -206,7 +206,7 @@ public class PresentationCtrl {
 
     // Domain communication
     public boolean logIn(String name) {
-        Pair<Boolean, String> result = domainCtrl.login(name);
+        Pair<Boolean, String> result = domainCtrl.loginUser(name);
         if (result.second != null) {
             // TODO: handle error
             return false;

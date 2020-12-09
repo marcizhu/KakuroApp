@@ -39,8 +39,7 @@ public class LoginScreen extends AbstractScreen {
         constraints.gridy = 0;
         contents.add(userListTitle, constraints);
 
-        // TODO: remove this, i coded this only for testing purposes
-        ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUsers();
+        ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUserList();
         userListLayout = new JPanel(new GridLayout(1, users.size()));
         userListLayout.setBorder(new EmptyBorder(0, 0, 20, 0));
 
@@ -56,7 +55,7 @@ public class LoginScreen extends AbstractScreen {
             profile.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    ((LoginScreenCtrl)ctrl).login(user);
+                    ((LoginScreenCtrl)ctrl).loginUser(user);
                 }
             });
             userListLayout.add(profile);
