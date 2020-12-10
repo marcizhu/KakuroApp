@@ -1,6 +1,7 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
+import src.presentation.utils.Palette;
 import src.utils.Pair;
 
 import javax.swing.*;
@@ -8,38 +9,41 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class PresentationCtrl {
-    private final int defaultWidth = 1200;
-    private final int defaultHeight = 720;
-    private final int windowBarHeight = 40;
+    // Misc settings
+    private static final int defaultWidth = 1200;
+    private static final int defaultHeight = 720;
+    private static final int windowBarHeight = 40;
 
     private String userSessionId;
 
     // Domain controller
-    private DomainCtrl domainCtrl;
+    private final DomainCtrl domainCtrl;
 
     // Window frame
-    private JFrame app;
+    private final JFrame app;
 
     // Window menu
     private JMenuBar menu;
 
     // App content
-    // The current one to handle events
-    private AbstractScreenCtrl currentScreenCtrl;
+    private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
+    private final MyKakurosScreenCtrl myKakurosScreenCtrl; ///< "My Kakuros" Screen controller
+    private final LoginScreenCtrl loginScreenCtrl;         ///< "Login" Screen controller
+
     // List of all screen controllers to handle screen switching
-    private DemoScreenCtrl demoScreenCtrl;
-    private MyKakurosScreenCtrl myKakurosScreenCtrl;
-    private LoginScreenCtrl loginScreenCtrl;
+    //private DemoScreenCtrl demoScreenCtrl;
 
     public PresentationCtrl() {
         // Initialize JFrame;
         app = new JFrame();
+
         // Initialize the general domain Controller
         domainCtrl = new DomainCtrl();
+
         // Initialize screen controllers
-        demoScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
         loginScreenCtrl = new LoginScreenCtrl(this, domainCtrl);
+        //demoScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -100,24 +104,28 @@ public class PresentationCtrl {
                 onDashboardMenuItemClicked();
             }
         });
+
         addMenuButton(menu, constraints, "KAKURO LIST", 1, 2, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onKakuroListMenuItemClicked();
             }
         });
+
         addMenuButton(menu, constraints, "MY KAKUROS", 2, 2, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onMyKakurosMenuItemClicked();
             }
         });
+
         addMenuButton(menu, constraints, "STATISTICS", 3, 2, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onStatisticsMenuItemClicked();
             }
         });
+
         addMenuButton(menu, constraints, "RANKINGS", 4, 2, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -136,7 +144,8 @@ public class PresentationCtrl {
                 onLogOutMenuItemClicked();
             }
         });
-        menu.getComponent(6).setForeground(Color.RED);
+
+        menu.getComponent(6).setForeground(Palette.PastelRed);
     }
 
     private void addMenuButton(JMenuBar menuBar, GridBagConstraints constraints, String text, int gridx, int weightx, MouseAdapter listener) {
@@ -154,44 +163,69 @@ public class PresentationCtrl {
     private void onDashboardMenuItemClicked() {
         System.out.println("DASHBOARD");
         currentScreenCtrl.onDashboardMenuItemClicked();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(0).setForeground(Color.BLUE);
         //setScreen(dashboardScreenCtrl);
     }
+
     private void onKakuroListMenuItemClicked() {
         System.out.println("KAKURO LIST");
         currentScreenCtrl.onKakuroListMenuItemClicked();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(1).setForeground(Color.BLUE);
         //setScreen(kakuroListScreenCtrl);
     }
+
     private void onMyKakurosMenuItemClicked() {
         System.out.println("MY KAKUROS");
         currentScreenCtrl.onMyKakurosMenuItemClicked();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(2).setForeground(Color.BLUE);
         setScreen(myKakurosScreenCtrl);
     }
+
     private void onStatisticsMenuItemClicked() {
         System.out.println("STATISTICS");
         currentScreenCtrl.onStatisticsMenuItemClicked();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(3).setForeground(Color.BLUE);
         //setScreen(statisticsScreenCtrl);
     }
+
     private void onRankingsMenuItemClicked() {
         System.out.println("RANKINGS");
         currentScreenCtrl.onRankingsMenuItemClicked();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(4).setForeground(Color.BLUE);
         //setScreen(rankingsScreenCtrl);
     }
+
     private void onLogOutMenuItemClicked() {
         System.out.println("LOG OUT");
         currentScreenCtrl.onLogOutMenuItemClicked();
         // This one behaves differently because the login screen doesn't have the menu bar and we have to
         // warn domain that the user is logging out, etc.
-        logOut();
+        int dialogResult = JOptionPane.showConfirmDialog(
+                null,
+                "Do you want to log out?",
+                "Warning: Log out",
+                JOptionPane.YES_NO_OPTION);
+
+        if(dialogResult == JOptionPane.YES_OPTION){
+            logOut();
+        }
     }
 
     // Screen management
@@ -220,6 +254,7 @@ public class PresentationCtrl {
             setScreen(myKakurosScreenCtrl);
             return true;
         }
+
         // user does not exist, this should not happen with the current UI since users are listed
         return false;
     }
@@ -237,10 +272,13 @@ public class PresentationCtrl {
 
     public void startNewGame(String kakuroID) {
         currentScreenCtrl.onDestroy();
-        for (int i = 0; i < 5; i++) menu.getComponent(i).setForeground(Color.BLACK);
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
         currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
         ((GameScreenCtrl)currentScreenCtrl).setUpGame(domainCtrl.newGameInstance(userSessionId, kakuroID));
-        currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
+        currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();
     }

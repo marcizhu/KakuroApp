@@ -11,15 +11,14 @@ public class KakuroInfoCardView extends JPanel {
     public static final int STATE_SOLVED = 2;
     public static final int STATE_SURRENDERED = 3;
 
+    private final KakuroView kakuroView;
+    private final JPanel kakuroInfoAndButtons;
     private InfoCardButtonsClickListener listener;
 
     public interface InfoCardButtonsClickListener {
         void onExportClicked(String id);
         void onPlayClicked(String id);
     }
-
-    private KakuroView kakuroView;
-    private JPanel kakuroInfoAndButtons;
 
     public KakuroInfoCardView(String board, final String name, String difficulty, String timesPlayed, String ownerName, String date, String recordTime, int state) {
         //setLayout(new GridBagLayout());
@@ -177,7 +176,7 @@ public class KakuroInfoCardView extends JPanel {
     public void setSize(int width, int height) {
         kakuroInfoAndButtons.setSize(width, kakuroInfoAndButtons.getHeight());
         kakuroView.setSize(width, height - kakuroInfoAndButtons.getHeight());
-        int maxWidth = kakuroInfoAndButtons.getWidth() > kakuroView.getWidth() ? kakuroInfoAndButtons.getWidth() : kakuroView.getWidth();
+        int maxWidth = Math.max(kakuroInfoAndButtons.getWidth(), kakuroView.getWidth());
         if (maxWidth < kakuroInfoAndButtons.getMinimumSize().width) maxWidth = kakuroInfoAndButtons.getMinimumSize().width;
         if (maxWidth > kakuroInfoAndButtons.getWidth()) kakuroInfoAndButtons.setSize(maxWidth, kakuroInfoAndButtons.getHeight());
         super.setSize(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
@@ -196,7 +195,7 @@ public class KakuroInfoCardView extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        int maxWidth = kakuroInfoAndButtons.getWidth() > kakuroView.getWidth() ? kakuroInfoAndButtons.getWidth() : kakuroView.getWidth();
+        int maxWidth = Math.max(kakuroInfoAndButtons.getWidth(), kakuroView.getWidth());
         if (maxWidth < kakuroInfoAndButtons.getMinimumSize().width) maxWidth = kakuroInfoAndButtons.getMinimumSize().width;
         return new Dimension(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
     }

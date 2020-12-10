@@ -9,10 +9,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class GameScreen extends AbstractScreen {
-
     KakuroView gameBoard;
 
     JPanel leftContent;
@@ -432,7 +435,7 @@ public class GameScreen extends AbstractScreen {
             if (m.first == selectedMove) singleMovePanel.setBackground(Color.GRAY);
             singleMovePanel.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mousePressed(MouseEvent e) {
+                public void mouseReleased(MouseEvent e) {
                     ((GameScreenCtrl)ctrl).selectMovement(m.first);
                 }
             });

@@ -1,4 +1,5 @@
 package src.presentation.views;
+
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -6,23 +7,24 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class BarChartView extends JPanel {
-    private int histogramHeight = 200;
-    private int barWidth = 50;
-    private int barGap = 10;
+    private final JPanel barPanel;
+    private final JPanel labelPanel;
 
-    private JPanel barPanel;
-    private JPanel labelPanel;
+    private final List<Bar> bars = new ArrayList<>();
 
-    private List<Bar> bars = new ArrayList<Bar>();
+    // Misc settings
+    private static final int histogramHeight = 200;
+    private static final int barGap = 10;
+    private static final int barWidth = 50;
 
     public BarChartView() {
         setBorder(new EmptyBorder(0, 0, 0, 0));
         setLayout(new BorderLayout());
 
         barPanel = new JPanel(new GridLayout(1, 0, barGap, 0));
-        add(barPanel, BorderLayout.CENTER);
-
         labelPanel = new JPanel(new GridLayout(1, 0, barGap, 0));
+
+        add(barPanel, BorderLayout.CENTER);
         add(labelPanel, BorderLayout.PAGE_END);
     }
 
@@ -47,9 +49,9 @@ public class BarChartView extends JPanel {
             label.setHorizontalAlignment(JLabel.CENTER);
             label.setVerticalTextPosition(JLabel.TOP);
             label.setVerticalAlignment(JLabel.BOTTOM);
-            int barHeight = (bar.getValue() * histogramHeight) / maxValue;
-            Icon icon = new ColorIcon(bar.getColor(), barWidth, barHeight);
-            label.setIcon(icon);
+
+            final int barHeight = (bar.getValue() * histogramHeight) / maxValue;
+            label.setIcon(new ColorIcon(bar.getColor(), barWidth, barHeight));
             barPanel.add(label);
 
             JLabel barLabel = new JLabel(bar.getLabel());
@@ -58,10 +60,10 @@ public class BarChartView extends JPanel {
         }
     }
 
-    private class Bar {
-        private String label;
-        private int value;
-        private Color color;
+    private static class Bar {
+        private final String label;
+        private final int value;
+        private final Color color;
 
         public Bar(String label, int value, Color color) {
             this.label = label;
@@ -82,10 +84,14 @@ public class BarChartView extends JPanel {
         }
     }
 
-    private class ColorIcon implements Icon {
-        private Color color;
-        private int width;
-        private int height;
+    private static class ColorIcon implements Icon {
+        private final Color color;
+        private final int width;
+        private final int height;
+
+        // Settings
+        private static final int arcWidth = 10;
+        private static final int arcHeight = 10;
 
         public ColorIcon(Color color, int width, int height) {
             this.color = color;
@@ -106,7 +112,7 @@ public class BarChartView extends JPanel {
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             g.setColor(color);
-            g.fillRoundRect(x, y, width, height, 10, 10);
+            g.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
         }
     }
 

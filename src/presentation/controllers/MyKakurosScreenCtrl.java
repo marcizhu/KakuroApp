@@ -38,6 +38,7 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
                 if (!newInfo.get(i).get(j).equals(infoToDisplay.get(i).get(j))) return true;
             }
         }
+
         return false;
     }
 
@@ -48,6 +49,7 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
     public void onExportKakuroClicked(String id) {
         System.out.println("Export: " + id);
     }
+
     public void onPlayKakuroClicked(String id) {
         presentationCtrl.startNewGame(id);
     }

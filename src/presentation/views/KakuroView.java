@@ -1,5 +1,7 @@
 package src.presentation.views;
 
+import src.presentation.utils.RGBUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -14,11 +16,13 @@ public class KakuroView extends JPanel {
     public static final int BLACK_SECTION_BOTTOM = 2;
     public static final int BLACK_SECTION_LEFT = 3;
     public static final int BLACK_SECTION_RIGHT = 4;
+
     private Color blackCellColor;
 
-
-    private int rows, columns, cellSideSize;
-    private JPanel[][] cells;
+    private final int rows;
+    private final int columns;
+    private int cellSideSize;
+    private final JPanel[][] cells;
 
     private BoardMouseEventListener listener;
 
@@ -99,22 +103,21 @@ public class KakuroView extends JPanel {
     }
 
     private void computeCellSideSize(int width, int height) {
-        if(width/columns < height/rows)// horizontally constrained
-            cellSideSize = width/columns;
-        else
-            cellSideSize = height/rows;
+        // horizontally constrained
+        cellSideSize = Math.min(width / columns, height / rows);
     }
 
     @Override
     public void setSize(int width, int height) {
         computeCellSideSize(width, height);
-        super.setSize(cellSideSize*columns, cellSideSize*rows);
+        super.setSize(cellSideSize * columns, cellSideSize * rows);
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 cells[r][c].setSize(cellSideSize, cellSideSize);
                 cells[r][c].revalidate();
             }
         }
+
         revalidate();
     }
 
@@ -130,22 +133,24 @@ public class KakuroView extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(this.columns*this.cellSideSize, this.rows*this.cellSideSize);
+        return new Dimension(columns * cellSideSize, rows * cellSideSize);
     }
 
     public void setBoardMouseEventListener(BoardMouseEventListener l) {
         if (listener != null) listener.onListenerDetached();
-        this.listener = l;
+        listener = l;
     }
 
     public void setWhiteCellValue(int r, int c, int value) {
         if (r < 0 || c < 0 || r >= rows || c >= columns) return;
         if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setValue(value);
     }
+
     public void setWhiteCellNotations(int r, int c, int notations) {
         if (r < 0 || c < 0 || r >= rows || c >= columns) return;
         if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setNotations(notations);
     }
+
     public void setBlackCellValue(int r, int c, int value, int section) {
         if (r < 0 || c < 0 || r >= rows || c >= columns) return;
         if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(value, section);
@@ -163,63 +168,70 @@ public class KakuroView extends JPanel {
         if (cells[r][c] instanceof WhiteCellView) return;
         ((BlackCellView)cells[r][c]).setSectionColor(section, color);
     }
+
     public void unselectBlackCell(int r, int c, int section) {
         if (cells[r][c] instanceof WhiteCellView) return;
         ((BlackCellView)cells[r][c]).unselectSection(section);
     }
+
     public void setWhiteCellSelectedColor(int r, int c, Color color) {
         if (cells[r][c] instanceof BlackCellView) return;
         ((WhiteCellView)cells[r][c]).setSelectedColor(color);
     }
+
     public void unselectWhiteCell(int r, int c) {
         if (cells[r][c] instanceof BlackCellView) return;
         ((WhiteCellView)cells[r][c]).unselect();
     }
 
     private class BlackCellView extends JPanel {
-        private int row, col;
         private boolean topToPaint, bottomToPaint, leftToPaint, rightToPaint;
-        private JLabel topLbl, bottomLbl, leftLbl, rightLbl;
+        private final JLabel topLbl, bottomLbl, leftLbl, rightLbl;
         private Color topColor, bottomColor, leftColor, rightColor;
+
         public BlackCellView (int row, int col, int top, int bottom, int left, int right, boolean showValues) {
-            this.row = row;
-            this.col = col;
-            topToPaint = top!=0;
+            topToPaint = top != 0;
             topColor = blackCellColor;
             topLbl = new JLabel("", JLabel.CENTER);
             topLbl.setForeground(Color.WHITE);
             topLbl.setOpaque(false);
-            bottomToPaint = bottom!=0;
+
+            bottomToPaint = bottom != 0;
             bottomColor = blackCellColor;
             bottomLbl = new JLabel("", JLabel.CENTER);
             bottomLbl.setForeground(Color.WHITE);
             bottomLbl.setOpaque(false);
-            leftToPaint = left!=0;
+
+            leftToPaint = left != 0;
             leftColor = blackCellColor;
             leftLbl = new JLabel("", JLabel.CENTER);
             leftLbl.setForeground(Color.WHITE);
             leftLbl.setOpaque(false);
-            rightToPaint = right!=0;
+
+            rightToPaint = right != 0;
             rightColor = blackCellColor;
             rightLbl = new JLabel("", JLabel.CENTER);
             rightLbl.setForeground(Color.WHITE);
             rightLbl.setOpaque(false);
+
             if (showValues) {
                 if (topToPaint) topLbl.setText(""+top);
                 if (bottomToPaint) bottomLbl.setText(""+bottom);
                 if (leftToPaint) leftLbl.setText(""+left);
                 if (rightToPaint) rightLbl.setText(""+right);
+
                 setLayout(new GridLayout(3,3));
-                add(transparentSpace());
-                add(topToPaint ? topLbl : transparentSpace());
-                add(transparentSpace());
-                add(leftToPaint ? leftLbl : transparentSpace());
-                add(transparentSpace());
-                add(rightToPaint ? rightLbl : transparentSpace());
-                add(transparentSpace());
-                add(bottomToPaint ? bottomLbl : transparentSpace());
-                add(transparentSpace());
+                add(new TransparentPanel());
+                add(topToPaint ? topLbl : new TransparentPanel());
+                add(new TransparentPanel());
+                add(leftToPaint ? leftLbl : new TransparentPanel());
+                add(new TransparentPanel());
+                add(rightToPaint ? rightLbl : new TransparentPanel());
+                add(new TransparentPanel());
+                add(bottomToPaint ? bottomLbl : new TransparentPanel());
+                add(new TransparentPanel());
             }
+
             setVisible(true);
 
             addMouseListener(new MouseAdapter() {
@@ -256,7 +268,7 @@ public class KakuroView extends JPanel {
 
                 @Override
                 public void mouseEntered(MouseEvent e){
-                    if (listener!=null)
+                    if (listener != null)
                         listener.onBlackCellViewEntered(row, col);
                 }
             });
@@ -264,11 +276,10 @@ public class KakuroView extends JPanel {
             setBackground(new Color(0,0,0,0));
         }
 
-        // FIXME: Ugly solution, I don't know if there's a better way to do this
-        private JPanel transparentSpace() {
-            JPanel p = new JPanel();
-            p.setVisible(false);
-            return p;
+        private class TransparentPanel extends JPanel {
+            public TransparentPanel() {
+                setVisible(false);
+            }
         }
 
         @Override
@@ -280,59 +291,66 @@ public class KakuroView extends JPanel {
             int topRightX = getWidth(), topRightY = 0;
             int bottomLeftX = 0, bottomLeftY = getHeight();
             int bottomRightX = getWidth(), bottomRightY = getHeight();
+
             if (topToPaint) {
                 g.setColor(topColor);
                 g.fillPolygon(new int[] { topLeftX, topRightX, centerX }, new int[] { topLeftY, topRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topLeftX, topRightX, centerX }, new int[] { topLeftY, topRightY, centerY }, 3);
             }
+
             if (bottomToPaint) {
                 g.setColor(bottomColor);
                 g.fillPolygon(new int[] { bottomLeftX, bottomRightX, centerX }, new int[] { bottomLeftY, bottomRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { bottomLeftX, bottomRightX, centerX }, new int[] { bottomLeftY, bottomRightY, centerY }, 3);
             }
+
             if (leftToPaint) {
                 g.setColor(leftColor);
                 g.fillPolygon(new int[] { topLeftX, bottomLeftX, centerX }, new int[] { topLeftY, bottomLeftY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topLeftX, bottomLeftX, centerX }, new int[] { topLeftY, bottomLeftY, centerY }, 3);
             }
+
             if (rightToPaint) {
                 g.setColor(rightColor);
                 g.fillPolygon(new int[] { topRightX, bottomRightX, centerX }, new int[] { topRightY, bottomRightY, centerY }, 3);
                 g.setColor(Color.BLACK);
                 g.drawPolygon(new int[] { topRightX, bottomRightX, centerX }, new int[] { topRightY, bottomRightY, centerY }, 3);
             }
+
             g.setColor(c);
             paintComponents(g);
         }
 
         public void setSectionValue(int value, int section) {
+            String val = value == 0 ? "" : Integer.toString(value);
+
             switch(section) {
                 case BLACK_SECTION_TOP:
                     topToPaint = value != 0;
-                    topLbl.setText(value == 0 ? "" : ""+value);
+                    topLbl.setText(val);
                     break;
                 case BLACK_SECTION_BOTTOM:
                     bottomToPaint = value != 0;
-                    bottomLbl.setText(value == 0 ? "" : ""+value);
+                    bottomLbl.setText(val);
                     break;
                 case BLACK_SECTION_LEFT:
                     leftToPaint = value != 0;
-                    leftLbl.setText(value == 0 ? "" : ""+value);
+                    leftLbl.setText(val);
                     break;
                 case BLACK_SECTION_RIGHT:
                     rightToPaint = value != 0;
-                    rightLbl.setText(value == 0 ? "" : ""+value);
+                    rightLbl.setText(val);
                     break;
             }
             revalidate();
         }
 
         public void setSectionColor(int section, Color color) {
-            int brightness = (color.getRed()+color.getGreen()+color.getBlue())/3;
-            Color fontColor = brightness > 150 ? Color.BLACK : Color.WHITE;
+            Color fontColor = RGBUtils.getContrastColor(color);
+
             switch(section) {
                 case BLACK_SECTION_TOP:
                     topColor = color;
@@ -354,8 +372,8 @@ public class KakuroView extends JPanel {
             revalidate();
         }
         public void unselectSection(int section) {
-            int brightness = (blackCellColor.getRed()+blackCellColor.getGreen()+blackCellColor.getBlue())/3;
-            Color fontColor = brightness > 150 ? Color.BLACK : Color.WHITE;
+            Color fontColor = RGBUtils.getContrastColor(blackCellColor);
+
             switch(section) {
                 case BLACK_SECTION_TOP:
                     topColor = blackCellColor;
@@ -377,8 +395,8 @@ public class KakuroView extends JPanel {
             revalidate();
         }
         public void resetBlackCellColor() {
-            int brightness = (blackCellColor.getRed()+blackCellColor.getGreen()+blackCellColor.getBlue())/3;
-            Color fontColor = brightness > 150 ? Color.BLACK : Color.WHITE;
+            Color fontColor = RGBUtils.getContrastColor(blackCellColor);
+
             topColor = blackCellColor;
             topLbl.setForeground(fontColor);
             bottomColor = blackCellColor;
@@ -392,20 +410,18 @@ public class KakuroView extends JPanel {
     }
 
     private class WhiteCellView extends JPanel {
-        private final int row, col;
         private int value, notations;
-        private boolean showValues;
+        private final boolean showValues;
         private Color selectedColor;
 
         public WhiteCellView (int row, int col, int value, int notations, boolean showValues) {
-            this.row = row;
-            this.col = col;
             this.value = value;
             this.notations = notations;
             this.showValues = showValues;
-            if (showValues) {
+
+            if (showValues)
                 resetLayout();
-            }
+
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
             setBackground(Color.WHITE);
             setVisible(true);
@@ -450,9 +466,8 @@ public class KakuroView extends JPanel {
             Color valueFontColor = Color.BLACK;
             Color notationFontColor = Color.GRAY;
             if (selectedColor != null) {
-                int brightness = (selectedColor.getRed()+selectedColor.getGreen()+selectedColor.getBlue())/3;
-                valueFontColor = brightness > 150 ? Color.BLACK : Color.WHITE;
-                notationFontColor = brightness > 150 ? Color.GRAY : Color.LIGHT_GRAY;
+                valueFontColor = RGBUtils.isTooBright(selectedColor) ? Color.BLACK : Color.WHITE;
+                notationFontColor = RGBUtils.isTooBright(selectedColor) ? Color.GRAY : Color.LIGHT_GRAY;
             }
             if (value != 0) {
                 removeAll();
@@ -474,6 +489,7 @@ public class KakuroView extends JPanel {
             } else {
                 removeAll();
                 setLayout(new GridLayout(3,3));
+
                 for (int i = 0; i < 9; i++) {
                     JLabel notationLbl = new JLabel();
                     notationLbl.setForeground(notationFontColor);
@@ -507,6 +523,7 @@ public class KakuroView extends JPanel {
             setBackground(selectedColor);
             resetLayout();
         }
+
         public void unselect() {
             if (selectedColor == null) return;
             selectedColor = null;

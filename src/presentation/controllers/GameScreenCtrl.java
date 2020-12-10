@@ -3,10 +3,14 @@ package src.presentation.controllers;
 import src.domain.controllers.DomainCtrl;
 import src.domain.controllers.GameCtrl;
 import src.presentation.screens.GameScreen;
+import src.presentation.utils.Dialogs;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
+import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class GameScreenCtrl extends AbstractScreenCtrl {
@@ -41,8 +45,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void kakuroSolvedCorrectly() {
-        // show alert indicating kakuro solved, the time, top 3 or whatever
-        System.out.println("SOLVED!!!");
+        // TODO: Show alert indicating kakuro solved, the time, top 3 or whatever
+        Dialogs.showInfoDialog("You solved the kakuro!", "Kakuro solved");
     }
 
     public String getBoardToDisplay() {
@@ -73,6 +77,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         }
         conflictiveCoord = conflicts;
     }
+
     private void unselectConflictiveCoord() {
         for (Pair<Pair<Integer, Integer>, Integer> cc : conflictiveCoord) {
             if (cc.second == WHITE_CELL) {
@@ -82,6 +87,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
             }
         }
     }
+
     public void setSelectedPos(int row, int col) {
         unselectConflictiveCoord();
         if (selectedPos.first != -1) ((GameScreen)screen).unselectWhiteCell(selectedPos.first, selectedPos.second);
@@ -89,24 +95,28 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         ((GameScreen)screen).selectWhiteCell(selectedPos.first, selectedPos.second);
         game.getHelpOptionsAtSelect(selectedPos.first, selectedPos.second);
     }
+
     public void selectMovement(int moveIdx) {
         if (game.selectMove(moveIdx)) {
             ((GameScreen)screen).updateMovesPanel(moveIdx);
             game.getHelpOptionsAtSelect(selectedPos.first, selectedPos.second);
         }
     }
+
     public void undoMovement() {
         if (game.undoMove()) {
             ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
             game.getHelpOptionsAtSelect(selectedPos.first, selectedPos.second);
         }
     }
+
     public void redoMovement() {
         if (game.redoMove()) {
             ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
             game.getHelpOptionsAtSelect(selectedPos.first, selectedPos.second);
         }
     }
+
     public void resetGame() {
         game.resetGame();
         unselectConflictiveCoord();
@@ -191,8 +201,21 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void onExportClick() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export kakuro");
 
+        int userSelection = fileChooser.showSaveDialog(getContents());
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String file = fileChooser.getSelectedFile().getAbsolutePath();
+            Pair<Boolean, String> ret = game.exportKakuro(file);
+
+            if(!ret.first) {
+                Dialogs.showErrorDialog("Error while exporting kakuro: " + ret.second, "Error");
+            }
+        }
     }
+
     public void onHintClick() {
         Pair<Pair<Integer, Integer>, Integer> response = game.getHint();
         System.out.println("Response is: " + response.first.first + " . " + response.first.second + ": " + response.second);
@@ -212,6 +235,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
             }
         }
     }
+
     public void onSolveClick() {
 
     }

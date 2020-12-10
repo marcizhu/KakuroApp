@@ -1,6 +1,5 @@
 package src.presentation.screens;
 
-import src.presentation.controllers.AbstractScreenCtrl;
 import src.presentation.controllers.MyKakurosScreenCtrl;
 import src.presentation.views.KakuroInfoCardView;
 
@@ -31,15 +30,19 @@ public class MyKakurosScreen extends AbstractScreen {
 
         ArrayList<ArrayList<String>> info = ((MyKakurosScreenCtrl) ctrl).getInfoToDisplay();
 
-        kakuroListLayout = new JPanel(new GridLayout(info.size()/3+1, 3));
+        kakuroListLayout = new JPanel(new GridLayout(info.size() / 3 + 1, 3));
 
-        for (ArrayList<String> option: info) {
+        for (ArrayList<String> option : info) {
             if (option.size() != 8) continue;
             String state = option.get(7);
             int stateCode = 0;
-            if (state.equals("unfinished")) stateCode = KakuroInfoCardView.STATE_UNFINISHED;
-            else if (state.equals("solved")) stateCode = KakuroInfoCardView.STATE_SOLVED;
-            else if (state.equals("surrendered")) stateCode = KakuroInfoCardView.STATE_SURRENDERED;
+
+            switch (state) {
+                case "unfinished":  stateCode = KakuroInfoCardView.STATE_UNFINISHED; break;
+                case "solved":      stateCode = KakuroInfoCardView.STATE_SOLVED; break;
+                case "surrendered": stateCode = KakuroInfoCardView.STATE_SURRENDERED; break;
+            }
+
             KakuroInfoCardView kak = new KakuroInfoCardView(
                     option.get(0),
                     option.get(1),

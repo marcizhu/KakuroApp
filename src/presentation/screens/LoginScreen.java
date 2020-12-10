@@ -2,6 +2,7 @@ package src.presentation.screens;
 
 import src.presentation.controllers.AbstractScreenCtrl;
 import src.presentation.controllers.LoginScreenCtrl;
+import src.presentation.utils.RGBUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,13 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-
 public class LoginScreen extends AbstractScreen {
-    private JLabel userListTitle, registerTitle;
-    private JPanel userListLayout;
-    private JScrollPane userListPane;
     private JTextField registerUsernameInput;
-    private JButton registerButton;
 
     public LoginScreen(AbstractScreenCtrl ctrl) {
         super(ctrl);
@@ -29,7 +25,7 @@ public class LoginScreen extends AbstractScreen {
         contents.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        userListTitle = new JLabel("Who are you? Choose your profile");
+        JLabel userListTitle = new JLabel("Who are you? Choose your profile");
         userListTitle.setFont(new Font(userListTitle.getFont().getName(), Font.PLAIN, 20));
         EmptyBorder border = new EmptyBorder(5, 10, 5, 10);
         userListTitle.setBorder(border);
@@ -40,7 +36,7 @@ public class LoginScreen extends AbstractScreen {
         contents.add(userListTitle, constraints);
 
         ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUserList();
-        userListLayout = new JPanel(new GridLayout(1, users.size()));
+        JPanel userListLayout = new JPanel(new GridLayout(1, users.size()));
         userListLayout.setBorder(new EmptyBorder(0, 0, 20, 0));
 
         for (String user : users) {
@@ -61,14 +57,14 @@ public class LoginScreen extends AbstractScreen {
             userListLayout.add(profile);
         }
 
-        userListPane = new JScrollPane(userListLayout);
+        JScrollPane userListPane = new JScrollPane(userListLayout);
         userListPane.setBorder(BorderFactory.createEmptyBorder());
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
         constraints.gridy = 1;
         contents.add(userListPane, constraints);
 
-        registerTitle = new JLabel("Create new profile");
+        JLabel registerTitle = new JLabel("Create new profile");
         registerTitle.setForeground(Color.BLACK);
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
@@ -81,7 +77,7 @@ public class LoginScreen extends AbstractScreen {
         constraints.gridy = 3;
         contents.add(registerUsernameInput, constraints);
 
-        registerButton = new JButton("Register");
+        JButton registerButton = new JButton("Register");
         registerButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -97,13 +93,15 @@ public class LoginScreen extends AbstractScreen {
 
     private static class UserIcon implements Icon {
         private final Color color;
-        private final int width = 120;
-        private final int height = 120;
         private final char letter;
+
+        // UI Settings
+        private static final int width = 120;
+        private static final int height = 120;
 
         public UserIcon(String user) {
             this.letter = user.charAt(0);
-            this.color = new Color(user.hashCode());
+            this.color = RGBUtils.Hash2Color(user);
         }
 
         @Override
@@ -123,12 +121,12 @@ public class LoginScreen extends AbstractScreen {
             g.setColor(color);
             g.setFont(new Font(g.getFont().getName(), Font.BOLD, 40));
             g.fillRoundRect(x, y, width, height, 10, 10);
-            g.setColor(Color.WHITE);
+            g.setColor(RGBUtils.isTooBright(color) ? color.darker().darker() : color.brighter().brighter());
 
             FontMetrics metrics = g.getFontMetrics(g.getFont());
             // Determine the X & Y coordinates for the text
-            int textX = x + (width - metrics.stringWidth("" + letter)) / 2;
-            int textY = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+            final int textX = x + (width - metrics.stringWidth("" + letter)) / 2;
+            final int textY = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
             g.drawString("" + letter, textX, textY);
             g.setFont(oldFont);
         }

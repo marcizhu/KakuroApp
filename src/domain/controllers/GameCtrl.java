@@ -9,6 +9,8 @@ import src.domain.entities.*;
 import src.presentation.controllers.GameScreenCtrl;
 import src.utils.Pair;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GameCtrl {
@@ -663,6 +665,17 @@ public class GameCtrl {
 
         // if it reaches this point it looks like there is no hint to be given
         return new Pair<>(new Pair<>(-1, -1), -1);
+    }
+
+    public Pair<Boolean, String> exportKakuro(String file) {
+        try {
+            FileWriter myWriter = new FileWriter(file);
+            myWriter.write(kakuro.getBoard().toString() + "\n");
+            myWriter.close();
+            return new Pair<>(true, null);
+        } catch(IOException e) {
+            return new Pair<>(false, e.getMessage());
+        }
     }
 
     private void validateKakuro() {
