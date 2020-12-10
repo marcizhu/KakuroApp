@@ -35,12 +35,9 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
             // TODO: handle error
             return;
         }
-        ArrayList<Map<String, Object>> newInfo = result.first;
-        if (infoToDisplay != newInfo) {
-            return;
-        }
 
-        return false;
+        infoToDisplay = result.first;
+        screen.build(width, height);
     }
 
     public ArrayList<Map<String, Object>> getInfoToDisplay() {
