@@ -249,4 +249,17 @@ public class PresentationCtrl {
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();
     }
+
+    public void startNewCreation(int numRows, int numCols) {
+        currentScreenCtrl.onDestroy();
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
+        currentScreenCtrl = new CreatorScreenCtrl(this, domainCtrl);
+        ((CreatorScreenCtrl)currentScreenCtrl).setUpCreator(domainCtrl.newCreatorInstance(userSessionId, numRows, numCols));
+        currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
+        app.setContentPane(currentScreenCtrl.getContents());
+        app.revalidate();
+    }
 }

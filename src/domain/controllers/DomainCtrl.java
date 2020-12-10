@@ -91,4 +91,9 @@ public class DomainCtrl {
 
         return new GameCtrl(user, kakuro);
     }
+
+    public CreatorCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
+        User user = new User(sessionID);
+        return new CreatorCtrl(user, numRows, numCols);
+    }
 }

@@ -4,6 +4,7 @@ import src.domain.controllers.DomainCtrl;
 import src.domain.controllers.GameCtrl;
 import src.presentation.screens.GameScreen;
 import src.presentation.utils.Dialogs;
+import src.presentation.utils.Palette;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
@@ -166,9 +167,9 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
     public void markButtonPanelInRed(int valuesUsed, int selectedValue) {
         for (int i = 0; i < 9; i++) {
-            if (i+1 == selectedValue) ((GameScreen)screen).tintValuePanelButtonText(i+1, new Color(40, 100, 255));
+            if (i+1 == selectedValue) ((GameScreen)screen).tintValuePanelButtonText(i+1, Palette.StrongBlue);
             else if ((valuesUsed & (1<<i)) != 0) {
-                ((GameScreen)screen).tintValuePanelButtonText(i+1, new Color(255, 50, 50));
+                ((GameScreen)screen).tintValuePanelButtonText(i+1, Palette.StrongRed);
                 System.out.println("Marked: " + (i+1));
             }
             else ((GameScreen)screen).tintValuePanelButtonText(i+1, Color.BLACK);
@@ -229,11 +230,11 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
             setConflictiveCoord(conflict);
         } else {
             setSelectedPos(response.first.first, response.first.second);
-            ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, new Color(255, 160, 100));
+            ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, Palette.HintOrange);
             if (response.second != -1) {
                 ((GameScreen)screen).updateMovesPanel(game.getCurrentMoveIdx());
                 ((GameScreen)screen).setValueWhiteCell(response.first.first, response.first.second, response.second);
-                ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, new Color(160, 255, 160));
+                ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, Palette.HintGreen);
             }
         }
     }

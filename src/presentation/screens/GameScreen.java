@@ -1,6 +1,7 @@
 package src.presentation.screens;
 
 import src.presentation.controllers.GameScreenCtrl;
+import src.presentation.utils.Palette;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
@@ -490,7 +491,7 @@ public class GameScreen extends AbstractScreen {
     }
 
     public void selectWhiteCell(int r, int c) {
-        gameBoard.setWhiteCellSelectedColor(r, c, new Color(180, 180, 255));
+        gameBoard.setWhiteCellSelectedColor(r, c, Palette.SelectionBlue);
     }
     public void selectWhiteCellColor(int r, int c, Color col) {
         gameBoard.setWhiteCellSelectedColor(r, c, col);
@@ -509,9 +510,9 @@ public class GameScreen extends AbstractScreen {
     }
     public void selectConflictive(int r, int c, int s) {
         if (s == GameScreenCtrl.WHITE_CELL) {
-            gameBoard.setWhiteCellSelectedColor(r, c, new Color(255, 160, 160));
+            gameBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
         } else {
-            gameBoard.setBlackCellSelectedColor(r, c, s, new Color(255, 160, 160));
+            gameBoard.setBlackCellSelectedColor(r, c, s, Palette.WarningLightRed);
         }
     }
     public void tintValuePanelButtonText(int value, Color tint) {
