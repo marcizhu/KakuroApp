@@ -169,7 +169,9 @@ public class Generator {
         // First row always black
         for (int j = 0; j < width; j++) b.setCell(new BlackCell(), 0, j);
 
-        for (int idx = width+1; idx < width*height/2; idx++) {
+        int lastIdx = ((width-1)*(height-1))/2;
+        lastIdx += width + (lastIdx/(width-1)) +1;
+        for (int idx = width+1; idx <= lastIdx; idx++) {
             int i = idx/width;
             int j = idx%width;
             int symI = height-i;
@@ -194,9 +196,9 @@ public class Generator {
                 if (((i+1 < height && b.isBlackCell(i+1, j)) || i+1 >= height) && ((j+1 < width && b.isBlackCell(i, j+1)) || j+1 >= width)) continue;
                 // At this point this black cell is a starting point for either a row or a column
                 // check row
-                if (i+1 < height && b.isWhiteCell(i+1, j)) makeNecessaryPartitionRow(i, j, b);
+                if (j+1 < width && b.isWhiteCell(i, j+1)) makeNecessaryPartitionRow(i, j, b);
                 // check column
-                if (j+1 < width && b.isWhiteCell(i, j+1)) makeNecessaryPartitionCol(i, j, b);
+                if (i+1 < height && b.isWhiteCell(i+1, j)) makeNecessaryPartitionCol(i, j, b);
             }
         }
         return b;
@@ -211,7 +213,7 @@ public class Generator {
         for (int k = 0; k < 3; k++) {
             for (int kk = 0; kk < 3; kk++) {
                 if (i-1+k < 0 || i-1+k >= height || j-1+kk < 0 || j-1+kk >= width) continue;
-                if ((i-1+k != i || j-1+kk !=j) && b.isWhiteCell(i-1+k, j-1+kk)) toVisit.add(new Coordinates( i-1+k, j-1+kk));
+                if ((i-1+k != i || j-1+kk != j) && (i-1+k != symI && j-1+kk != j) && b.isWhiteCell(i-1+k, j-1+kk)) toVisit.add(new Coordinates( i-1+k, j-1+kk));
             }
         }
         if (toVisit.size() > 0) {
@@ -259,12 +261,14 @@ public class Generator {
         int size = 0;
         ArrayList<Integer> validPos = new ArrayList<>();
         ArrayList<Integer> invalidPos = new ArrayList<>();
+        ArrayList<Integer> allPos = new ArrayList<>();
         while (pos < width && b.isWhiteCell(i, pos)) {
             size++;
             int symI = height-i;
             int symJ = width-pos;
             if (isValidPosition(b, i, pos) && !((symI-i == 2 && pos == symJ && (i+1 < height && b.isWhiteCell(i+1, pos))) || (i == symI && symJ-pos == 2 && (pos+1 < width && b.isWhiteCell(i, pos+1))))) validPos.add(pos);
             else invalidPos.add(pos);
+            allPos.add(pos);
             pos++;
         }
         if (size > 9) { //Maybe different values for difficulties??
@@ -306,9 +310,12 @@ public class Generator {
                 }
             }
             // will get a disconnected board
-            int randomChoice = random.nextInt(size);
-            b.setCell(new BlackCell(), i, randomChoice);
-            b.setCell(new BlackCell(), height-i, width-randomChoice);
+            if (foundCut) {
+                int randomChoice = random.nextInt(size);
+                int p = j+1+randomChoice;
+                b.setCell(new BlackCell(), i, p);
+                b.setCell(new BlackCell(), height-i, width-p);
+            }
         }
     }
 
@@ -366,9 +373,12 @@ public class Generator {
                 }
             }
             // will get a disconnected board
-            int randomChoice = random.nextInt(size);
-            b.setCell(new BlackCell(), randomChoice, j);
-            b.setCell(new BlackCell(), height-randomChoice, width-j);
+            if (!foundCut) {
+                int randomChoice = random.nextInt(size);
+                int p = i+1+randomChoice;
+                b.setCell(new BlackCell(), p, j);
+                b.setCell(new BlackCell(), height-p, width-j);
+            }
         }
     }
 
