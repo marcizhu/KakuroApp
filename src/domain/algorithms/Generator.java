@@ -163,71 +163,213 @@ public class Generator {
                 diff = 50;
         }
 
-        for(int i = 0; i<height; i++) {
-            for(int j = 0; j<width; j++) {
-                Cell c = new WhiteCell(true);
-                if (i == 0 || j == 0 || (Math.abs(random.nextInt(100)) < diff && isValidPosition(b, i, j))) {
-                    // Cell will be black if we are in the first row or column or randomly with a 1/7 chance
-                    c = new BlackCell();
+        // First column always black
+        for (int i = 0; i < height; i++) b.setCell(new BlackCell(), i, 0);
+
+        // First row always black
+        for (int j = 0; j < width; j++) b.setCell(new BlackCell(), 0, j);
+
+        for (int idx = width+1; idx < width*height/2; idx++) {
+            int i = idx/width;
+            int j = idx%width;
+            int symI = height-i;
+            int symJ = width-j;
+            if (i == 0 || j == 0) continue;
+            Cell c = new WhiteCell(true);
+            if ((Math.abs(random.nextInt(100)) < diff && isValidPosition(b, i, j))) {
+                // Cell will be black if we are in the first row or column or randomly with a 1/7 chance
+                if (!((symI-i == 2 && j == symJ && (i+1 < height && b.isWhiteCell(i+1, j))) || (i == symI && symJ-j == 2 && (j+1 < width && b.isWhiteCell(i, j+1))))) {
+                    if (checkConnected(i, j, b)) c = new BlackCell();
                 }
-                b.setCell(c, i, j);
             }
+            b.setCell(c, i, j);
+            if (c instanceof BlackCell) b.setCell(new BlackCell((BlackCell) c), symI, symJ);
+            else b.setCell(new WhiteCell(true), symI, symJ);
         }
 
         // Traverse the board once and fix all rows and columns of length > 9
         for(int i = 0; i<height; i++) {
-            for(int j = 0; j<width; j++) {
-                if (b.isBlackCell(i, j)) continue;
-
-                int rowStart, rowEnd;
-                int pos = j+1;
-                while (pos < width && b.isWhiteCell(i, pos)) {
-                    pos++;
-                }
-                rowEnd = pos-1;
-                pos = j-1;
-                while (j > 0 && b.isWhiteCell(i, pos)) {
-                    pos--;
-                }
-                rowStart = pos+1;
-
-                // FIXME: this can result in columns of size 1!!! :(
-                while (rowEnd - rowStart + 1 > 9) {
-                    for (int p = rowStart + 9; p >= rowStart; p--) {
-                        if (isValidPosition(b, i, p) || p == rowStart) {
-                            b.setCell(new BlackCell(), i, p);
-                            rowStart = p+1;
-                            break;
-                        }
-                    }
-                }
-
-                // Fix columns with len  > 9
-                int colStart, colEnd;
-                pos = i+1;
-                while (pos < height && b.isWhiteCell(pos, j)) {
-                    pos++;
-                }
-                colEnd = pos-1;
-                pos = i-1;
-                while (j > 0 && b.isWhiteCell(pos, j)) {
-                    pos--;
-                }
-                colStart = pos+1;
-
-                while (colEnd - colStart + 1 > 9) {
-                    for (int p = colStart + 9; p >= colStart; p--) {
-                        if (isValidPosition(b, p, j) || p == colStart) {
-                            b.setCell(new BlackCell(), p, j);
-                            colStart = p+1;
-                            break;
-                        }
-                    }
-                }
+            for (int j = 0; j < width; j++) {
+                if (b.isWhiteCell(i, j)) continue;
+                if (((i+1 < height && b.isBlackCell(i+1, j)) || i+1 >= height) && ((j+1 < width && b.isBlackCell(i, j+1)) || j+1 >= width)) continue;
+                // At this point this black cell is a starting point for either a row or a column
+                // check row
+                if (i+1 < height && b.isWhiteCell(i+1, j)) makeNecessaryPartitionRow(i, j, b);
+                // check column
+                if (j+1 < width && b.isWhiteCell(i, j+1)) makeNecessaryPartitionCol(i, j, b);
             }
         }
-
         return b;
+    }
+
+    private boolean checkConnected (int i, int j, Board b) {
+        int height = b.getHeight();
+        int width = b.getWidth();
+        int symI = height-i;
+        int symJ = width-j;
+        ArrayList<Coordinates> toVisit = new ArrayList<>();
+        for (int k = 0; k < 3; k++) {
+            for (int kk = 0; kk < 3; kk++) {
+                if (i-1+k < 0 || i-1+k >= height || j-1+kk < 0 || j-1+kk >= width) continue;
+                if ((i-1+k != i || j-1+kk !=j) && b.isWhiteCell(i-1+k, j-1+kk)) toVisit.add(new Coordinates( i-1+k, j-1+kk));
+            }
+        }
+        if (toVisit.size() > 0) {
+            boolean[][] visited = new boolean[height][width];
+            visited[i][j] = true;
+            visited[symI][symJ] = true;
+            // Probably should be done iteratively BFS
+            PriorityQueue<Pair<Integer, Coordinates>> queue = new PriorityQueue(1, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    int f = ((Pair<Integer, Coordinates>) o1).first;
+                    int s = ((Pair<Integer, Coordinates>) o2).first;
+                    if (f == s) return 0;
+                    if (f < s) return -1;
+                    return 1;
+                }
+            });
+            queue.add(new Pair<>(gridDist(i,j,toVisit.get(0).r,toVisit.get(0).c), toVisit.get(0)));
+            while (!queue.isEmpty() && !toVisit.isEmpty()) {
+                Coordinates currPos = queue.poll().second;
+                if (visited[currPos.r][currPos.c]) continue;
+                visited[currPos.r][currPos.c] = true;
+                toVisit.remove(currPos);
+                // Check adjacent whiteCells
+                if (currPos.r-1 >= 0 && b.isWhiteCell(currPos.r-1, currPos.c)) queue.add(new Pair<>(gridDist(i,j,currPos.r-1,currPos.c), new Coordinates(currPos.r-1,currPos.c)));
+                if (currPos.r+1 < height && b.isWhiteCell(currPos.r+1, currPos.c)) queue.add(new Pair<>(gridDist(i,j,currPos.r+1,currPos.c), new Coordinates(currPos.r+1,currPos.c)));
+                if (currPos.c-1 >= 0 && b.isWhiteCell(currPos.r, currPos.c-1)) queue.add(new Pair<>(gridDist(i,j,currPos.r,currPos.c-1), new Coordinates(currPos.r,currPos.c-1)));
+                if (currPos.c+1 < width && b.isWhiteCell(currPos.r, currPos.c+1)) queue.add(new Pair<>(gridDist(i,j,currPos.r,currPos.c+1), new Coordinates(currPos.r,currPos.c+1)));
+            }
+            return toVisit.isEmpty();
+        }
+        return true; // shouldn't happen, would mean we already had more than one connected component and cell was surrounded by black cells
+    }
+
+    private int gridDist(int i, int j, int r, int c) {
+        int xDist = i<r ? r-i : i-r;
+        int yDist = j<c ? c-j : j-c;
+        return xDist + yDist;
+    }
+
+    private void makeNecessaryPartitionRow(int i, int j, Board b) {
+        int height = b.getHeight();
+        int width = b.getWidth();
+        int pos = j+1;
+        int size = 0;
+        ArrayList<Integer> validPos = new ArrayList<>();
+        ArrayList<Integer> invalidPos = new ArrayList<>();
+        while (pos < width && b.isWhiteCell(i, pos)) {
+            size++;
+            int symI = height-i;
+            int symJ = width-pos;
+            if (isValidPosition(b, i, pos) && !((symI-i == 2 && pos == symJ && (i+1 < height && b.isWhiteCell(i+1, pos))) || (i == symI && symJ-pos == 2 && (pos+1 < width && b.isWhiteCell(i, pos+1))))) validPos.add(pos);
+            else invalidPos.add(pos);
+            pos++;
+        }
+        if (size > 9) { //Maybe different values for difficulties??
+            int iniPos = 1;
+            int finPos = 9;
+            if (size/2 < 9) iniPos = size - 9; // preferably do only one cut
+            boolean foundCut = false;
+
+            Collections.shuffle(validPos, random);
+            // try to get just one cut
+            for (int k = validPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = validPos.get(k);
+                if (p < j+iniPos || p > j+finPos) continue;
+                if (checkConnected(i, p, b)) {
+                    b.setCell(new BlackCell(), i, p);
+                    b.setCell(new BlackCell(), height-i, width-p);
+                    foundCut = true;
+                } else {
+                    validPos.remove(k);
+                }
+            }
+            // might get more than one cut
+            for (int k = validPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = validPos.get(k);
+                if (checkConnected(i, p, b)) {
+                    b.setCell(new BlackCell(), i, p);
+                    b.setCell(new BlackCell(), height-i, width-p);
+                    foundCut = true;
+                }
+            }
+            // might get a row / column of length 1
+            Collections.shuffle(invalidPos, random);
+            for (int k = invalidPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = invalidPos.get(k);
+                if (checkConnected(i, p, b)) {
+                    b.setCell(new BlackCell(), i, p);
+                    b.setCell(new BlackCell(), height-i, width-p);
+                    foundCut = true;
+                }
+            }
+            // will get a disconnected board
+            int randomChoice = random.nextInt(size);
+            b.setCell(new BlackCell(), i, randomChoice);
+            b.setCell(new BlackCell(), height-i, width-randomChoice);
+        }
+    }
+
+    private void makeNecessaryPartitionCol(int i, int j, Board b) {
+        int height = b.getHeight();
+        int width = b.getWidth();
+        int pos = i+1;
+        int size = 0;
+        ArrayList<Integer> validPos = new ArrayList<>();
+        ArrayList<Integer> invalidPos = new ArrayList<>();
+        while (pos < height && b.isWhiteCell(pos, j)) {
+            size++;
+            int symI = height-pos;
+            int symJ = width-j;
+            if (isValidPosition(b, pos, j) && !((symI-pos == 2 && j == symJ && (pos+1 < height && b.isWhiteCell(pos+1, j))) || (pos == symI && symJ-j == 2 && (j+1 < width && b.isWhiteCell(pos, j+1))))) validPos.add(pos);
+            else invalidPos.add(pos);
+            pos++;
+        }
+        if (size > 9) { //Maybe different values for difficulties??
+            int iniPos = 1;
+            int finPos = 9;
+            if (size/2 < 9) iniPos = size - 9; // preferably do only one cut
+            boolean foundCut = false;
+
+            Collections.shuffle(validPos, random);
+            // try to get just one cut
+            for (int k = validPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = validPos.get(k);
+                if (p < i+iniPos || p > i+finPos) continue;
+                if (checkConnected(p, j, b)) {
+                    b.setCell(new BlackCell(), p, j);
+                    b.setCell(new BlackCell(), height-p, width-j);
+                    foundCut = true;
+                } else {
+                    validPos.remove(k);
+                }
+            }
+            // might get more than one cut
+            for (int k = validPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = validPos.get(k);
+                if (checkConnected(p, j, b)) {
+                    b.setCell(new BlackCell(), p, j);
+                    b.setCell(new BlackCell(), height-p, width-j);
+                    foundCut = true;
+                }
+            }
+            // might get a row / column of length 1
+            Collections.shuffle(invalidPos, random);
+            for (int k = invalidPos.size()-1; !foundCut && k >= 0; k--) {
+                int p = invalidPos.get(k);
+                if (checkConnected(p, j, b)) {
+                    b.setCell(new BlackCell(), p, j);
+                    b.setCell(new BlackCell(), height-p, width-j);
+                    foundCut = true;
+                }
+            }
+            // will get a disconnected board
+            int randomChoice = random.nextInt(size);
+            b.setCell(new BlackCell(), randomChoice, j);
+            b.setCell(new BlackCell(), height-randomChoice, width-j);
+        }
     }
 
     private void preprocessRows() {
@@ -1002,6 +1144,12 @@ public class Generator {
             }
             if (this.r < ((Coordinates)o).r) return -1;
             return 1;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Coordinates)) return false;
+            return this.r == ((Coordinates)o).r && this.c == ((Coordinates)o).c;
         }
     }
 
