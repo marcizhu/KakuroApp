@@ -98,59 +98,26 @@ public class PresentationCtrl {
         menu.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = 0;
-        addMenuButton(menu, constraints, "DASHBOARD", 0, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onDashboardMenuItemClicked();
-            }
-        });
 
-        addMenuButton(menu, constraints, "KAKURO LIST", 1, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onKakuroListMenuItemClicked();
-            }
-        });
-
-        addMenuButton(menu, constraints, "MY KAKUROS", 2, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onMyKakurosMenuItemClicked();
-            }
-        });
-
-        addMenuButton(menu, constraints, "STATISTICS", 3, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onStatisticsMenuItemClicked();
-            }
-        });
-
-        addMenuButton(menu, constraints, "RANKINGS", 4, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onRankingsMenuItemClicked();
-            }
-        });
+        addMenuButton(menu, constraints, "DASHBOARD", 0, 2, e -> onDashboardMenuItemClicked());
+        addMenuButton(menu, constraints, "KAKURO LIST", 1, 2, e -> onKakuroListMenuItemClicked());
+        addMenuButton(menu, constraints, "MY KAKUROS", 2, 2, e -> onMyKakurosMenuItemClicked());
+        addMenuButton(menu, constraints, "STATISTICS", 3, 2, e -> onStatisticsMenuItemClicked());
+        addMenuButton(menu, constraints, "RANKINGS", 4, 2, e -> onRankingsMenuItemClicked());
 
         JSeparator separator = new JSeparator();
         separator.setForeground(new Color(0,0,0,0));
         constraints.gridx = 5;
         menu.add(separator, constraints);
 
-        addMenuButton(menu, constraints, "LOG OUT", 6, 2, new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                onLogOutMenuItemClicked();
-            }
-        });
+        addMenuButton(menu, constraints, "LOG OUT", 6, 2, e -> onLogOutMenuItemClicked());
 
         menu.getComponent(6).setForeground(Palette.PastelRed);
     }
 
-    private void addMenuButton(JMenuBar menuBar, GridBagConstraints constraints, String text, int gridx, int weightx, MouseAdapter listener) {
+    private void addMenuButton(JMenuBar menuBar, GridBagConstraints constraints, String text, int gridx, int weightx, ActionListener listener) {
         JButton item = new JButton(text);
-        item.addMouseListener(listener);
+        item.addActionListener(listener);
         item.setHorizontalAlignment(SwingConstants.CENTER);
         item.setVerticalAlignment(SwingConstants.CENTER);
         item.setFocusable(false);
