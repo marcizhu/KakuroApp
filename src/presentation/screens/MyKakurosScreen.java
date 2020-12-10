@@ -35,7 +35,6 @@ public class MyKakurosScreen extends AbstractScreen {
 
         for (ArrayList<String> option: info) {
             if (option.size() != 8) continue;
-            System.out.println("Creating kakuroCardView");
             String state = option.get(7);
             int stateCode = 0;
             if (state.equals("unfinished")) stateCode = KakuroInfoCardView.STATE_UNFINISHED;

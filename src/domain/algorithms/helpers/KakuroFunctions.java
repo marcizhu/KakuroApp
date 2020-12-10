@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public class KakuroFunctions {
 
     private final KakuroFunctionsMaster master;
+    private CellValueAssignationListener cellValueAssignationListener;
+    private boolean abort;
 
     public interface KakuroFunctionsMaster {
         int getRowID(int r, int c); //id between 0 and number of rowLines-1
@@ -37,8 +39,17 @@ public class KakuroFunctions {
         SwappingCellQueue getNotationsQueue();
     }
 
+    public interface CellValueAssignationListener {
+        boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig);
+    }
+
     public KakuroFunctions(KakuroFunctionsMaster m) {
         this.master = m;
+        abort = false;
+    }
+
+    public void setCellValueAssignationListener(CellValueAssignationListener listener) {
+        this.cellValueAssignationListener = listener;
     }
 
     public boolean cellValueAssignation(int r, int c, int value) {
@@ -152,6 +163,7 @@ public class KakuroFunctions {
     // because we only change absolutely necessary cases that depend only on the first assignation call,
     // thus the responsible for the rollback is the first caller
     private boolean rowSumAssignation(int r, int c, int value, ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
+        if (abort) return false;
         // Should update the row sum for a given coordinates to the value and add row to rollback
         //  when in doubt, a sum assignation should be called before a cellValue
         //  assignation because it is more restrictive
@@ -167,6 +179,7 @@ public class KakuroFunctions {
     }
 
     private boolean colSumAssignation(int r, int c, int value, ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
+        if (abort) return false;
         // Should update the col sum for a given coordinates to the value, and add column to rollback
         //  when in doubt, a sum assignation should be called before a cellValue
         //  assignation because it is more restrictive
@@ -215,6 +228,8 @@ public class KakuroFunctions {
             else cellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             master.getNotationsQueue().eraseNotationsFromCell(r, c, (cellNotations & ~(1<<(value-1))));
         }
+        if (cellValueAssignationListener != null) abort = cellValueAssignationListener.onCellValueAssignation(new Pair<>(new Pair<>(r, c), value));
+        if (abort) return false;
         master.getNotationsQueue().removeOrderedCell(r, c); // removes it from queue but notations are mantained
         master.getWorkingBoard().setCellValue(r, c, value);
         master.setRowValuesUsed(r, c, master.getRowValuesUsed(r, c) | 1 << (value-1));
@@ -228,6 +243,7 @@ public class KakuroFunctions {
     }
 
     private boolean updateRowNotations(int r, int c, ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
+        if (abort) return false;
         //updates the notations of the row and can cause assignations, returns whether the update was successful
         ArrayList<Integer> affectedColumns = new ArrayList<>();
 
@@ -349,6 +365,7 @@ public class KakuroFunctions {
     }
 
     private boolean updateColNotations(int r, int c, ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
+        if (abort) return false;
         //updates the notations of the column and can cause assignations, returns whether the update was successful
         ArrayList<Integer> affectedRows = new ArrayList<>();
 

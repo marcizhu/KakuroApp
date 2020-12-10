@@ -5,9 +5,10 @@ import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class GameScreen extends AbstractScreen {
@@ -16,6 +17,10 @@ public class GameScreen extends AbstractScreen {
 
     JPanel leftContent;
 
+    JCheckBox redBtnPanChk;
+    JCheckBox showCombChk;
+    JCheckBox autoEraseChk;
+
     JPanel rightContent;
 
     JButton[] valuePanel;
@@ -23,6 +28,9 @@ public class GameScreen extends AbstractScreen {
     JButton clearCellBtn;
     JPanel movesPanel;
     JScrollPane movesPanelScroll;
+
+    JLabel rowOptionsLbl;
+    JLabel colOptionsLbl;
 
     public GameScreen(GameScreenCtrl ctrl) {
         super(ctrl);
@@ -33,12 +41,7 @@ public class GameScreen extends AbstractScreen {
         super.build(width, height);
         contents = new JPanel();
 
-        leftContent = new JPanel();
-        leftContent.add(new JLabel("left"));
-        leftContent.setSize(width/4, height);
-        leftContent.setBackground(Color.CYAN);
-        leftContent.setVisible(true);
-
+        buildLeftContent(width, height);
         buildRightContent(width, height);
 
         String initialBoard = ((GameScreenCtrl)ctrl).getBoardToDisplay();
@@ -54,7 +57,7 @@ public class GameScreen extends AbstractScreen {
         constraints.gridx = 0;
         constraints.gridy = 0;
         contents.add(leftContent, constraints);
-        constraints.fill = GridBagConstraints.VERTICAL;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
         constraints.gridy = 0;
         contents.add(gameBoard, constraints);
@@ -63,6 +66,161 @@ public class GameScreen extends AbstractScreen {
         constraints.gridy = 0;
         contents.add(rightContent, constraints);
         contents.setVisible(true);
+    }
+
+    public void buildLeftContent(int width, int height) {
+        leftContent = new JPanel();
+        leftContent.setLayout(new GridBagLayout());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(5, 5, 10, 5);
+
+        JPanel helpOptionsPanel = buildHelpOptionsPanel();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        leftContent.add(helpOptionsPanel, constraints);
+
+        JPanel bigButtonsPanel = buildBigButtonsPanel();
+        constraints.gridy = 1;
+        leftContent.add(bigButtonsPanel, constraints);
+
+        leftContent.setSize(width/4, height);
+        leftContent.setVisible(true);
+    }
+
+    public JPanel buildHelpOptionsPanel() {
+        JPanel helpOptionsPanel = new JPanel();
+        helpOptionsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 5, 10, 5);
+
+        // Help options title
+        JLabel title = new JLabel("HELP OPTIONS:");
+        title.setForeground(Color.BLACK);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 4;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        helpOptionsPanel.add(title, constraints);
+
+        // Separator
+        JSeparator separator = new JSeparator();
+        separator.setForeground(Color.BLACK);
+        constraints.gridy = 1;
+        helpOptionsPanel.add(separator, constraints);
+
+        // First help option label
+        JLabel redNumPadLbl = new JLabel("<html><body>Show the values used in row/column in red in the number pad</body></html>");
+        redNumPadLbl.setForeground(Color.BLACK);
+        constraints.gridy = 2;
+        constraints.gridwidth = 3;
+        helpOptionsPanel.add(redNumPadLbl, constraints);
+
+        // Second help option label
+        JLabel showCombLbl = new JLabel("<html><body>Show all combinations for the selected cell's row and column</body></html>");
+        showCombLbl.setForeground(Color.BLACK);
+        constraints.gridy = 3;
+        helpOptionsPanel.add(showCombLbl, constraints);
+
+        // Third help option label
+        JLabel autoEraseLbl = new JLabel("<html><body>Auto erase notations when value is assigned to a cell in the row or column</body></html>");
+        autoEraseLbl.setForeground(Color.BLACK);
+        constraints.gridy = 4;
+        helpOptionsPanel.add(autoEraseLbl, constraints);
+
+        // First help option checkbox
+        redBtnPanChk = new JCheckBox();
+        redBtnPanChk.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                ((GameScreenCtrl)ctrl).setHelpRedButtonPanel(e.getStateChange() == ItemEvent.SELECTED);
+            }
+        });
+        constraints.gridx = 3;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        helpOptionsPanel.add(redBtnPanChk, constraints);
+
+        // Second help option checkbox
+        showCombChk = new JCheckBox();
+        showCombChk.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+                if (selected) {
+                    rowOptionsLbl.setVisible(true);
+                    colOptionsLbl.setVisible(true);
+                } else {
+                    rowOptionsLbl.setVisible(false);
+                    colOptionsLbl.setVisible(false);
+                }
+                ((GameScreenCtrl)ctrl).setHelpShowCombinations(selected);
+                rowOptionsLbl.revalidate();
+                colOptionsLbl.revalidate();
+            }
+        });
+        constraints.gridy = 3;
+        helpOptionsPanel.add(showCombChk, constraints);
+
+        // First help option checkbox
+        autoEraseChk = new JCheckBox();
+        autoEraseChk.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                ((GameScreenCtrl)ctrl).setHelpAutoEraseNotations(e.getStateChange() == ItemEvent.SELECTED);
+            }
+        });
+        constraints.gridy = 4;
+        helpOptionsPanel.add(autoEraseChk, constraints);
+
+        return helpOptionsPanel;
+    }
+
+    public JPanel buildBigButtonsPanel() {
+        JPanel bigButtonsPanel = new JPanel();
+        bigButtonsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 5, 10, 5);
+        constraints.gridx = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+
+        // Button export
+        JButton exportBtn = new JButton("EXPORT MY PROGRESS");
+        exportBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameScreenCtrl)ctrl).onExportClick();
+            }
+        });
+        constraints.gridy = 0;
+        bigButtonsPanel.add(exportBtn, constraints);
+
+        // Button hint
+        JButton hintBtn = new JButton("I'M STUCK, GIVE ME A HINT");
+        hintBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameScreenCtrl)ctrl).onHintClick();
+            }
+        });
+        constraints.gridy = 1;
+        bigButtonsPanel.add(hintBtn, constraints);
+
+        // Button hint
+        JButton solveBtn = new JButton("I GIVE UP, SOLVE IT FOR ME");
+        solveBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((GameScreenCtrl)ctrl).onSolveClick();
+            }
+        });
+        constraints.gridy = 2;
+        bigButtonsPanel.add(solveBtn, constraints);
+
+        return bigButtonsPanel;
     }
 
     private void buildRightContent(int width, int height) {
@@ -166,9 +324,9 @@ public class GameScreen extends AbstractScreen {
 
         // Btn undo
         JButton undoBtn = new JButton("Undo");
-        undoBtn.addMouseListener(new MouseAdapter() {
+        undoBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 ((GameScreenCtrl)ctrl).undoMovement();
             }
         });
@@ -179,9 +337,9 @@ public class GameScreen extends AbstractScreen {
 
         // Btn redo
         JButton redoBtn = new JButton("Re-do");
-        redoBtn.addMouseListener(new MouseAdapter() {
+        redoBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 ((GameScreenCtrl)ctrl).redoMovement();
             }
         });
@@ -191,9 +349,9 @@ public class GameScreen extends AbstractScreen {
 
         // Btn redo
         JButton markBtn = new JButton("Mark");
-        markBtn.addMouseListener(new MouseAdapter() {
+        markBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 ((GameScreenCtrl)ctrl).toggleMark();
             }
         });
@@ -203,9 +361,9 @@ public class GameScreen extends AbstractScreen {
 
         // Btn reset
         JButton resetBtn = new JButton("Reset game");
-        resetBtn.addMouseListener(new MouseAdapter() {
+        resetBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 ((GameScreenCtrl)ctrl).resetGame();
             }
         });
@@ -274,7 +432,7 @@ public class GameScreen extends AbstractScreen {
             if (m.first == selectedMove) singleMovePanel.setBackground(Color.GRAY);
             singleMovePanel.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
                     ((GameScreenCtrl)ctrl).selectMovement(m.first);
                 }
             });
@@ -295,9 +453,11 @@ public class GameScreen extends AbstractScreen {
         for (int i = 0; i < 9; i++) {
             final int val = i+1;
             valuePanel[i] = new JButton(""+(val));
-            valuePanel[i].addMouseListener(new MouseAdapter() {
+            valuePanel[i].setFocusable(false);
+            valuePanel[i].setForeground(Color.BLACK);
+            valuePanel[i].addActionListener(new ActionListener() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void actionPerformed(ActionEvent e) {
                     ((GameScreenCtrl)ctrl).valueClicked(val);
                 }
             });
@@ -306,29 +466,65 @@ public class GameScreen extends AbstractScreen {
             buttonPanel.add(valuePanel[i], constraints);
         }
         notationModeBtn = new JButton("N");
-        notationModeBtn.addMouseListener(new MouseAdapter() {
+        notationModeBtn.setFocusable(false);
+        notationModeBtn.setForeground(Color.BLACK);
+        notationModeBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
+                notationModeBtn.setBorderPainted(!notationModeBtn.isBorderPainted());
+                notationModeBtn.setForeground(notationModeBtn.getForeground() == Color.BLACK ? Color.GRAY : Color.BLACK);
                 ((GameScreenCtrl)ctrl).toggleNotationsMode();
             }
         });
         constraints.gridx = 4;
         buttonPanel.add(notationModeBtn, constraints);
         clearCellBtn = new JButton("X");
-        clearCellBtn.addMouseListener(new MouseAdapter() {
+        clearCellBtn.setFocusable(false);
+        clearCellBtn.setForeground(Color.BLACK);
+        clearCellBtn.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 ((GameScreenCtrl)ctrl).clearWhiteCell();
             }
         });
         constraints.gridy = 2;
         buttonPanel.add(clearCellBtn, constraints);
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new GridBagLayout());
+
+        rowOptionsLbl = new JLabel("");
+        rowOptionsLbl.setForeground(Color.BLACK);
+        rowOptionsLbl.setOpaque(false);
+        rowOptionsLbl.setVisible(false);
+        rowOptionsLbl.setAlignmentY(SwingConstants.CENTER);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        optionsPanel.add(rowOptionsLbl, constraints);
+
+        colOptionsLbl = new JLabel("");
+        colOptionsLbl.setForeground(Color.BLACK);
+        colOptionsLbl.setOpaque(false);
+        colOptionsLbl.setVisible(false);
+        colOptionsLbl.setAlignmentY(SwingConstants.CENTER);
+        constraints.gridy = 1;
+        optionsPanel.add(colOptionsLbl, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 4;
+        constraints.weightx = 4;
+        constraints.fill = GridBagConstraints.BOTH;
+
+        buttonPanel.add(optionsPanel, constraints);
+
         return buttonPanel;
     }
 
     public void toggleMovementMark(int moveIdx) {
         int idx = movesPanel.getComponents().length - moveIdx;
-        if (idx < 0) return;
+        if (idx < 0 || movesPanel.getComponents().length == 0) return;
         JLabel mark = (JLabel)((JPanel)movesPanel.getComponents()[idx]).getComponents()[4];
         mark.setVisible(!mark.isVisible());
         if (mark.isVisible()) mark.setBackground(Color.ORANGE);
@@ -347,12 +543,17 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void onResize(int width, int height) {
         contents.setSize(width, height);
+        leftContent.setSize(width/4, height);
+        rightContent.setSize(width/4, height);
         int remainingWidth = width - leftContent.getWidth() - rightContent.getWidth();
         gameBoard.setSize(remainingWidth, height);
     }
 
     public void selectWhiteCell(int r, int c) {
         gameBoard.setWhiteCellSelectedColor(r, c, new Color(180, 180, 255));
+    }
+    public void selectWhiteCellColor(int r, int c, Color col) {
+        gameBoard.setWhiteCellSelectedColor(r, c, col);
     }
     public void unselectWhiteCell(int r, int c) {
         gameBoard.unselectWhiteCell(r, c);
@@ -372,6 +573,17 @@ public class GameScreen extends AbstractScreen {
         } else {
             gameBoard.setBlackCellSelectedColor(r, c, s, new Color(255, 160, 160));
         }
+    }
+    public void tintValuePanelButtonText(int value, Color tint) {
+        valuePanel[value-1].setForeground(tint);
+        valuePanel[value-1].revalidate();
+    }
+
+    public void setOptionsLblText(String rowTxt, String colTxt) {
+        rowOptionsLbl.setText("<html><body>"+rowTxt+"</body></html>");
+        colOptionsLbl.setText("<html><body>"+colTxt+"</body></html>");
+        rowOptionsLbl.revalidate();
+        colOptionsLbl.revalidate();
     }
 
     private void setUpListener() {

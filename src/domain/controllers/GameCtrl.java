@@ -1,6 +1,10 @@
 package src.domain.controllers;
 
 import src.domain.algorithms.Generator;
+import src.domain.algorithms.Solver;
+import src.domain.algorithms.helpers.KakuroConstants;
+import src.domain.algorithms.helpers.KakuroFunctions;
+import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.*;
 import src.presentation.controllers.GameScreenCtrl;
 import src.utils.Pair;
@@ -23,21 +27,30 @@ public class GameCtrl {
     private int[] rowSize;                  // sizes of each rowLine, always between 0 and 9
     private int[] rowValuesUsed;            // cell values used (assigned) in each rowLine, always boolean[9]
     private Pair<Integer, Integer>[] firstRowCoord;    // coordinates to the first white cell in each rowLine
-    private int[][] rowIDs;          // Pointers to position at arrays of row related data
+    private int[][] rowIDs;                 // Pointers to position at arrays of row related data
     private int rowLineSize;                // Number of different rowLines
 
     private int[] currentColSums;           // value of sums assigned to colLines, 0 means not assigned
     private int[] colSize;                  // sizes of each colLine, always between 0 and 9
     private int[] colValuesUsed;            // cell values used (assigned) in each colLine, always boolean[9]
     private Pair<Integer, Integer>[] firstColCoord;    // coordinates to the first white cell in each colLine
-    private int[][] colIDs;          // Pointers to position at array of colValuesUsed and colSums
+    private int[][] colIDs;                 // Pointers to position at array of colValuesUsed and colSums
     private int colLineSize;                // Number of different colLines
+
+    private boolean usedValuesHelpIsActive;
+    private boolean combinationsHelpIsActive;
+    private boolean autoEraseHelpIsActive;
+
+    private int hintAtMove;
+    private Pair<Pair<Integer, Integer>, Integer> lastHint;
 
     public GameCtrl(User user, Kakuro kakuro) {
         this.user = user;
         this.kakuro = kakuro;
         movementCount = 0;
         currentMovement = 0;
+        hintAtMove = -1;
+        lastHint = new Pair<>(new Pair<>(-1, -1), -1);
         // First we check if there's a game in progress for this kakuro and this userName, if not we create a new game.
         ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = dades.getAllGamesInProgress(user.getName());
         boolean shouldCreateNewGame = true;
@@ -54,6 +67,10 @@ public class GameCtrl {
         if (shouldCreateNewGame) {
             currentGame = new GameInProgress(user, kakuro);
         }
+
+        usedValuesHelpIsActive = false;
+        combinationsHelpIsActive = false;
+        autoEraseHelpIsActive = false;
     }
 
     public String gameSetUp(GameScreenCtrl view) {
@@ -69,6 +86,11 @@ public class GameCtrl {
 
     public int getCurrentMoveIdx() {
         return currentMovement;
+    }
+    public Pair<Integer, Integer> getCoordAtMove(int move) {
+        if (move > movementCount) return null;
+        Pair<Integer, Integer> coord = currentGame.getMovements().get(move-1).getCoordinates();
+        return new Pair<>(coord.first, coord.second);
     }
     public boolean selectMove(int moveIdx) {
         if (moveIdx > movementCount) return false;
@@ -215,12 +237,13 @@ public class GameCtrl {
 
     // returns if move was valid.
     public int playMove(int r, int c, int value) {
+        if (!kakuro.getBoard().isEmpty(r, c) || currentGame.getBoard().isBlackCell(r, c) || value == 0) return -1;
         if (currentMovement < movementCount) recreateGameUpToCurrentMove();
-        if (currentGame.getBoard().isBlackCell(r, c) || value == 0) return -1;
         int rowID = rowIDs[r][c];
         int colID = colIDs[r][c];
         int previousValue = currentGame.getBoard().getValue(r, c);
         if (previousValue == value) {
+            hintAtMove = -1;
             movementCount++;
             currentMovement = movementCount;
             currentGame.insertMovement(new Movement(currentMovement, value, 0, r, c));
@@ -269,11 +292,13 @@ public class GameCtrl {
         if (valid) {
             movementCount++;
             currentMovement = movementCount;
+            hintAtMove = -1;
             currentGame.insertMovement(new Movement(currentMovement, previousValue, value, r, c));
             rowValuesUsed[rowID] |= (1<<(value-1));
             currentRowSums[rowID] += value;
             colValuesUsed[colID] |= (1<<(value-1));
             currentColSums[colID] += value;
+            if (autoEraseHelpIsActive) autoEraseNotations(r, c);
             if (previousValue == 0) currentNumberWhiteCellsAssigned++;
             else {
                 rowValuesUsed[rowID] &= ~(1<<(previousValue-1));
@@ -348,6 +373,7 @@ public class GameCtrl {
         if (currentGame.getBoard().isBlackCell(r, c)) return false;
         // if it's a forced initial value don't clear it
         if (!kakuro.getBoard().isEmpty(r, c)) return false;
+        if (currentGame.getBoard().isEmpty(r, c)) return false; // already cleared
         int prevValue = currentGame.getBoard().getValue(r, c);
         movementCount++;
         currentMovement = movementCount;
@@ -379,6 +405,264 @@ public class GameCtrl {
             if (currentGame.getBoard().getValue(it, c) == value) return it;
         }
         return -1;
+    }
+
+    public void setUsedValuesHelpIsActive (boolean active) {
+        usedValuesHelpIsActive = active;
+    }
+
+    public void setCombinationsHelpIsActive (boolean active) {
+        combinationsHelpIsActive = active;
+    }
+
+    public void setAutoEraseHelpIsActive (boolean active) {
+        autoEraseHelpIsActive = active;
+    }
+
+    public void getHelpOptionsAtSelect(int r, int c) {
+        if (usedValuesHelpIsActive) sendUsedValuesHelp(r, c);
+        if (combinationsHelpIsActive) sendCombinationsHelp(r, c);
+    }
+
+    private void sendUsedValuesHelp(int r, int c) {
+        viewCtrl.markButtonPanelInRed(rowValuesUsed[rowIDs[r][c]] | colValuesUsed[colIDs[r][c]], currentGame.getBoard().getValue(r, c));
+    }
+
+    private void sendCombinationsHelp(int r, int c) {
+        int rowID = rowIDs[r][c];
+        int colID = colIDs[r][c];
+        int rowSum = currentGame.getBoard().getHorizontalSum(firstRowCoord[rowID].first, firstRowCoord[rowID].second-1);
+        ArrayList<Integer> rowCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSum, rowValuesUsed[rowID]);
+        int colSum = currentGame.getBoard().getVerticalSum(firstColCoord[colID].first-1, firstColCoord[colID].second);
+        ArrayList<Integer> colCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSum, colValuesUsed[colID]);
+        String rowResponse = "";
+        for (int rCase : rowCases) {
+            String partRowCase = "";
+            for (int i = 0; i < 9; i++) if ((rCase & (1<<i)) != 0) partRowCase+=""+(i+1);
+            if (rowResponse.length() > 0) rowResponse += ", ";
+            rowResponse += partRowCase;
+        }
+        String colResponse = "";
+        for (int cCase : colCases) {
+            String partColCase = "";
+            for (int i = 0; i < 9; i++) if ((cCase & (1<<i)) != 0) partColCase+=""+(i+1);
+            if (colResponse.length() > 0) colResponse += ", ";
+            colResponse += partColCase;
+        }
+        viewCtrl.setShowCombinations(rowResponse, colResponse);
+    }
+
+    private void autoEraseNotations(int r, int c) {
+        int value = currentGame.getBoard().getValue(r, c);
+        if (value == 0) return; // no values to be erased
+        int rowID = rowIDs[r][c];
+        int colID = colIDs[r][c];
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> message = new ArrayList<>();
+        // Check in row
+        for (int it = firstRowCoord[rowID].second; it < firstRowCoord[rowID].second+rowSize[rowID]; it++)
+            if (currentGame.getBoard().cellHasNotation(r, it, value)) {
+                currentGame.getBoard().setCellNotation(r, it, value, false);
+                message.add(new Pair<>(new Pair<>(r, it), currentGame.getBoard().getCellNotations(r, it)));
+            }
+        // Check in column
+        for (int it = firstColCoord[colID].first; it < firstColCoord[colID].first+colSize[colID]; it++)
+            if (currentGame.getBoard().cellHasNotation(it, c, value)) {
+                currentGame.getBoard().setCellNotation(it, c, value, false);
+                message.add(new Pair<>(new Pair<>(it, c), currentGame.getBoard().getCellNotations(it, c)));
+            }
+        viewCtrl.setNotations(message);
+    }
+
+    public Pair<Pair<Integer, Integer>, Integer> getHint() {
+        currentMovement = movementCount; // always give hint for most advanced move
+        if (hintAtMove != -1 && hintAtMove == currentMovement) {
+            // We already asked for a hint, just write the value
+            if (lastHint.second != -1) { // write the value if it wasn't a move problem
+                playMove(lastHint.first.first, lastHint.first.second, lastHint.second);
+            }
+            return lastHint;
+        }
+        hintAtMove = currentMovement;
+
+        // Check if it has solution from current board;
+        Solver solver = new Solver(currentGame.getBoard());
+        boolean hasSolution = solver.solve() != 0;
+
+        if (hasSolution) {
+            System.out.println("Hint: has solution");
+            // hint next move
+            lastHint = simulateHintFinder();
+        } else {
+            System.out.println("Hint: NO solution");
+            // hint number of movement where it went wrong, set lastHint.second to -1
+            int badMove = binarySearchBadMove(new Board(kakuro.getBoard()),1, currentMovement);
+            lastHint.first.first = -1;
+            lastHint.first.second = badMove;
+            lastHint.second = -1;
+        }
+        Pair<Pair<Integer, Integer>, Integer> response = new Pair<>(lastHint.first,-1);
+        return response;
+    }
+
+    private int binarySearchBadMove(Board testingBoard, int left, int right) {
+        if (right <= left) return left;
+        int mid = (left+right)/2;
+        ArrayList<Movement> moves = currentGame.getMovements();
+        for (int i = left; i <= mid; i++) {
+            Movement m = moves.get(i-1);
+            if (m.getNext() == 0) testingBoard.clearCellValue(m.getCoordinates().first, m.getCoordinates().second);
+            else testingBoard.setCellValue(m.getCoordinates().first, m.getCoordinates().second, m.getNext());
+        }
+        Solver s = new Solver(testingBoard);
+        int response = s.solve();
+        if (response == 0) { //No solution
+            Board newTestingBoard = new Board(kakuro.getBoard());
+            for (int i = 1; i < left; i++) {
+                Movement m = moves.get(i-1);
+                if (m.getNext() == 0) newTestingBoard.clearCellValue(m.getCoordinates().first, m.getCoordinates().second);
+                else newTestingBoard.setCellValue(m.getCoordinates().first, m.getCoordinates().second, m.getNext());
+            }
+            return binarySearchBadMove(newTestingBoard, left, mid);
+        } else {
+            return binarySearchBadMove(testingBoard, mid+1, right);
+        }
+    }
+
+    private Pair<Pair<Integer, Integer>, Integer> simulateHintFinder() {
+        Board testingBoard = new Board(kakuro.getBoard());
+        int rows = testingBoard.getHeight();
+        int columns = testingBoard.getWidth();
+        // all white cells to 0 and full possibilities
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> forcedValues = new ArrayList();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (testingBoard.isBlackCell(r, c)) continue;
+                if (!currentGame.getBoard().isEmpty(r, c)) forcedValues.add(new Pair<>(new Pair<>(r, c), currentGame.getBoard().getValue(r, c)));
+                testingBoard.setCell(new WhiteCell(true), r, c);
+            }
+        }
+        SwappingCellQueue testingCellQueue = new SwappingCellQueue(testingBoard);
+
+        int[] testingRowSum = new int[rowLineSize];
+        int[] testingColSum = new int[colLineSize];
+
+        int[] testingRowValuesUsed = new int[rowLineSize];
+        int[] testingColValuesUsed = new int[colLineSize];
+
+        // prepare new row dataStructures
+        for (int r = 0; r < rowLineSize; r++) {
+            testingRowSum[r] = 0;
+            testingRowValuesUsed[r] = 0;
+        }
+        // prepare new col dataStructures
+        for (int c = 0; c < colLineSize; c++) {
+            testingColSum[c] = 0;
+            testingColValuesUsed[c] = 0;
+        }
+
+        KakuroFunctions testingFunctions = new KakuroFunctions(new KakuroFunctions.KakuroFunctionsMaster() {
+            @Override
+            public int getRowID(int r, int c) { return rowIDs[r][c]; }
+
+            @Override
+            public int getColID(int r, int c) { return colIDs[r][c]; }
+
+            @Override
+            public int getRowLineSize(int r, int c) { return rowLineSize; }
+
+            @Override
+            public int getColLineSize(int r, int c) { return colLineSize; }
+
+            @Override
+            public int getRowSum(int r, int c) { return testingRowSum[rowIDs[r][c]]; }
+
+            @Override
+            public int getColSum(int r, int c) { return testingColSum[colIDs[r][c]]; }
+
+            @Override
+            public void setRowSum(int r, int c, int value) { testingRowSum[rowIDs[r][c]] = value; }
+
+            @Override
+            public void setColSum(int r, int c, int value) { testingColSum[colIDs[r][c]] = value; }
+
+            @Override
+            public int getRowSize(int r, int c) { return rowSize[rowIDs[r][c]]; }
+
+            @Override
+            public int getColSize(int r, int c) { return colSize[colIDs[r][c]]; }
+
+            @Override
+            public int getRowValuesUsed(int r, int c) { return testingRowValuesUsed[rowIDs[r][c]]; }
+
+            @Override
+            public int getColValuesUsed(int r, int c) { return testingColValuesUsed[colIDs[r][c]]; }
+
+            @Override
+            public void setRowValuesUsed(int r, int c, int values) { testingRowValuesUsed[rowIDs[r][c]] = values; }
+
+            @Override
+            public void setColValuesUsed(int r, int c, int values) { testingColValuesUsed[colIDs[r][c]] = values; }
+
+            @Override
+            public Pair<Integer, Integer> getFirstRowCoord(int r, int c) { return firstRowCoord[rowIDs[r][c]]; }
+
+            @Override
+            public Pair<Integer, Integer> getFirstColCoord(int r, int c) { return firstColCoord[colIDs[r][c]]; }
+
+            @Override
+            public Board getWorkingBoard() { return testingBoard; }
+
+            @Override
+            public SwappingCellQueue getNotationsQueue() { return testingCellQueue; }
+        });
+
+        final Pair<Integer, Integer> currentAssignation = new Pair<>(-1, -1);
+        final Pair<Pair<Integer, Integer>, Integer> finalHint = new Pair<>(new Pair<>(-1, -1), -1);
+
+        testingFunctions.setCellValueAssignationListener(new KakuroFunctions.CellValueAssignationListener() {
+            @Override
+            public boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig) {
+                if (assig.first.first != currentAssignation.first && assig.first.second != currentAssignation.second) {
+                    finalHint.first.first = assig.first.first;
+                    finalHint.first.second = assig.first.second;
+                    finalHint.second = assig.second;
+                    //System.out.println("Assigning value " + finalHint.second + " at pos: " + finalHint.first.first + ", " + finalHint.first.first + ". When assigning: " +
+                    //        currentAssignation.first + ", " + currentAssignation.second);
+                    return true;
+                }
+                //System.out.println("Assigning value " + assig.second + " at pos: " + assig.first.first + ", " + assig.first.first + ". When assigning: " +
+                //        currentAssignation.first + ", " + currentAssignation.second);
+                return false;
+            }
+        });
+
+        for (Pair<Pair<Integer, Integer>, Integer> f : forcedValues) {
+            currentAssignation.first = f.first.first;
+            currentAssignation.second = f.first.second;
+            testingFunctions.cellValueAssignation(f.first.first, f.first.second, f.second);
+            if (finalHint.second != -1) return finalHint;
+        }
+
+        for (int rowID = 0; rowID < rowLineSize; rowID++) {
+            int r = firstRowCoord[rowID].first;
+            int c = firstRowCoord[rowID].second-1;
+            currentAssignation.first = r;
+            currentAssignation.second = c+1;
+            testingFunctions.rowSumAssignation(r, c+1, testingBoard.getHorizontalSum(r, c));
+            if (finalHint.second != -1) return finalHint;
+        }
+
+        for (int colID = 0; colID < colLineSize; colID++) {
+            int r = firstColCoord[colID].first-1;
+            int c = firstColCoord[colID].second;
+            currentAssignation.first = r+1;
+            currentAssignation.second = c;
+            testingFunctions.colSumAssignation(r+1, c, testingBoard.getVerticalSum(r, c));
+            if (finalHint.second != -1) return finalHint;
+        }
+
+        // if it reaches this point it looks like there is no hint to be given
+        return new Pair<>(new Pair<>(-1, -1), -1);
     }
 
     private void validateKakuro() {
