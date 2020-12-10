@@ -80,6 +80,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         for (Pair<Pair<Integer, Integer>, Integer> cc : conflictiveCoord) {
             if (cc.second == WHITE_CELL) {
                 ((GameScreen)screen).unselectWhiteCell(cc.first.first, cc.first.second);
+                if (cc.first.first == selectedPos.first && cc.first.second == selectedPos.second)
+                    ((GameScreen)screen).selectWhiteCell(selectedPos.first, selectedPos.second);
             } else {
                 ((GameScreen)screen).unselectBlackCell(cc.first.first, cc.first.second, cc.second);
             }
@@ -219,10 +221,12 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         System.out.println("Response is: " + response.first.first + " . " + response.first.second + ": " + response.second);
         if (response.first.first == -1) {
             if (response.first.second == -1) return;
-            ((GameScreen)screen).updateMovesPanel(response.first.second);
+            selectMovement(response.first.second);
             Pair<Integer, Integer> coord = game.getCoordAtMove(response.first.second);
             setSelectedPos(coord.first, coord.second);
-            ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, new Color(255, 160, 160));
+            ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflict = new ArrayList<>();
+            conflict.add(new Pair<>(selectedPos, WHITE_CELL));
+            setConflictiveCoord(conflict);
         } else {
             setSelectedPos(response.first.first, response.first.second);
             ((GameScreen)screen).selectWhiteCellColor(selectedPos.first, selectedPos.second, new Color(255, 160, 100));
