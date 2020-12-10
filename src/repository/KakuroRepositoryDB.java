@@ -3,6 +3,8 @@ package src.repository;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
+import src.repository.serializers.KakuroDeserializer;
+import src.repository.serializers.KakuroSeializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.remove(i);
-                driver.writeToFile(kakuroList, "Kakuro");
+                driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
                 return;
             }
         }
@@ -44,18 +46,18 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.set(i, kakuro);
-                driver.writeToFile(kakuroList, "Kakuro");
+                driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
                 return;
             }
         }
 
         kakuroList.add(kakuro);
-        driver.writeToFile(kakuroList, "Kakuro");
+        driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
     }
 
     @Override
     public ArrayList<Kakuro> getAllKakuros() throws IOException {
-        return (ArrayList<Kakuro>)(ArrayList<?>) driver.readAll(Kakuro.class);
+        return (ArrayList<Kakuro>)(ArrayList<?>) driver.readAll(Kakuro.class, new KakuroDeserializer());
     }
 
     @Override

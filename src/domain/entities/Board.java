@@ -73,11 +73,13 @@ public class Board {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (b.cells[i][j] instanceof BlackCell) {
-                    cells[i][j] = new BlackCell((BlackCell) b.cells[i][j]);
+                    BlackCell c = b.cells[i][j] == null ? null : new BlackCell((BlackCell) b.cells[i][j]);
+                    cells[i][j] = c;
                 } else {
-                    cells[i][j] = new WhiteCell((WhiteCell) b.cells[i][j]);
+                    WhiteCell c = b.cells[i][j] == null ? null : new WhiteCell((WhiteCell) b.cells[i][j]);
+                    cells[i][j] = c;
                 }
-                cells[i][j].setCoordinates(i, j);
+                if (cells[i][j] != null) cells[i][j].setCoordinates(i, j);
             }
         }
     }
@@ -277,7 +279,8 @@ public class Board {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                col[j] = cells[i][j].toString();
+                String c = cells[i][j] == null ? "x" : cells[i][j].toString();
+                col[j] = c;
             }
 
             row[i] = String.join(",", col);

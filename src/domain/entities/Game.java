@@ -1,26 +1,45 @@
 package src.domain.entities;
 
+import org.mockito.internal.verification.Times;
+
 import java.sql.Timestamp;
 import java.util.UUID;
 
 public abstract class Game {
     private final UUID id;
     private final User player;
-    private final UUID kakuroId;
-    private final Kakuro kakuro; // TODO: remove this?
+    private final UUID kakuroId; // FIXME: remove
+    private final Kakuro kakuro;
     private final float timeSpent;
     private final Timestamp startTime;
 
     public Game(User player, Kakuro kakuro) {
         this.id = UUID.randomUUID();
         this.player = player;
-        this.kakuroId = kakuro.getId();
+        this.kakuroId = kakuro.getId(); // FIXME: remove
         this.kakuro = kakuro;
         this.startTime = new Timestamp(System.currentTimeMillis());
         this.timeSpent = 0;
     }
 
-    public UUID getId () { return this.id; }
+    // For deserializing purposes
+    public Game(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
+        this.id = id;
+        this.player = player;
+        this.kakuroId = kakuro.getId(); // FIXME: remove
+        this.kakuro = kakuro;
+        this.startTime = startTime;
+        this.timeSpent = timeSpent;
+    }
+
+
+    public Kakuro getKakuro() {
+        return this.kakuro;
+    }
+
+    public UUID getKakuroId() {
+        return this.kakuro == null ? null : this.kakuro.getId();
+    }
 
     public UUID getId () { return this.id; }
 
@@ -28,8 +47,20 @@ public abstract class Game {
         return this.timeSpent;
     }
 
+    public User getPlayer() {
+        return this.player;
+    }
+
+    public String getPlayerName() {
+        return this.player == null ? null : this.player.getName();
+    }
+
     public Timestamp getStartTime() {
         return  this.startTime;
+    }
+
+    public String toString () {
+        return "Id: " + id.toString() + "\nPlayer: " + player.toString() + "\nKakuro: " + kakuro.toString();
     }
 
 }

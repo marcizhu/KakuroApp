@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.StreamSupport;
 
@@ -27,10 +28,7 @@ public class DBTest {
 
         for (String s : tables) {
             File f = new File(path + s + ".json");
-            if (!f.createNewFile()) {
-                // This will empty the contents of the file
-                new PrintWriter(f).close();
-            }
+            //Files.write(Paths.get(path + s + ".json"), "");
         }
     }
 
@@ -58,7 +56,7 @@ public class DBTest {
         writer.write(rawJSON);
         writer.close();
 
-        ArrayList<Object> objects = testDB.readAll(TestObject.class);
+        ArrayList<Object> objects = testDB.readAll(TestObject.class, null);
 
         assertTrue(objects.equals(expectedObjects));
     }

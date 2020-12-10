@@ -1,6 +1,7 @@
 package src.repository;
 
 import src.domain.entities.User;
+import src.repository.serializers.UserSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;

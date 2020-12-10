@@ -3,6 +3,10 @@ package src.repository;
 import src.domain.entities.Game;
 import src.domain.entities.GameFinished;
 import src.domain.entities.GameInProgress;
+import src.domain.entities.Kakuro;
+import src.repository.serializers.GameDeserializer;
+import src.repository.serializers.GameSerializer;
+import src.repository.serializers.KakuroSeializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,53 +22,79 @@ import java.util.UUID;
 public class GameRepositoryDB implements GameRepository {
 
     private final DB driver;
+    private final GameSerializer serializer;
+    private final GameDeserializer deserializer;
+    private final ArrayList<Class> subclasses;
 
     public GameRepositoryDB (DB driver) {
         this.driver = driver;
+        this.serializer = new GameSerializer();
+        this.deserializer = new GameDeserializer();
+        this.subclasses = new ArrayList<>();
+        subclasses.add(GameInProgress.class);
+        subclasses.add(GameFinished.class);
     }
 
     @Override
     public Game getGame(UUID gameId) throws IOException {
-        // TODO:
+        for (Game g: getAllGames()) if (g.getId().equals(gameId)) return g;
         return null;
     }
 
     @Override
+    public void deleteGame(Game game) throws IOException {
+        deleteGame(game.getId());
+    }
+
+    @Override
     public void deleteGame(UUID gameId) throws IOException {
-        // TODO:
+        ArrayList<Game> gamesList = this.getAllGames();
+
+        for (int i = 0; i<gamesList.size(); i++) {
+            if (gamesList.get(i).getId().equals(gameId)) {
+                gamesList.remove(i);
+                driver.writeToFile(gamesList, "game", serializer, subclasses);
+                return;
+            }
+        }
     }
 
     @Override
     public void saveGame(Game game) throws IOException {
-        // FIXME:
         ArrayList<Game> gamesList = this.getAllGames();
 
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(game.getId())) {
                 gamesList.set(i, game);
-                driver.writeToFile(gamesList, "Game");
+                driver.writeToFile(gamesList, "game", serializer, subclasses);
                 return;
             }
         }
 
         gamesList.add(game);
-        driver.writeToFile(gamesList, "Game");
+        driver.writeToFile(gamesList, "game", serializer, subclasses);
     }
 
     @Override
     public ArrayList<Game> getAllGames() throws IOException {
-        return (ArrayList<Game>)(ArrayList<?>) driver.readAll(Game.class);
+        return (ArrayList<Game>)(ArrayList<?>) driver.readAll(Game.class, deserializer);
     }
 
     @Override
     public ArrayList<GameInProgress> getAllGamesInProgress() throws IOException {
-        return (ArrayList<GameInProgress>)(ArrayList<?>) driver.readAll(Game.class); // FIXME: do this work ?????
+        ArrayList<Game> games = getAllGames();
+        ArrayList<GameInProgress> gamesInProgress = new ArrayList<>();
+        for (Game g : games) if (g instanceof GameInProgress) gamesInProgress.add((GameInProgress) g);
+
+        return gamesInProgress;
     }
 
     @Override
     public ArrayList<GameFinished> getAllGamesFinished() throws IOException {
-        //ArrayList<GameFinished> finishedGames = new ArrayList<>();
-        //for (Object o: driver.readAll(Game.class)) if (o instanceof GameFinished) finishedGames.add((GameFinished) o);
-        return (ArrayList<GameFinished>)(ArrayList<?>) driver.readAll(Game.class); // FIXME: do this work ?????
+        ArrayList<Game> games = getAllGames();
+        ArrayList<GameFinished> finishedGames = new ArrayList<>();
+        for (Game g : games) if (g instanceof GameFinished) finishedGames.add((GameFinished) g);
+
+        return finishedGames;
     }
 }
