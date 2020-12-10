@@ -49,7 +49,8 @@ public class GameInProgress extends Game {
         this.board = new Board(super.getKakuro().getBoard());
         for (Movement move : movements) {
             Pair<Integer, Integer> coord = move.getCoordinates();
-            board.setCellValue(coord.first, coord.second, move.getNext());
+            if (move.getNext() == 0) board.clearCellValue(coord.first, coord.second);
+            else board.setCellValue(coord.first, coord.second, move.getNext());
         }
     }
 
