@@ -213,7 +213,7 @@ public class Generator {
         for (int k = 0; k < 3; k++) {
             for (int kk = 0; kk < 3; kk++) {
                 if (i-1+k < 0 || i-1+k >= height || j-1+kk < 0 || j-1+kk >= width) continue;
-                if ((i-1+k != i || j-1+kk != j) && (i-1+k != symI && j-1+kk != j) && b.isWhiteCell(i-1+k, j-1+kk)) toVisit.add(new Coordinates( i-1+k, j-1+kk));
+                if ((i-1+k != i || j-1+kk != j) && (i-1+k != symI || j-1+kk != symJ) && b.isWhiteCell(i-1+k, j-1+kk)) toVisit.add(new Coordinates( i-1+k, j-1+kk));
             }
         }
         if (toVisit.size() > 0) {
