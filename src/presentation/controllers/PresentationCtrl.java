@@ -1,6 +1,7 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
+import src.utils.Pair;
 
 import javax.swing.*;
 import java.awt.*;
@@ -205,9 +206,13 @@ public class PresentationCtrl {
 
     // Domain communication
     public boolean logIn(String name) {
-        String result = domainCtrl.login(name);
-        if (!result.equals("denied")) {
-            userSessionId = result;
+        Pair<Boolean, String> result = domainCtrl.loginUser(name);
+        if (result.second != null) {
+            // TODO: handle error
+            return false;
+        }
+        if (result.first) { // user exists
+            userSessionId = name;
             buildMenuBar();
             app.setJMenuBar(menu);
             // TODO: when dashboard is implemented switch to dashboard screen
@@ -215,6 +220,7 @@ public class PresentationCtrl {
             setScreen(myKakurosScreenCtrl);
             return true;
         }
+        // user does not exist, this should not happen with the current UI since users are listed
         return false;
     }
 

@@ -42,13 +42,13 @@ public class GameRepositoryDB implements GameRepository {
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(game.getId())) {
                 gamesList.set(i, game);
-                driver.writeToFile(gamesList, "game");
+                driver.writeToFile(gamesList, "Game");
                 return;
             }
         }
 
         gamesList.add(game);
-        driver.writeToFile(gamesList, "game");
+        driver.writeToFile(gamesList, "Game");
     }
 
     @Override
