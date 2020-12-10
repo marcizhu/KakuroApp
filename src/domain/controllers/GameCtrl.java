@@ -12,6 +12,8 @@ import src.utils.Pair;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class GameCtrl {
 
@@ -491,11 +493,10 @@ public class GameCtrl {
         boolean hasSolution = solver.solve() != 0;
 
         if (hasSolution) {
-            System.out.println("Hint: has solution");
             // hint next move
-            lastHint = simulateHintFinder();
+            lastHint = trivialFinder();
+            if (lastHint.second == -1) lastHint = simulateHintFinder();
         } else {
-            System.out.println("Hint: NO solution");
             // hint number of movement where it went wrong, set lastHint.second to -1
             int badMove = binarySearchBadMove(new Board(kakuro.getBoard()),1, currentMovement);
             lastHint.first.first = -1;
@@ -527,6 +528,28 @@ public class GameCtrl {
         } else {
             return binarySearchBadMove(testingBoard, mid+1, right);
         }
+    }
+
+    private Pair<Pair<Integer, Integer>, Integer> trivialFinder() {
+        for (int r = 0; r < rowLineSize; r++) {
+            if (Integer.bitCount(rowValuesUsed[r]) == rowSize[r]-1) { //find which is left to assign
+                for (int it = firstRowCoord[r].second; it < firstRowCoord[r].second + rowSize[r]; it++) {
+                    if (currentGame.getBoard().isEmpty(firstRowCoord[r].first, it)) {
+                        return new Pair<>(new Pair<>(firstRowCoord[r].first, it), currentGame.getBoard().getHorizontalSum(firstRowCoord[r].first, firstRowCoord[r].second-1) - currentRowSums[r]);
+                    }
+                }
+            }
+        }
+        for (int c = 0; c < colLineSize; c++) {
+            if (Integer.bitCount(colValuesUsed[c]) == colSize[c]-1) { //find which is left to assign
+                for (int it = firstColCoord[c].first; it < firstColCoord[c].first + colSize[c]; it++) {
+                    if (currentGame.getBoard().isEmpty(it, firstColCoord[c].second)) {
+                        return new Pair<>(new Pair<>(it, firstColCoord[c].second), currentGame.getBoard().getVerticalSum(firstColCoord[c].first-1, firstColCoord[c].second) - currentColSums[c]);
+                    }
+                }
+            }
+        }
+        return new Pair<>(new Pair<>(-1, -1),-1);
     }
 
     private Pair<Pair<Integer, Integer>, Integer> simulateHintFinder() {
@@ -623,17 +646,11 @@ public class GameCtrl {
         testingFunctions.setCellValueAssignationListener(new KakuroFunctions.CellValueAssignationListener() {
             @Override
             public boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig) {
-                if (assig.first.first != currentAssignation.first && assig.first.second != currentAssignation.second) {
-                    finalHint.first.first = assig.first.first;
-                    finalHint.first.second = assig.first.second;
-                    finalHint.second = assig.second;
-                    //System.out.println("Assigning value " + finalHint.second + " at pos: " + finalHint.first.first + ", " + finalHint.first.first + ". When assigning: " +
-                    //        currentAssignation.first + ", " + currentAssignation.second);
-                    return true;
-                }
-                //System.out.println("Assigning value " + assig.second + " at pos: " + assig.first.first + ", " + assig.first.first + ". When assigning: " +
-                //        currentAssignation.first + ", " + currentAssignation.second);
-                return false;
+                if (!currentGame.getBoard().isEmpty(assig.first.first, assig.first.second)) return false;
+                finalHint.first.first = assig.first.first;
+                finalHint.first.second = assig.first.second;
+                finalHint.second = assig.second;
+                return true;
             }
         });
 
@@ -653,7 +670,13 @@ public class GameCtrl {
             if (finalHint.second != -1) return finalHint;
         }
 
-        for (int colID = 0; colID < colLineSize; colID++) {
+        // Make it appear more randomly distributed just for user experience
+        Random random = new Random(currentMovement);
+        ArrayList<Integer> distributedColIDs = new ArrayList<>();
+        for (int colID = 0; colID < colLineSize; colID++) distributedColIDs.add(colID);
+        Collections.shuffle(distributedColIDs, random);
+        for (int idx = 0; idx < colLineSize; idx++) {
+            int colID = distributedColIDs.get(idx);
             int r = firstColCoord[colID].first-1;
             int c = firstColCoord[colID].second;
             currentAssignation.first = r+1;
