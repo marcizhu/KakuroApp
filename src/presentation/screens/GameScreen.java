@@ -5,12 +5,8 @@ import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -135,11 +131,8 @@ public class GameScreen extends AbstractScreen {
 
         // First help option checkbox
         redBtnPanChk = new JCheckBox();
-        redBtnPanChk.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                ((GameScreenCtrl)ctrl).setHelpRedButtonPanel(e.getStateChange() == ItemEvent.SELECTED);
-            }
+        redBtnPanChk.addItemListener(e -> {
+            ((GameScreenCtrl)ctrl).setHelpRedButtonPanel(e.getStateChange() == ItemEvent.SELECTED);
         });
         constraints.gridx = 3;
         constraints.gridy = 2;
@@ -149,33 +142,25 @@ public class GameScreen extends AbstractScreen {
 
         // Second help option checkbox
         showCombChk = new JCheckBox();
-        showCombChk.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                boolean selected = e.getStateChange() == ItemEvent.SELECTED;
-                if (selected) {
-                    rowOptionsLbl.setVisible(true);
-                    colOptionsLbl.setVisible(true);
-                } else {
-                    rowOptionsLbl.setVisible(false);
-                    colOptionsLbl.setVisible(false);
-                }
-                ((GameScreenCtrl)ctrl).setHelpShowCombinations(selected);
-                rowOptionsLbl.revalidate();
-                colOptionsLbl.revalidate();
+        showCombChk.addItemListener(e -> {
+            boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+            if (selected) {
+                rowOptionsLbl.setVisible(true);
+                colOptionsLbl.setVisible(true);
+            } else {
+                rowOptionsLbl.setVisible(false);
+                colOptionsLbl.setVisible(false);
             }
+            ((GameScreenCtrl)ctrl).setHelpShowCombinations(selected);
+            rowOptionsLbl.revalidate();
+            colOptionsLbl.revalidate();
         });
         constraints.gridy = 3;
         helpOptionsPanel.add(showCombChk, constraints);
 
         // First help option checkbox
         autoEraseChk = new JCheckBox();
-        autoEraseChk.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                ((GameScreenCtrl)ctrl).setHelpAutoEraseNotations(e.getStateChange() == ItemEvent.SELECTED);
-            }
-        });
+        autoEraseChk.addItemListener(e -> ((GameScreenCtrl)ctrl).setHelpAutoEraseNotations(e.getStateChange() == ItemEvent.SELECTED));
         constraints.gridy = 4;
         helpOptionsPanel.add(autoEraseChk, constraints);
 
@@ -192,34 +177,19 @@ public class GameScreen extends AbstractScreen {
 
         // Button export
         JButton exportBtn = new JButton("EXPORT MY PROGRESS");
-        exportBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).onExportClick();
-            }
-        });
+        exportBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onExportClick());
         constraints.gridy = 0;
         bigButtonsPanel.add(exportBtn, constraints);
 
         // Button hint
         JButton hintBtn = new JButton("I'M STUCK, GIVE ME A HINT");
-        hintBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).onHintClick();
-            }
-        });
+        hintBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onHintClick());
         constraints.gridy = 1;
         bigButtonsPanel.add(hintBtn, constraints);
 
         // Button hint
         JButton solveBtn = new JButton("I GIVE UP, SOLVE IT FOR ME");
-        solveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).onSolveClick();
-            }
-        });
+        solveBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onSolveClick());
         constraints.gridy = 2;
         bigButtonsPanel.add(solveBtn, constraints);
 
@@ -327,12 +297,7 @@ public class GameScreen extends AbstractScreen {
 
         // Btn undo
         JButton undoBtn = new JButton("Undo");
-        undoBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).undoMovement();
-            }
-        });
+        undoBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).undoMovement());
         constraints.gridx = 0;
         constraints.gridy = 5;
         constraints.gridwidth = 1;
@@ -340,36 +305,21 @@ public class GameScreen extends AbstractScreen {
 
         // Btn redo
         JButton redoBtn = new JButton("Re-do");
-        redoBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).redoMovement();
-            }
-        });
+        redoBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).redoMovement());
         constraints.gridx = 1;
         constraints.gridy = 5;
         movementsPanel.add(redoBtn, constraints);
 
         // Btn redo
         JButton markBtn = new JButton("Mark");
-        markBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).toggleMark();
-            }
-        });
+        markBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).toggleMark());
         constraints.gridx = 2;
         constraints.gridy = 5;
         movementsPanel.add(markBtn, constraints);
 
         // Btn reset
         JButton resetBtn = new JButton("Reset game");
-        resetBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).resetGame();
-            }
-        });
+        resetBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).resetGame());
         resetBtn.setForeground(Color.RED);
         constraints.gridx = 3;
         constraints.gridy = 5;
@@ -458,12 +408,7 @@ public class GameScreen extends AbstractScreen {
             valuePanel[i] = new JButton(""+(val));
             valuePanel[i].setFocusable(false);
             valuePanel[i].setForeground(Color.BLACK);
-            valuePanel[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ((GameScreenCtrl)ctrl).valueClicked(val);
-                }
-            });
+            valuePanel[i].addActionListener(e -> ((GameScreenCtrl)ctrl).valueClicked(val));
             constraints.gridx = i%5;
             constraints.gridy = i/5;
             buttonPanel.add(valuePanel[i], constraints);
@@ -471,25 +416,17 @@ public class GameScreen extends AbstractScreen {
         notationModeBtn = new JButton("N");
         notationModeBtn.setFocusable(false);
         notationModeBtn.setForeground(Color.BLACK);
-        notationModeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                notationModeBtn.setBorderPainted(!notationModeBtn.isBorderPainted());
-                notationModeBtn.setForeground(notationModeBtn.getForeground() == Color.BLACK ? Color.GRAY : Color.BLACK);
-                ((GameScreenCtrl)ctrl).toggleNotationsMode();
-            }
+        notationModeBtn.addActionListener(e -> {
+            notationModeBtn.setBorderPainted(!notationModeBtn.isBorderPainted());
+            notationModeBtn.setForeground(notationModeBtn.getForeground() == Color.BLACK ? Color.GRAY : Color.BLACK);
+            ((GameScreenCtrl)ctrl).toggleNotationsMode();
         });
         constraints.gridx = 4;
         buttonPanel.add(notationModeBtn, constraints);
         clearCellBtn = new JButton("X");
         clearCellBtn.setFocusable(false);
         clearCellBtn.setForeground(Color.BLACK);
-        clearCellBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((GameScreenCtrl)ctrl).clearWhiteCell();
-            }
-        });
+        clearCellBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).clearWhiteCell());
         constraints.gridy = 2;
         buttonPanel.add(clearCellBtn, constraints);
 

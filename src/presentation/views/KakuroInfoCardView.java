@@ -2,8 +2,6 @@ package src.presentation.views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class KakuroInfoCardView extends JPanel {
     public static final int STATE_NEUTRAL = 0;
@@ -44,7 +42,7 @@ public class KakuroInfoCardView extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         kakuroInfoAndButtons.add(nameLbl, constraints);
 
-        JLabel difficultyLbl = new JLabel("Difficulty: "+difficulty);
+        JLabel difficultyLbl = new JLabel("Difficulty: " + difficulty);
         difficultyLbl.setHorizontalTextPosition(SwingConstants.LEFT);
         difficultyLbl.setForeground(Color.BLACK);
         constraints.gridy = 1;
@@ -123,11 +121,8 @@ public class KakuroInfoCardView extends JPanel {
         }
 
         JButton exportBtn = new JButton("=");
-        exportBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (listener != null) listener.onExportClicked(name);
-            }
+        exportBtn.addActionListener(e -> {
+            if (listener != null) listener.onExportClicked(name);
         });
         exportBtn.setForeground(Color.BLACK);
         exportBtn.setFocusable(false);
@@ -137,18 +132,10 @@ public class KakuroInfoCardView extends JPanel {
         constraints.fill = GridBagConstraints.NONE;
         kakuroInfoAndButtons.add(exportBtn, constraints);
 
-        String playStr;
-        if (state == STATE_UNFINISHED) {
-            playStr = "RESUME";
-        } else {
-            playStr = "PLAY";
-        }
+        String playStr = state == STATE_UNFINISHED ? "RESUME" : "PLAY";
         JButton playBtn = new JButton(playStr);
-        playBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (listener != null) listener.onPlayClicked(name);
-            }
+        playBtn.addActionListener(e -> {
+            if (listener != null) listener.onPlayClicked(name);
         });
         playBtn.setForeground(Color.BLACK);
         playBtn.setFocusable(false);

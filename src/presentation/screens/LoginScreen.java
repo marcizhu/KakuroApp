@@ -98,12 +98,9 @@ public class LoginScreen extends AbstractScreen {
         contents.add(registerUsernameInput, constraints);
 
         JButton registerButton = new JButton("Register");
-        registerButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                String username = registerUsernameInput.getText();
-                ((LoginScreenCtrl)ctrl).register(username);
-            }
+        registerButton.addActionListener(e -> {
+            String username = registerUsernameInput.getText();
+            ((LoginScreenCtrl)ctrl).register(username);
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
@@ -117,6 +114,10 @@ public class LoginScreen extends AbstractScreen {
         private int width = 120;
         private int height = 120;
 
+        // Misc Settings
+        private static final int fontSize = 40;
+        private static final int arcLength = 10;
+
         public void onMouseEnter() {
             width += 20;
             height += 20;
@@ -128,8 +129,8 @@ public class LoginScreen extends AbstractScreen {
         }
 
         public UserIcon(String user) {
-            this.letter = user.charAt(0);
-            this.color = RGBUtils.Hash2Color(user);
+            letter = user.charAt(0);
+            color = RGBUtils.Hash2Color(user);
         }
 
         @Override
@@ -145,17 +146,16 @@ public class LoginScreen extends AbstractScreen {
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Font oldFont = g.getFont();
-
             g.setColor(color);
-            g.setFont(new Font(g.getFont().getName(), Font.BOLD, 40));
-            g.fillRoundRect(x, y, width, height, 10, 10);
-            g.setColor(RGBUtils.isTooBright(color) ? color.darker().darker() : color.brighter().brighter());
+            g.setFont(new Font(g.getFont().getName(), Font.BOLD, fontSize));
+            g.fillRoundRect(x, y, width, height, arcLength, arcLength);
+            g.setColor(RGBUtils.getContrastColor(color));
 
             FontMetrics metrics = g.getFontMetrics(g.getFont());
             // Determine the X & Y coordinates for the text
-            final int textX = x + (width - metrics.stringWidth("" + letter)) / 2;
+            final int textX = x + (width - metrics.stringWidth(Character.toString(letter))) / 2;
             final int textY = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
-            g.drawString("" + letter, textX, textY);
+            g.drawString(Character.toString(letter), textX, textY);
             g.setFont(oldFont);
         }
     }
