@@ -502,8 +502,7 @@ public class GameCtrl {
             lastHint.first.second = badMove;
             lastHint.second = -1;
         }
-        Pair<Pair<Integer, Integer>, Integer> response = new Pair<>(lastHint.first,-1);
-        return response;
+        return new Pair<>(lastHint.first,-1);
     }
 
     private int binarySearchBadMove(Board testingBoard, int left, int right) {
@@ -670,7 +669,7 @@ public class GameCtrl {
     public Pair<Boolean, String> exportKakuro(String file) {
         try {
             FileWriter myWriter = new FileWriter(file);
-            myWriter.write(kakuro.getBoard().toString() + "\n");
+            myWriter.write(currentGame.getBoard().toString() + "\n");
             myWriter.close();
             return new Pair<>(true, null);
         } catch(IOException e) {
@@ -679,8 +678,9 @@ public class GameCtrl {
     }
 
     private void validateKakuro() {
-        // TODO implement validation
-        viewCtrl.kakuroSolvedCorrectly();
-    }
+        Solver solver = new Solver(currentGame.getBoard());
 
+        if(solver.solve() == 1)
+            viewCtrl.kakuroSolvedCorrectly();
+    }
 }

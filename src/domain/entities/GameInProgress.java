@@ -5,10 +5,10 @@ import src.utils.Pair;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class GameInProgress extends Game{
+public class GameInProgress extends Game {
     private UUID boardId;
     private Board board; // TODO: remove this?
-    private ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
+    private final ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
 
     public GameInProgress(User player, Kakuro kakuro) {
         super(player, kakuro);
