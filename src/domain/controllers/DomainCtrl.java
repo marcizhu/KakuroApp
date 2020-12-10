@@ -74,33 +74,6 @@ public class DomainCtrl {
     }
 
     // TODO: testing purposes, delete when it is properly implemented
-    public ArrayList<ArrayList<String>> getMyKakurosList(String sessionID) {
-        ArrayList<ArrayList<String>> result = new ArrayList<>();
-
-        String board = "";
-        try {
-            board = Reader.fromFile("data/kakuros/solved/jutge.kak").toString();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        for (int i = 0; i < 14; i++) {
-            ArrayList<String> partial = new ArrayList<>();
-            partial.add(board);
-            partial.add("Breakfast kakuro");
-            partial.add("Hard");
-            partial.add("12");
-            partial.add("Cesc");
-            partial.add("2020.3.1");
-            partial.add("1:23");
-            partial.add("unfinished");
-            result.add(partial);
-        }
-
-        return result;
-    }
-
-    // TODO: testing purposes, delete when it is properly implemented
     public GameCtrl newGameInstance(String sessionID, String kakuroID) {
         User user = new User(sessionID);
         Kakuro kakuro;

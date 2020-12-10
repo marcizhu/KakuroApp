@@ -663,7 +663,7 @@ public class GameCtrl {
 
         for (int rowID = 0; rowID < rowLineSize; rowID++) {
             int r = firstRowCoord[rowID].first;
-            int c = firstRowCoord[rowID].second-1;
+            int c = firstRowCord[rowID].second-1;
             currentAssignation.first = r;
             currentAssignation.second = c+1;
             testingFunctions.rowSumAssignation(r, c+1, testingBoard.getHorizontalSum(r, c));
