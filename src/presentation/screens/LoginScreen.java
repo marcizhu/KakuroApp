@@ -14,6 +14,9 @@ import java.util.ArrayList;
 public class LoginScreen extends AbstractScreen {
     private JTextField registerUsernameInput;
 
+    private static final EmptyBorder thinBorder = new EmptyBorder(0, 10, 0, 10);
+    private static final EmptyBorder thickBorder = new EmptyBorder(10, 20, 10, 20);
+
     public LoginScreen(AbstractScreenCtrl ctrl) {
         super(ctrl);
     }
@@ -45,13 +48,30 @@ public class LoginScreen extends AbstractScreen {
             profile.setHorizontalAlignment(JLabel.CENTER);
             profile.setVerticalTextPosition(JLabel.BOTTOM);
             profile.setVerticalAlignment(JLabel.BOTTOM);
-            profile.setBorder(new EmptyBorder(5, 20, 5, 20));
+            profile.setBorder(thickBorder);
             profile.setIcon(new UserIcon(user));
 
             profile.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
                     ((LoginScreenCtrl)ctrl).loginUser(user);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    super.mouseEntered(e);
+                    ((UserIcon)profile.getIcon()).onMouseEnter();
+                    profile.setBorder(thinBorder);
+                    profile.revalidate();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    super.mouseExited(e);
+                    ((UserIcon)profile.getIcon()).onMouseLeave();
+                    profile.setBorder(thickBorder);
+                    profile.revalidate();
                 }
             });
             userListLayout.add(profile);
@@ -94,10 +114,18 @@ public class LoginScreen extends AbstractScreen {
     private static class UserIcon implements Icon {
         private final Color color;
         private final char letter;
+        private int width = 120;
+        private int height = 120;
 
-        // UI Settings
-        private static final int width = 120;
-        private static final int height = 120;
+        public void onMouseEnter() {
+            width += 20;
+            height += 20;
+        }
+
+        public void onMouseLeave() {
+            width -= 20;
+            height -= 20;
+        }
 
         public UserIcon(String user) {
             this.letter = user.charAt(0);

@@ -9,8 +9,6 @@ import src.utils.Pair;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class GameScreenCtrl extends AbstractScreenCtrl {

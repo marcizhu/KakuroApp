@@ -57,6 +57,7 @@ public class MyKakurosScreen extends AbstractScreen {
                 public void onExportClicked(String id) {
                     ((MyKakurosScreenCtrl) ctrl).onExportKakuroClicked(id);
                 }
+
                 @Override
                 public void onPlayClicked(String id) {
                     ((MyKakurosScreenCtrl) ctrl).onPlayKakuroClicked(id);

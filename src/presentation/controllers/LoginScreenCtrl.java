@@ -22,6 +22,10 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
 
     public ArrayList<String> getUserList() {
         Pair<ArrayList<String>, String> ret = domainCtrl.getUserList();
+        if(ret.first == null) {
+            Dialogs.showErrorDialog("Unable to load users: " + ret.second,"Error");
+        }
+
         return ret.first;
     }
 
