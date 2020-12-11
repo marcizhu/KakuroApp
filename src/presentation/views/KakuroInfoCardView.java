@@ -3,6 +3,9 @@ package src.presentation.views;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.GregorianCalendar;
 
 public class KakuroInfoCardView extends JPanel {
     public static final int STATE_NEUTRAL = 0;
@@ -59,7 +62,19 @@ public class KakuroInfoCardView extends JPanel {
         constraints.gridy = 2;
         kakuroInfoAndButtons.add(sizeLbl, constraints);
 
-        JLabel recordLbl = new JLabel("BEST TIME: "+recordTime);
+        int hours = recordTime/3600;
+        int minutes = recordTime/60 - hours*60;
+        int seconds = recordTime - minutes*60 - hours*3600;
+        String recordTimeStr = "";
+        if (hours > 0) {
+            recordTimeStr += hours+":";
+            if (minutes < 10) recordTimeStr += "0";
+        }
+        recordTimeStr += minutes+":";
+        if (seconds < 10) recordTimeStr += "0";
+        recordTimeStr += seconds;
+
+        JLabel recordLbl = new JLabel("BEST TIME: "+recordTimeStr);
         recordLbl.setHorizontalTextPosition(SwingConstants.LEFT);
         recordLbl.setForeground(Color.BLACK);
         constraints.gridy = 3;
@@ -82,7 +97,8 @@ public class KakuroInfoCardView extends JPanel {
         constraints.gridy = 1;
         kakuroInfoAndButtons.add(ownerLbl, constraints);
 
-        JLabel creationLbl = new JLabel("Creation date: " + date);
+        LocalDate localDate = date.toLocalDateTime().toLocalDate();
+        JLabel creationLbl = new JLabel("Creation date: " + localDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
         creationLbl.setHorizontalTextPosition(SwingConstants.RIGHT);
         creationLbl.setForeground(Color.BLACK);
         constraints.gridy = 2;
@@ -118,6 +134,7 @@ public class KakuroInfoCardView extends JPanel {
             constraints.gridy = 3;
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
+            constraints.insets = new Insets(3,2,2,2);
             kakuroInfoAndButtons.add(flagLbl, constraints);
         }
 
@@ -131,6 +148,7 @@ public class KakuroInfoCardView extends JPanel {
         constraints.gridy = 3;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(3,2,2,2);
         kakuroInfoAndButtons.add(exportBtn, constraints);
 
         String playStr = state == STATE_UNFINISHED ? "RESUME" : "PLAY";
@@ -169,6 +187,10 @@ public class KakuroInfoCardView extends JPanel {
         if (maxWidth > kakuroInfoAndButtons.getWidth()) kakuroInfoAndButtons.setSize(maxWidth, kakuroInfoAndButtons.getHeight());
         super.setSize(maxWidth, kakuroInfoAndButtons.getHeight() + kakuroView.getHeight());
         revalidate();
+    }
+
+    public Dimension getRealMinimumSize() {
+        return new Dimension(kakuroInfoAndButtons.getMinimumSize().width, kakuroInfoAndButtons.getMinimumSize().height + kakuroInfoAndButtons.getMinimumSize().width);
     }
 
     @Override

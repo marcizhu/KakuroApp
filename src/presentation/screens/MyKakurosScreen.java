@@ -32,8 +32,8 @@ public class MyKakurosScreen extends AbstractScreen {
         contents.add(title);
 
         ArrayList<Map<String, Object>> info = ((MyKakurosScreenCtrl) ctrl).getInfoToDisplay();
-        if (info == null) return;
-        kakuroListLayout = new JPanel(new GridLayout(info.size()/3+1, 3));
+        if (info.size() == 0) return;
+        kakuroListLayout = new JPanel(new GridLayout(info.size()/3 + ((info.size()%3 != 0) ? 1 : 0), 3));
 
         for (Map<String, Object> kakuroData : info) {
             System.out.println("Creating kakuroCardView");
@@ -82,18 +82,19 @@ public class MyKakurosScreen extends AbstractScreen {
         int remainingHeight = height - title.getHeight();
         kakuroListPane.setSize(width, remainingHeight);
         kakuroListLayout.setSize(width-50, remainingHeight);
-        /*int rowSize = 3;
-        if (kakuroListPane.getComponents().length > 0) {
-            if (width < 2*kakuroListPane.getComponents()[0].getWidth()) rowSize = 1;
-            else if (width < 3*kakuroListPane.getComponents()[0].getWidth()) rowSize = 2;
-            kakuroListLayout.setLayout(new GridLayout(kakuroListLayout.getComponents().length/rowSize +1, rowSize));
-        }*/
+        int rowSize = 3;
+        int numComp = kakuroListLayout.getComponents().length;
+        if (numComp > 0) {
+            if (width < 2*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 1;
+            else if (width < 3*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 2;
+            kakuroListLayout.setLayout(new GridLayout(numComp/rowSize  + ((numComp%3 != 0) ? 1 : 0), rowSize));
+        }
         for (Component c : kakuroListLayout.getComponents()) {
             c.setSize(contents.getWidth()/4, height*2/3);
             c.revalidate();
         }
         kakuroListLayout.revalidate();
-        kakuroListPane.revalidate();
+        kakuroListPane.setViewportView(kakuroListLayout);
     }
 
     @Override
