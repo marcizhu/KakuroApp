@@ -1,16 +1,12 @@
 import src.domain.algorithms.Generator;
 import src.domain.entities.Difficulty;
 
-import java.util.Scanner;
-
 public class kakurogenerator {
     public static void main(String[] args) {
-        Scanner inputScanner = new Scanner(System.in);
-
-        int numRows = inputScanner.nextInt();
-        int numCols = inputScanner.nextInt();
-        int diff = inputScanner.nextInt();
-        int seed = inputScanner.nextInt();
+        int numRows = Integer.parseInt(args[0]);
+        int numCols = Integer.parseInt(args[1]);
+        int diff = Integer.parseInt(args[2]);
+        int seed = Integer.parseInt(args[3]);
 
         Difficulty difficulty;
 

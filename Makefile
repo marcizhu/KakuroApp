@@ -33,9 +33,9 @@ kakurosolver: clean
 
 # Make kakurogenerator.tar.gz
 kakurogenerator: clean
-    cp test/kakurogenerator.java kakurogenerator.java
-    tar zcf kakurogenerator.tar.gz src/* kakurogenerator.java
-    rm kakurogenerator.java
+	cp test/kakurogenerator.java kakurogenerator.java
+	tar zcf kakurogenerator.tar.gz src/* kakurogenerator.java
+	rm kakurogenerator.java
 
 # Run targets
 run-solver: app/SolverApp.class
@@ -49,4 +49,4 @@ run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/Generator
 
 clean:
 	find src app test -name "*.class" -type f -delete
-	rm -f kakurosolver.tar.gz
+	rm -f kakurosolver.tar.gz kakurogenerator.tar.gz
