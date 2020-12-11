@@ -58,6 +58,7 @@ public class DomainCtrl {
         try {
             result = kakuroCtrl.getKakuroListByUser(username);
         } catch (Exception e) {
+            e.printStackTrace();
             return new Pair<>(null, e.getMessage());
         }
         return new Pair<>(result, null);

@@ -15,7 +15,7 @@ public class KakuroSeializer implements JsonSerializer<Kakuro> {
         obj.addProperty("createdAt", kakuro.getCreatedAt().toString());
         obj.addProperty("difficulty", kakuro.getDifficulty().toString());
         obj.addProperty("boardId", kakuro.getBoard().getId().toString());
-        obj.addProperty("userName", kakuro.getUser().getName());
+        obj.addProperty("createdBy", kakuro.getUser().getName());
 
         return obj;
     }

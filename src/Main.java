@@ -1,45 +1,12 @@
 package src;
 
-import src.domain.entities.*;
+import src.domain.entities.Board;
 import src.presentation.controllers.PresentationCtrl;
-import src.repository.*;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-
-
-		GameRepository gr = new GameRepositoryDB(new DB());
-		UserRepository ur = new UserRepositoryDB(new DB());
-		KakuroRepository kr = new KakuroRepositoryDB(new DB());
-
-		User player = ur.getUser("Larry");
-
-		Board board = new Board(5, 5);
-
-		Kakuro kakuro = kr.getKakuro(UUID.fromString("b9f9a524-7bf1-448a-9b69-36689ac499e6"));
-
-		GameInProgress gp = new GameInProgress(player, kakuro);
-		//gr.saveGame(gp);
-		GameFinished gf = new GameFinished(player, kakuro);
-		//gr.saveGame(gf);
-
-
-		for (Game g: gr.getAllGames())System.out.println(g.getId());
-		for (Game g: gr.getAllGamesFinished())System.out.println(g.getId());
-		for (Game g: gr.getAllGamesInProgress())System.out.println(g.getId());
-
-		Game g = gr.getGame(UUID.fromString("7e69b768-7867-432a-aa9a-670152884b2e"));
-		System.out.println(g.toString());
-
-
-
-		//GameFinished gf = new GameFinished(player, kakuro, board);
-		//repo.saveGame(gf);
-
-		/*
 		// Actually the main function should do this
 		javax.swing.SwingUtilities.invokeLater(
 				new Runnable() {
@@ -110,10 +77,6 @@ public class Main {
 		System.out.println("Generated " + N + " EXTREME difficulty kakuros in: " + (System.currentTimeMillis()-time) + " ms");
 		*/
 
-		//Game g = new GameFinished(xavi, k, b);
-		//Game j = new GameInProgress();
-
-		//repo.saveGame(g);
 
 		// Program to read a kakuro from a file and send it to solve, then save it to file.
 		/*
@@ -138,7 +101,6 @@ public class Main {
 			}
 		}*/
 	}
-
 
 	// For debugging purposes only
 	public static void printBoard(Board b) {

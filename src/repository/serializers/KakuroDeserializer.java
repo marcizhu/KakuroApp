@@ -22,15 +22,15 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
         UserRepository repo = new UserRepositoryDB(new DB());
 
         Timestamp createdAt = Timestamp.valueOf(obj.get("createdAt").getAsString());
-        String userName = obj.get("userName").getAsString();
+        String createdBy = obj.get("createdBy").getAsString();
         Difficulty d = Difficulty.valueOf(obj.get("difficulty").getAsString());
         UUID kakuroId = UUID.fromString(obj.get("id").getAsString());
         Board b = new Board(10, 10); // FIXME: get board with boardId with boardRepository
         User u;
         try {
-            u = repo.getUser(userName);
+            u = repo.getUser(createdBy);
         } catch (IOException e) {
-            System.err.println("Error getting user " + userName + " from database");
+            System.err.println("Error getting user " + createdBy + " from database");
             u = null;
         }
 

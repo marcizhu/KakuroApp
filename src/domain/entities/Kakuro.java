@@ -43,7 +43,7 @@ public class Kakuro {
     }
 
     // TODO: remove (here for compatibility)
-    public Kakuro(Difficulty difficulty, UUID boardId, String userName, Board board) {
+    public Kakuro(Difficulty difficulty, UUID boardId, String createdBy, Board board) {
         this.createdBy = null;
         this.board = new Board(); // TODO: fix this
         this.id = UUID.randomUUID();
