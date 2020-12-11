@@ -51,7 +51,7 @@ public class KakuroCtrl {
             kakuroData.put("name", "Breakfast Kakuro"); // TODO: unhardcode this
             kakuroData.put("difficulty", kakuro.getDifficulty().toString());
             kakuroData.put("timesPlayed", 12); // TODO: compute this
-            kakuroData.put("createdBy", kakuro.getCreatedBy());
+            kakuroData.put("createdBy", kakuro.getCreatedBy().getName());
             kakuroData.put("createdAt", kakuro.getCreatedAt());
             kakuroData.put("bestTime", 14400); // TODO: compute this (given in seconds?)
             kakuroData.put("state", "unfinished"); // TODO: compute this
