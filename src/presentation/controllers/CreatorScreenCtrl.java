@@ -19,7 +19,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     private CreatorCtrl creator;
 
-    private Pair<Integer, Integer> selectedPos;
+    private Pair<Pair<Integer, Integer>, Integer> selectedPos;
 
     public CreatorScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
@@ -28,15 +28,15 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     public void setUpCreator(CreatorCtrl creatorInstance) {
         this.creator = creatorInstance;
         creator.setUp(this);
-        selectedPos = new Pair<>(-1, -1);
+        selectedPos = new Pair<>(new Pair<>(-1, -1), -2);
     }
 
     public String getBoardToDisplay() {
         return creator.getBoardToString();
     }
 
-    public void setSelectedPos(int r, int c) {
-        selectedPos.first = r; selectedPos.second = c;
+    public void setSelectedPos(int r, int c, int s) {
+        selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
     }
 
     // Black cell manegent

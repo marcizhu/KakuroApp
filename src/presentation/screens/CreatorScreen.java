@@ -446,11 +446,13 @@ public class CreatorScreen extends AbstractScreen {
     private void setUpListener() {
         creatorBoard.setBoardMouseEventListener(new KakuroView.BoardMouseEventListener() {
             @Override
-            public void onBlackCellViewClicked(int row, int col, int section) { }
+            public void onBlackCellViewClicked(int row, int col, int section) {
+                ((CreatorScreenCtrl)ctrl).setSelectedPos(row, col, section);
+            }
 
             @Override
             public void onWhiteCellViewClicked(int row, int col) {
-                ((CreatorScreenCtrl)ctrl).setSelectedPos(row, col);
+                ((CreatorScreenCtrl)ctrl).setSelectedPos(row, col, CreatorScreenCtrl.WHITE_CELL);
             }
 
             @Override

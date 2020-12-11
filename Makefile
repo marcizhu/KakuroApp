@@ -31,6 +31,12 @@ kakurosolver: clean
 	tar zcf kakurosolver.tar.gz src/* kakurosolver.java
 	rm kakurosolver.java
 
+# Make kakurogenerator.tar.gz
+kakurogenerator: clean
+    cp test/kakurogenerator.java kakurogenerator.java
+    tar zcf kakurogenerator.tar.gz src/* kakurogenerator.java
+    rm kakurogenerator.java
+
 # Run targets
 run-solver: app/SolverApp.class
 	java app/SolverApp

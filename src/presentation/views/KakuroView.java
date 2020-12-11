@@ -29,7 +29,7 @@ public class KakuroView extends JPanel {
     public KakuroView(String board, boolean showValues) {
         blackCellColor = Color.BLACK;
 
-        Matcher m = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$").matcher("");
+        Matcher m = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$|^#(\\d+)$").matcher("");
         String[] rows = board.split("\\n");
         String[] line1 = rows[0].split(",");
 
@@ -75,6 +75,13 @@ public class KakuroView extends JPanel {
                     else if(m.group(3) != null && m.group(4) != null) {
                         col = Integer.parseInt(m.group(3));
                         row = Integer.parseInt(m.group(4));
+                    }
+                    else if(m.group(5) != null) {
+                        int sections = Integer.parseInt(m.group(5));
+                        if ((sections & (1<<BLACK_SECTION_TOP)) != 0) currColSums[j] = -1;
+                        if ((sections & (1<<BLACK_SECTION_BOTTOM)) != 0) col = -1;
+                        if ((sections & (1<<BLACK_SECTION_LEFT)) != 0) currRowSum = -1;
+                        if ((sections & (1<<BLACK_SECTION_RIGHT)) != 0) row = -1;
                     }
 
                     cells[i][j] = new BlackCellView(i, j, currColSums[j], col, currRowSum, row, showValues);
@@ -215,20 +222,25 @@ public class KakuroView extends JPanel {
             rightLbl.setOpaque(false);
 
             if (showValues) {
-                if (topToPaint) topLbl.setText(""+top);
-                if (bottomToPaint) bottomLbl.setText(""+bottom);
-                if (leftToPaint) leftLbl.setText(""+left);
-                if (rightToPaint) rightLbl.setText(""+right);
+                boolean showTopLbl = topToPaint && top != -1;
+                boolean showBottomLbl = bottomToPaint && bottom != -1;
+                boolean showLeftLbl = leftToPaint && left != -1;
+                boolean showRightLbl = rightToPaint && right != -1;
+
+                if (showTopLbl) topLbl.setText(""+top);
+                if (showBottomLbl) bottomLbl.setText(""+bottom);
+                if (showLeftLbl) leftLbl.setText(""+left);
+                if (showRightLbl) rightLbl.setText(""+right);
 
                 setLayout(new GridLayout(3,3));
                 add(new TransparentPanel());
-                add(topToPaint ? topLbl : new TransparentPanel());
+                add(showTopLbl ? topLbl : new TransparentPanel());
                 add(new TransparentPanel());
-                add(leftToPaint ? leftLbl : new TransparentPanel());
+                add(showLeftLbl ? leftLbl : new TransparentPanel());
                 add(new TransparentPanel());
-                add(rightToPaint ? rightLbl : new TransparentPanel());
+                add(showRightLbl ? rightLbl : new TransparentPanel());
                 add(new TransparentPanel());
-                add(bottomToPaint ? bottomLbl : new TransparentPanel());
+                add(showBottomLbl ? bottomLbl : new TransparentPanel());
                 add(new TransparentPanel());
             }
 
