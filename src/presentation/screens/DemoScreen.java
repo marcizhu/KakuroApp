@@ -7,6 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DemoScreen extends AbstractScreen {
 
@@ -33,7 +37,9 @@ public class DemoScreen extends AbstractScreen {
         contents.add(leftContent, constraints);
         try {
             String boardStr = new String(Files.readAllBytes(Paths.get("data/kakuros/solved/jutge.kak")));
-            kak = new KakuroInfoCardView(boardStr,"Breakfast kakuro","HARD","12","Cesc","2020.3.1","1:23",KakuroInfoCardView.STATE_SURRENDERED);
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = dateFormat.parse("23/09/20020");
+            kak = new KakuroInfoCardView(boardStr,"Breakfast kakuro","HARD",12,"Cesc",new Timestamp(date.getTime()),1234,KakuroInfoCardView.STATE_SURRENDERED);
             kak.setSize(width, height);
             constraints.fill = GridBagConstraints.VERTICAL;
             constraints.gridx = 1;

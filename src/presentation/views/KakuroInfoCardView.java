@@ -2,6 +2,7 @@ package src.presentation.views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Timestamp;
 
 public class KakuroInfoCardView extends JPanel {
     public static final int STATE_NEUTRAL = 0;
@@ -18,7 +19,7 @@ public class KakuroInfoCardView extends JPanel {
         void onPlayClicked(String id);
     }
 
-    public KakuroInfoCardView(String board, final String name, String difficulty, String timesPlayed, String ownerName, String date, String recordTime, int state) {
+    public KakuroInfoCardView(String board, final String name, String difficulty, Integer timesPlayed, String ownerName, Timestamp date, Integer recordTime, int state) {
         //setLayout(new GridBagLayout());
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
