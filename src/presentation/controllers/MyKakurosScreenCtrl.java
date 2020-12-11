@@ -2,12 +2,14 @@ package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
 import src.presentation.screens.MyKakurosScreen;
+import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
 
-    private ArrayList<ArrayList<String>> infoToDisplay;
+    private ArrayList<Map<String, Object>> infoToDisplay;
 
     public MyKakurosScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
@@ -17,32 +19,28 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
     @Override
     public void build(int width, int height) { // Called at setScreen right after a call to onDestroy of the previous screen.
         screen = new MyKakurosScreen(this);
-        infoToDisplay = domainCtrl.getMyKakurosList(presentationCtrl.getUserSessionId());
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByUser(presentationCtrl.getUserSessionId());
+        if (result.second != null) {
+            // TODO: handle error
+            return;
+        }
+        infoToDisplay = result.first;
         super.build(width, height);
     }
 
     @Override
     public void onFocusRegained(int width, int height) {
-        ArrayList<ArrayList<String>> newInfo = domainCtrl.getMyKakurosList(presentationCtrl.getUserSessionId());
-        if (!infoToDisplayChanged(newInfo)) return;
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByUser(presentationCtrl.getUserSessionId());
+        if (result.second != null) {
+            // TODO: handle error
+            return;
+        }
+
+        infoToDisplay = result.first;
         screen.build(width, height);
     }
 
-    private boolean infoToDisplayChanged(ArrayList<ArrayList<String>> newInfo) {
-        if (infoToDisplay == null || newInfo.size() != infoToDisplay.size()) return true;
-        int size = newInfo.size();
-        for (int i = 0; i < size; i++) {
-            if (newInfo.get(i).size() != infoToDisplay.get(i).size()) return true;
-            int numOfArgs = newInfo.get(i).size();
-            for (int j = 0; j < numOfArgs; j++) {
-                if (!newInfo.get(i).get(j).equals(infoToDisplay.get(i).get(j))) return true;
-            }
-        }
-
-        return false;
-    }
-
-    public ArrayList<ArrayList<String>> getInfoToDisplay() {
+    public ArrayList<Map<String, Object>> getInfoToDisplay() {
         return infoToDisplay;
     }
 

@@ -2,10 +2,13 @@ package src.presentation.screens;
 
 import src.presentation.controllers.MyKakurosScreenCtrl;
 import src.presentation.views.KakuroInfoCardView;
+import src.utils.Pair;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MyKakurosScreen extends AbstractScreen {
 
@@ -28,13 +31,13 @@ public class MyKakurosScreen extends AbstractScreen {
         title.setVisible(true);
         contents.add(title);
 
-        ArrayList<ArrayList<String>> info = ((MyKakurosScreenCtrl) ctrl).getInfoToDisplay();
+        ArrayList<Map<String, Object>> info = ((MyKakurosScreenCtrl) ctrl).getInfoToDisplay();
+        if (info == null) return;
+        kakuroListLayout = new JPanel(new GridLayout(info.size()/3+1, 3));
 
-        kakuroListLayout = new JPanel(new GridLayout(info.size() / 3 + 1, 3));
-
-        for (ArrayList<String> option : info) {
-            if (option.size() != 8) continue;
-            String state = option.get(7);
+        for (Map<String, Object> kakuroData : info) {
+            System.out.println("Creating kakuroCardView");
+            String state = (String) kakuroData.get("state");
             int stateCode = 0;
 
             switch (state) {
@@ -44,13 +47,13 @@ public class MyKakurosScreen extends AbstractScreen {
             }
 
             KakuroInfoCardView kak = new KakuroInfoCardView(
-                    option.get(0),
-                    option.get(1),
-                    option.get(2),
-                    option.get(3),
-                    option.get(4),
-                    option.get(5),
-                    option.get(6),
+                    (String) kakuroData.get("board"),
+                    (String) kakuroData.get("name"),
+                    (String) kakuroData.get("difficulty"),
+                    (Integer) kakuroData.get("timesPlayed"),
+                    (String) kakuroData.get("createdBy"),
+                    (Timestamp) kakuroData.get("createdAt"),
+                    (Integer) kakuroData.get("bestTime"),
                     stateCode);
             kak.setListener(new KakuroInfoCardView.InfoCardButtonsClickListener() {
                 @Override

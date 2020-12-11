@@ -62,7 +62,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
     public ArrayList<Kakuro> getAllKakurosByUser(User user) throws IOException {
         ArrayList<Kakuro> kakuros = getAllKakuros();
         ArrayList<Kakuro> res = new ArrayList<>();
-        for (Kakuro k : kakuros) if (k.getUserName().equals(user.getName())) res.add(k);
+        for (Kakuro k : kakuros) if (k.getCreatedBy().equals(user.getName())) res.add(k);
 
         return res;
     }
