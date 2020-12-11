@@ -566,7 +566,7 @@ public class Generator {
         //printNotations();
 
         if (realAmbiguities.size() > 0) { // this should never happen
-            System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
+            //System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
             ArrayList<Coordinates> toSolve = new ArrayList<>();
             for (Coordinates c : realAmbiguities)
                 if (workingBoard.isEmpty(c.r, c.c)) toSolve.add(c);
@@ -574,7 +574,7 @@ public class Generator {
             computeRowSums();
             computeColSums();
         } else {
-            System.out.println("Unique solution found!");
+            //System.out.println("Unique solution found!");
             defineBlackCellSums();
         }
 
@@ -625,7 +625,7 @@ public class Generator {
                 boolean success = valueBiasedSumAssignation(coord.first, coord.second, workingBoard.getCellNotations(coord.first, coord.second));
                 if (success) {
                     if (workingBoard.isEmpty(coord.first, coord.second)) { // if valueBiasedSumAssignation is working perfectly this shouldn't happen
-                        System.out.println("Success at valueBiasedSumAssig but no value was assigned at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
+                        //System.out.println("Success at valueBiasedSumAssig but no value was assigned at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
                         if (notationsQueue.getFirstElement().equals(candidate))
                             notationsQueue.hideFirstElement();
                     } else {
@@ -658,7 +658,7 @@ public class Generator {
                         notationsQueue.removeOrderedCell(coord.first, coord.second);
                         continue; // ambiguity solved
                     } else {
-                        System.out.println("Wasnt avoided but did success... shouldnt happen at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
+                        //System.out.println("Wasnt avoided but did success... shouldnt happen at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
                     }
                 }
             }
@@ -725,7 +725,7 @@ public class Generator {
     }
 
     private void provisionalFillInBacktracking(ArrayList<Coordinates> toSolve) {
-        if (!fillWhiteCells(toSolve, 0)) System.out.println("No correct assignment of values found");
+        fillWhiteCells(toSolve, 0); //System.out.println("No correct assignment of values found");
     }
 
     private boolean fillWhiteCells (ArrayList<Coordinates> coord, int pos) {
