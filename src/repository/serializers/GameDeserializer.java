@@ -7,6 +7,7 @@ import src.repository.*;
 import javax.management.timer.TimerMBean;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -52,10 +53,17 @@ public class GameDeserializer implements JsonDeserializer<Game> {
 
     private Game deserializeGameInProgress (JsonObject obj, UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
-        Board board = new BoardRepositoryDB(new DB()).getBoard(boardId);
+        Timestamp lastPlayed = Timestamp.valueOf(obj.get("lastPlayed").getAsString());
+
+        Board board = null;
+        try {
+            board =  new BoardRepositoryDB(new DB()).getBoard(boardId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ArrayList<Movement> movements = new ArrayList();//obj.get("movements").; // TODO: implement !!// FIXME: bug potential ??
 
-        return new GameInProgress(id, startTime, timeSpent, player, kakuro, board, movements);
+        return new GameInProgress(id, startTime, timeSpent, player, kakuro, board, movements, lastPlayed);
     }
 
     private Game deserializeGameFinished (JsonObject obj, UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {

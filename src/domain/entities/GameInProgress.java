@@ -9,23 +9,27 @@ import java.util.UUID;
 public class GameInProgress extends Game{
     private Board board;
     private ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
+    private Timestamp lastPlayed;
 
     public GameInProgress(User player, Kakuro kakuro) {
         super(player, kakuro);
         this.board = new Board(kakuro.getBoard());
         movements = new ArrayList<>();
+        setLastPlayedToNow();
     }
 
     public GameInProgress(User player, Kakuro kakuro, Board board) {
         super(player, kakuro);
         this.board = board;
         movements = new ArrayList<>();
+        setLastPlayedToNow();
     }
 
-    public GameInProgress(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, Board board, ArrayList<Movement> movements) {
+    public GameInProgress(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, Board board, ArrayList<Movement> movements, Timestamp lastPlayed) {
         super(id, startTime, timeSpent, player, kakuro);
         this.board = board;
         this.movements = movements;
+        this.lastPlayed = lastPlayed;
     }
 
     public UUID getBoardId() {
@@ -67,5 +71,11 @@ public class GameInProgress extends Game{
 
     public Board getBoard() {
         return this.board;
+    }
+
+    public Timestamp getLastPlayed () { return this.lastPlayed; }
+
+    public void setLastPlayedToNow () {
+        this.lastPlayed = new Timestamp(System.currentTimeMillis());
     }
 }

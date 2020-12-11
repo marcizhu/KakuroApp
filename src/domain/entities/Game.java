@@ -10,7 +10,7 @@ public abstract class Game {
     private final User player;
     private final UUID kakuroId; // FIXME: remove
     private final Kakuro kakuro;
-    private final float timeSpent;
+    private float timeSpent;
     private final Timestamp startTime;
 
     public Game(User player, Kakuro kakuro) {
@@ -32,6 +32,7 @@ public abstract class Game {
         this.timeSpent = timeSpent;
     }
 
+    public void setTimeSpent(float timeSpent) { this.timeSpent = timeSpent; }
 
     public Kakuro getKakuro() {
         return this.kakuro;
