@@ -1,9 +1,6 @@
 package src.repository;
 
-import src.domain.entities.Game;
-import src.domain.entities.GameFinished;
-import src.domain.entities.GameInProgress;
-import src.domain.entities.Kakuro;
+import src.domain.entities.*;
 import src.repository.serializers.GameDeserializer;
 import src.repository.serializers.GameSerializer;
 import src.repository.serializers.KakuroSeializer;
@@ -73,6 +70,30 @@ public class GameRepositoryDB implements GameRepository {
 
         gamesList.add(game);
         driver.writeToFile(gamesList, "game", serializer, subclasses);
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesByUser(User user) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesByUser(String userName) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesInKakuro(Kakuro kak) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesInKakuro(String kakuroName) {
+        //TODO
+        return null;
     }
 
     @Override

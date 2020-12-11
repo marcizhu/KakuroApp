@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 public class Kakuro {
+    private final String name = ""; // TODO: implement as PRIMARY KEY!!
     private final User createdBy;
     private final String userName; // FIXME: remove
     private final Timestamp createdAt;

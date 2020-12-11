@@ -13,6 +13,7 @@ public interface KakuroRepository {
     void deleteKakuro (Kakuro kakuro) throws IOException;
     void saveKakuro (Kakuro kakuro) throws IOException;
     ArrayList<Kakuro> getAllKakuros () throws IOException;
-    ArrayList<Kakuro> getAllKakurosByUser (User user) throws IOException;
+    ArrayList<Kakuro> getAllKakurosByUser (User user) throws IOException; // Get all kakuros created by a concrete user
+    ArrayList<Kakuro> getAllKakurosUserCreated () throws IOException; // Get all kakuros created by any user TODO
     ArrayList<Kakuro> getAllKakurosByDifficulty (Difficulty difficulty) throws IOException;
 }
