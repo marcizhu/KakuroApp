@@ -1,21 +1,20 @@
 package test.repository;
 
-import org.junit.jupiter.api.*;
-import src.repository.DB;
+import src.repository.*;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
-import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.stream.StreamSupport;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DBTest {
     private DB testDB = new DB("test/database/");
@@ -24,11 +23,14 @@ public class DBTest {
     public static void setUp () throws IOException {
         // Create database with empty files
         String path = "test/database/";
-        String[] tables = {"testobject"};
+        String[] tables = {"TestObject"};
 
         for (String s : tables) {
             File f = new File(path + s + ".json");
-            //Files.write(Paths.get(path + s + ".json"), "");
+            if (!f.createNewFile()) {
+                // This will empty the contents of the file
+                new PrintWriter(f).close();
+            }
         }
     }
 
@@ -36,7 +38,7 @@ public class DBTest {
     public void tearDown () throws IOException {
         // Empty each table in the database
         String path = "test/database/";
-        String[] tables = {"testobject"};
+        String[] tables = {"TestObject"};
 
         for (String s : tables) {
             File f = new File(path + s + ".json");
@@ -52,18 +54,18 @@ public class DBTest {
         expectedObjects.add(new TestObject(1, "1", true));
 
         String rawJSON = "[{\"a\": 0, \"b\": \"0\", \"c\": false}, {\"a\": 1, \"b\": \"1\", \"c\": true}]";
-        FileWriter writer = new FileWriter("test/database/testobject.json");
+        FileWriter writer = new FileWriter("test/database/TestObject.json");
         writer.write(rawJSON);
         writer.close();
 
-        ArrayList<Object> objects = testDB.readAll(TestObject.class, null);
+        ArrayList<Object> objects = testDB.readAll(TestObject.class);
 
         assertTrue(objects.equals(expectedObjects));
     }
 
     @Test
     public void testWriteToFile() throws IOException {
-        // Initial state: file testobject.json is empty
+        // Initial state: file TestObject.json is empty
 
         ArrayList<Object> expectedObjects = new ArrayList<>();
         expectedObjects.add(new TestObject(0, "0", false));
@@ -72,9 +74,9 @@ public class DBTest {
         String expectedFileContents = "[{\"a\":0,\"b\":\"0\",\"c\":false},{\"a\":1,\"b\":\"1\",\"c\":true}]";
 
 
-        testDB.writeToFile(expectedObjects, "testobject");
+        testDB.writeToFile(expectedObjects, "TestObject");
 
-        String fileContents = Files.readString(Path.of("test/database/testobject.json"));
+        String fileContents = Files.readString(Path.of("test/database/TestObject.json"));
 
         assertTrue(fileContents.equals(expectedFileContents));
     }

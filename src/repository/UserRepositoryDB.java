@@ -55,9 +55,4 @@ public class UserRepositoryDB implements UserRepository {
     public ArrayList<User> getAllUsers () throws IOException {
         return (ArrayList<User>)(ArrayList<?>) driver.readAll(User.class);
     }
-
-    @Override
-    public ArrayList<User> getAllUsers () throws IOException {
-        return (ArrayList<User>)(ArrayList<?>) driver.readAll(User.class);
-    }
 }

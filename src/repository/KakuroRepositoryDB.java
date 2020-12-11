@@ -33,7 +33,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.remove(i);
-                driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
+                driver.writeToFile(kakuroList, "Kakuro", new KakuroSeializer(), Kakuro.class);
                 return;
             }
         }
@@ -46,13 +46,13 @@ public class KakuroRepositoryDB implements KakuroRepository {
         for (int i = 0; i<kakuroList.size(); i++) {
             if (kakuroList.get(i).getId().equals(kakuro.getId())) {
                 kakuroList.set(i, kakuro);
-                driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
+                driver.writeToFile(kakuroList, "Kakuro", new KakuroSeializer(), Kakuro.class);
                 return;
             }
         }
 
         kakuroList.add(kakuro);
-        driver.writeToFile(kakuroList, "kakuro", new KakuroSeializer(), Kakuro.class);
+        driver.writeToFile(kakuroList, "Kakuro", new KakuroSeializer(), Kakuro.class);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
     public ArrayList<Kakuro> getAllKakurosByUser(User user) throws IOException {
         ArrayList<Kakuro> kakuros = getAllKakuros();
         ArrayList<Kakuro> res = new ArrayList<>();
-        for (Kakuro k : kakuros) if (k.getCreatedBy().equals(user.getName())) res.add(k);
+        for (Kakuro k : kakuros) if (k.getCreatedBy().getName().equals(user.getName())) res.add(k);
 
         return res;
     }

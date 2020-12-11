@@ -1,7 +1,7 @@
 package test.repository;
 
 import org.junit.jupiter.api.Test;
-import src.domain.User;
+import src.domain.entities.User;
 import src.repository.DB;
 import src.repository.UserRepositoryDB;
 import src.repository.UserRepository;
@@ -50,7 +50,7 @@ public class UserRepositoryDBTest {
 
         // Assert that the database driver was called properly
         verify(dbMock).readAll(User.class);
-        verify(dbMock).writeToFile(new ArrayList<>(), "user");
+        verify(dbMock).writeToFile(new ArrayList<>(), "User");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class UserRepositoryDBTest {
 
         // Assert that the database driver was called properly
         verify(dbMock).readAll(User.class);
-        verify(dbMock).writeToFile(expectedUsers, "user");
+        verify(dbMock).writeToFile(expectedUsers, "User");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class UserRepositoryDBTest {
 
         verify(dbMock).readAll(User.class);
         // Therefore, we expect the database to write the updated Larry with score 425
-        verify(dbMock).writeToFile(expectedUsers, "user");
+        verify(dbMock).writeToFile(expectedUsers, "User");
     }
 }
 

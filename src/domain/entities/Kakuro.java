@@ -6,7 +6,6 @@ import java.util.UUID;
 public class Kakuro {
     private final String name = ""; // TODO: implement as PRIMARY KEY!!
     private final User createdBy;
-    private final String userName; // FIXME: remove
     private final Timestamp createdAt;
     private final UUID id;
     private final Difficulty difficulty;
@@ -20,7 +19,6 @@ public class Kakuro {
         this.difficulty = difficulty;
         this.createdAt = new Timestamp(System.currentTimeMillis());;
         this.boardId = board.getId(); // FIXME: remove
-        this.userName = ""; //createdBy.getName(); // FIXME: remove
         this.board = board;
     }
 
@@ -32,7 +30,6 @@ public class Kakuro {
         this.difficulty = difficulty;
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.boardId = board.getId(); // FIXME: remove
-        this.userName = createdBy.getName(); // FIXME: remove
     }
 
     // Creates a Kakuro with a given Id and creation date assigned to a User (Used by the Deserializer)
@@ -43,7 +40,6 @@ public class Kakuro {
         this.difficulty = difficulty;
         this.createdAt = createdAt;
         this.boardId = UUID.randomUUID(); // board.getId(); // FIXME: remove
-        this.userName = ""; //createdBy.getName(); // FIXME: remove
     }
 
     // TODO: remove (here for compatibility)
@@ -54,7 +50,6 @@ public class Kakuro {
         this.difficulty = difficulty;
         this.createdAt = new Timestamp(System.currentTimeMillis());;
         this.boardId = boardId;
-        this.createdBy = createdBy;
     }
 
     public UUID getId() {
@@ -69,10 +64,9 @@ public class Kakuro {
         return this.boardId;
     }
 
-    public String getCreatedBy() {
-        return this.createdBy;
-    }
+    public User getCreatedBy() { return this.createdBy; }
 
+    // FIXME: remove
     public User getUser() { return this.createdBy; }
 
     public Timestamp getCreatedAt() {

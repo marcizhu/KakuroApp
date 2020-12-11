@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
+
+
 		GameRepository gr = new GameRepositoryDB(new DB());
 		UserRepository ur = new UserRepositoryDB(new DB());
 		KakuroRepository kr = new KakuroRepositoryDB(new DB());
@@ -31,6 +33,8 @@ public class Main {
 
 		Game g = gr.getGame(UUID.fromString("7e69b768-7867-432a-aa9a-670152884b2e"));
 		System.out.println(g.toString());
+
+
 
 		//GameFinished gf = new GameFinished(player, kakuro, board);
 		//repo.saveGame(gf);
@@ -106,10 +110,10 @@ public class Main {
 		System.out.println("Generated " + N + " EXTREME difficulty kakuros in: " + (System.currentTimeMillis()-time) + " ms");
 		*/
 
-		Game g = new GameFinished(xavi, k, b);
+		//Game g = new GameFinished(xavi, k, b);
 		//Game j = new GameInProgress();
 
-		repo.saveGame(g);
+		//repo.saveGame(g);
 
 		// Program to read a kakuro from a file and send it to solve, then save it to file.
 		/*

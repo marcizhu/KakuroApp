@@ -115,6 +115,10 @@ public class KakuroRepositoryDBTest {
         ArrayList<Kakuro> larryKakuros = repo.getAllKakurosByUser(larry);
 
         expectedKakuros.remove(1);
+
+        System.out.println(expectedKakuros);
+        System.out.println(larryKakuros);
+
         assertTrue(expectedKakuros.equals(larryKakuros));
 
         // Assert that the database driver was called properly
