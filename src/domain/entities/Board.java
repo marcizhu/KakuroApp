@@ -1,5 +1,6 @@
 package src.domain.entities;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import java.util.UUID;
@@ -58,6 +59,21 @@ public class Board {
                 cells[i][j].setCoordinates(i, j);
             }
         }
+    }
+
+    /**
+     * Constructor.
+     * Initializes a board with all its parameters, used for deserialization
+     * @param id  The id of the board
+     * @param width  The width of the board
+     * @param height The height of the board
+     * @param cells  Matrix of cells to fill the board
+     */
+    public Board(UUID id, int width, int height, Cell[][] cells) {
+        this.id = id;
+        this.width = width;
+        this.height = height;
+        this.cells = cells;
     }
 
     /**
@@ -286,7 +302,7 @@ public class Board {
             row[i] = String.join(",", col);
         }
 
-        String header = height + "," + width + "\n";
+        String header = "id: " + id.toString() + "\n" + height + "," + width + "\n";
         return header + String.join("\n", row);
     }
 

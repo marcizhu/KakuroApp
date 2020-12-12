@@ -26,6 +26,7 @@ public class GameSerializer implements JsonSerializer<Game> {
         obj.addProperty("inProgress", true);
         obj.addProperty("boardId", g.getBoardId().toString());
         obj.addProperty("movements", g.getMovements().toString()); // FIXME: do this even work fr?
+        obj.addProperty("lastPlayed", g.getLastPlayed().toString());
 
         return obj;
     }
