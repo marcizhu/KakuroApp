@@ -273,8 +273,8 @@ public class Generator {
         }
         if (size > 9) { //Maybe different values for difficulties??
             int iniPos = 1;
-            int finPos = 9;
-            if (size/2 < 9) iniPos = size - 9; // preferably do only one cut
+            int finPos = size < 9 ? size : 9;
+            if (size/2 < 9) iniPos = size-9 > 0 ? size-9 : 0; // preferably do only one cut
             boolean foundCut = false;
 
             Collections.shuffle(validPos, random);
@@ -293,6 +293,7 @@ public class Generator {
             // might get more than one cut
             for (int k = validPos.size()-1; !foundCut && k >= 0; k--) {
                 int p = validPos.get(k);
+                if (p > j+finPos) continue;
                 if (checkConnected(i, p, b)) {
                     b.setCell(new BlackCell(), i, p);
                     b.setCell(new BlackCell(), height-i, width-p);
@@ -303,6 +304,7 @@ public class Generator {
             Collections.shuffle(invalidPos, random);
             for (int k = invalidPos.size()-1; !foundCut && k >= 0; k--) {
                 int p = invalidPos.get(k);
+                if (p > j+finPos) continue;
                 if (checkConnected(i, p, b)) {
                     b.setCell(new BlackCell(), i, p);
                     b.setCell(new BlackCell(), height-i, width-p);
@@ -311,7 +313,7 @@ public class Generator {
             }
             // will get a disconnected board
             if (foundCut) {
-                int randomChoice = random.nextInt(size);
+                int randomChoice = random.nextInt(finPos);
                 int p = j+1+randomChoice;
                 b.setCell(new BlackCell(), i, p);
                 b.setCell(new BlackCell(), height-i, width-p);
@@ -556,7 +558,7 @@ public class Generator {
                             finished = false;
                         }
                     }
-                    if (workingBoard.isEmpty(c.r, c.c)) realAmbiguities.add(c); //this should never happen
+                    if (workingBoard.isEmpty(c.r, c.c)) realAmbiguities.add(c);
                     if (!finished) break; // a value was assigned, should check the correct way of assigning values before continuing.
                 }
             }
@@ -565,7 +567,7 @@ public class Generator {
         //System.out.println("After ambiguity check");
         //printNotations();
 
-        if (realAmbiguities.size() > 0) { // this should never happen
+        if (realAmbiguities.size() > 0) {
             //System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
             ArrayList<Coordinates> toSolve = new ArrayList<>();
             for (Coordinates c : realAmbiguities)

@@ -1,8 +1,13 @@
 package src;
 
+import src.domain.algorithms.Generator;
+import src.domain.algorithms.Solver;
 import src.domain.entities.Board;
+import src.domain.entities.Difficulty;
 import src.presentation.controllers.PresentationCtrl;
+import src.presentation.views.KakuroView;
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class Main {
@@ -19,6 +24,45 @@ public class Main {
 		);//*/
 		// From here on are testing and debugging purposes
 
+		// Program to visualize a board
+
+		// EASY real 1 sol:
+		// 7x7 -8858449551121823241
+		// 9x9 -4625736275950176293
+		// 12x12 8702915438493554245
+
+		// MEDIUM real 1 sol:
+		// 7x7 -8528620179486954430
+		// 9x9 2983276301678302414
+		// 12x12 -4974726975096362887
+
+		// HARD real 1 sol:
+		// 7x7 4968171675600747215
+		// 9x9 4360066047828370670
+		// 12x12 -3589869560657460313
+
+		// EXTREME real 1 sol:
+		// 7x7 3323012031544810870
+		// 9x9 6443636693436442265
+		// 12x12 2541328425778467360
+
+		// to investigate: extreme 15*15 -5432280936471879465 , has a starting value in a 1 length col
+/*
+		Generator gen = new Generator(20, 20, Difficulty.HARD,  true);
+		gen.generate();
+
+		Solver solver = new Solver(gen.getGeneratedBoard());
+		System.out.println("Solutions: "+solver.solve());
+		System.out.println("Seed: " + gen.getUsedSeed());
+
+		JFrame frame = new JFrame();
+		KakuroView kak = new KakuroView(gen.getGeneratedBoard().toString(), true);
+		kak.setSize(800, 800);
+		frame.add(kak);
+		frame.pack();
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+*/
 		// Program to generate a board and send it to solver to check the solutions
 		// Zero solutions generated with param: 100, 100, HARD, -1003457041328273474, true... pendant to investigate
 		// Prepared executions for DEMO: Unique solutions:
