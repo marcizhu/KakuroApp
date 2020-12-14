@@ -302,7 +302,7 @@ public class Board {
             row[i] = String.join(",", col);
         }
 
-        String header = "id: " + id.toString() + "\n" + height + "," + width + "\n";
+        String header = height + "," + width + "\n";
         return header + String.join("\n", row);
     }
 
@@ -316,7 +316,8 @@ public class Board {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (cells[i][j] instanceof BlackCell) col[j] = "*";
+                if (cells[i][j] == null) col[j] = "x";
+                else if (cells[i][j] instanceof BlackCell) col[j] = "*";
                 else col[j] = ""+cells[i][j].getNotations();
             }
             row[i] = String.join(",", col);
