@@ -8,14 +8,11 @@ Our solver is capable of solving empty Kakuros as well as checking if a given so
 
 ## Main algorithm
 
-The solver is based on a backtracking algorithm. It will process all cells from left to right and top to bottom. Depending on the cell it finds, it will perform different actions:
+The solver is based on a inference algorithm which falls back to backtracking. It will try to deduce the values of all cells based on the row/column size, numbers already placed on nearby white cells, etc... If at any point, a white cells can't have any numbers placed in it, then the number of solutions is zero and the solver returns said value. If instead this deduction algorithm can place a single number in each and every white cell, then the given kakuro had only a single solution and it has been successfully solved.
 
-- **White cell:** If a white cell is being evaluated, then the algorithm will try one of the possible values that could go on that cell. After a number has been placed in a cell, the algorithm tries to solve the next cell. If any of the possible values for this cell yield any valid solution, then this function returns, therefore backtracking and allowing the previous white cell to get a new value and continue solving.
+Finally, if the algorithm reaches a point where there are empty white cells, each one with multiple values that can be placed on it, and it is impossible to deduce any value, the algorithm falls back to a backtracking solver.
 
-- **Black cell:** When a black cell is being evaluated, we first check if the row sum is correct or not. If it is not correct, we backtrack. Else, we also check if the value of column on top (if it exists) is valid. In case it is not valid, we backtrack once again. Finally, if both sums are correct, we continue solving the next cell.
-
-As we said, this process is repeated for all cells from left to right and top to bottom until we either find two solutions (indicating that the given Kakuro had at least two or more solutions), one solution (meaning that the given Kakuro only had a unique solution) or no solution was found and all possibilities were explored.
-
+This solver processes all remaining white cells, evaluating first the cells with less possible values.
 
 
 ## Optimizations
@@ -44,8 +41,21 @@ But we still can do a bit more in order to reduce the number of branches: say we
 
 To implement this last bit of optimization, we use some matrices that hold the numbers already present in each row and column of the board, and then we "filter" the possible values given by the class `KakuroConstants` to reduce the possibilities even further.
 
+
+### Optimization #3: Process cells in order of possibilities
+
+Our first algorithm tried to solve the kakuro by evaluating white cells from left to right and from top to bottom. Our new approach processes first cells with less possibilities (for example, cells where only two or three values can be placed in that cell) before evaluating cells with more possibilities.
+
+While this improvement might not seem a big deal, it proved one of the most important optimizations done to the solver. This one, together with the optimization described in the next section, sped up the solver by a factor of around ~80-100x according to our (somewhat informal) benchmarks.
+
+
+### Optimization #4: Use inference to speed up the solving process
+
+As described in the introduction of this document, our solver is now based on a inference algorithm which falls back to backtracking if a solution can't be found. Even if it has to do backtracking to find a solution, the number of branches that it has to check is dramatically reduced, since now many white cells have a number already placed on them.
+
+
 ### Further improvement
 
-While writing the generator algorithm, we discovered some new optimizations that we could use in order to speed up the solver even further. For example, given the previous example of a row (or column) with three white cells and a total sum of 8, if one cell can have the numbers 1, 2 or 5 and the other two can only have the numbers 1 or 2, then we can assume that the first cell can only have a 5, and the other two must have either a 1 or a 2. This approach could prevent the solver from checking some branches while only adding a small overhead, so it might pay off to implement this small feature.
+Of course, our solver is not perfect nor the fastest in the world. Some extra optimizations that we could perform are, for example, to use faster data structures in order to optimize the way the inference is done, allowing a faster deduction process and further decreasing the total time required by the algorithm.
 
-For now though we will leave the code as it is, because we think the solver is good enough and we also don't have the time to implement this, test it, debug it, benchmark the old and the new algorithms... But probably on the near future we will implement this and many other small optimizations which should increase the performance of our algorithm.
+Finally, another optimization that we could perform is to add more deduction rules to the deduction algorithm. This optimization would greatly improve performance, because if the inference algorithm can find a solution for kakuros with unique solutions without having to call the backtracker, it would mean that a solution can be found in `O(n^2)` worst case instead of the `O(9^n)` worst-case time required by the backtracking algorithm.
