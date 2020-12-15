@@ -53,6 +53,7 @@ public class KakuroFunctions {
     }
 
     public boolean cellValueAssignation(int r, int c, int value) {
+        if (value == 0) return false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -69,6 +70,7 @@ public class KakuroFunctions {
     public boolean rowSumAssignation(int r, int c, int value) { return initRowSumAssignation(r, c, value, false); }
     public boolean rowSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initRowSumAssignation(r, c, value, true); }
     private boolean initRowSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
+        if (value == 0) return false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -84,6 +86,7 @@ public class KakuroFunctions {
     public boolean colSumAssignation(int r, int c, int value) { return initColSumAssignation(r, c, value, false); }
     public boolean colSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initColSumAssignation(r, c, value, true); }
     private boolean initColSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
+        if (value == 0) return false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -99,6 +102,7 @@ public class KakuroFunctions {
     public boolean bothRowColSumAssignation(int r, int c, int rowValue, int colValue) { return initBothRowColSumAssignation(r, c, rowValue, colValue, false); }
     public boolean bothRowColSumAssignationAssertCellValueAssigned(int r, int c, int rowValue, int colValue) { return initBothRowColSumAssignation(r, c, rowValue, colValue, true); }
     private boolean initBothRowColSumAssignation(int r, int c, int rowValue, int colValue, boolean assertRCValueAssigned) {
+        if (rowValue == 0 || colValue == 0) return false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
