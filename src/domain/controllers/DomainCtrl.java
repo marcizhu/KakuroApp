@@ -10,14 +10,13 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class DomainCtrl {
-    DB driver;
     UserRepository userRepository;
     KakuroRepository kakuroRepository;
     UserCtrl userCtrl;
     KakuroCtrl kakuroCtrl;
 
     public DomainCtrl() {
-        driver = new DB();
+        DB driver = new DB();
         userRepository = new UserRepositoryDB(driver);
         kakuroRepository = new KakuroRepositoryDB(driver);
         userCtrl = new UserCtrl(userRepository);
