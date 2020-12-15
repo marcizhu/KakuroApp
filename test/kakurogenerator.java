@@ -15,7 +15,7 @@ public class kakurogenerator {
         else if (diff == 3) difficulty = Difficulty.HARD;
         else difficulty = Difficulty.EXTREME;
 
-        Generator generator = new Generator(numRows, numCols, difficulty, seed);
+        Generator generator = new Generator(numRows, numCols, difficulty, seed, false);
         generator.generate();
 
         System.out.println(generator.getGeneratedBoard().toString());
