@@ -8,7 +8,7 @@ Our solver is capable of solving empty Kakuros as well as checking if a given so
 
 ## Main algorithm
 
-The solver is based on a inference algorithm which falls back to backtracking. It will try to deduce the values of all cells based on the row/column size, numbers already placed on nearby white cells, etc... If at any point, a white cells can't have any numbers placed in it, then the number of solutions is zero and the solver returns said value. If instead this deduction algorithm can place a single number in each and every white cell, then the given kakuro had only a single solution and it has been successfully solved.
+The solver is based on a inference algorithm which falls back to backtracking. It will try to deduce the values of all cells based on the row/column size, numbers already placed on nearby white cells, etc... If at any point, a white cell can't have any numbers placed in it, then the number of solutions is zero and the solver returns said value. If instead this deduction algorithm can place a single number in each and every white cell, then the given kakuro had only a single solution and it has been successfully solved.
 
 Finally, if the algorithm reaches a point where there are empty white cells, each one with multiple values that can be placed on it, and it is impossible to deduce any value, the algorithm falls back to a backtracking solver.
 
