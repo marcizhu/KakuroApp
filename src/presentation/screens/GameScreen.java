@@ -132,9 +132,7 @@ public class GameScreen extends AbstractScreen {
 
         // First help option checkbox
         redBtnPanChk = new JCheckBox();
-        redBtnPanChk.addItemListener(e -> {
-            ((GameScreenCtrl)ctrl).setHelpRedButtonPanel(e.getStateChange() == ItemEvent.SELECTED);
-        });
+        redBtnPanChk.addItemListener(e -> ((GameScreenCtrl)ctrl).setHelpRedButtonPanel(e.getStateChange() == ItemEvent.SELECTED));
         constraints.gridx = 3;
         constraints.gridy = 2;
         constraints.gridwidth = 1;

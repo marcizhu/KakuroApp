@@ -14,10 +14,8 @@ import java.util.ArrayList;
 public class SwappingCellQueue {
     private final Board workingBoard;
 
-    private final int rows, columns;
-
-    private WhiteCell[] orderedCells; // Contains all the WhiteCells in increasing order of number of notations
-    private int[] startPos;           // 1 pointer to hiding cells and 9 pointers to the first position with corresponding number of notations
+    private final WhiteCell[] orderedCells; // Contains all the WhiteCells in increasing order of number of notations
+    private final int[] startPos;           // 1 pointer to hiding cells and 9 pointers to the first position with corresponding number of notations
                                       // if there is no elements of size n, then startPos[n-1] = startPos[n]
                                       // any element in a position before startPos[0] is in an invalid position.
     private int endElement;           // should coincide with the size of the array
@@ -30,9 +28,9 @@ public class SwappingCellQueue {
      */
     public SwappingCellQueue(Board b) {
         workingBoard = b;
-        rows = b.getHeight();
-        columns = b.getWidth();
-        endElement = rows*columns;
+        int rows = b.getHeight();
+        int columns = b.getWidth();
+        endElement = rows * columns;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if (workingBoard.isBlackCell(i,j)) endElement--;

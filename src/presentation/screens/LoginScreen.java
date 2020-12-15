@@ -114,10 +114,6 @@ public class LoginScreen extends AbstractScreen {
         private int width = 120;
         private int height = 120;
 
-        // Misc Settings
-        private static final int fontSize = 40;
-        private static final int arcLength = 10;
-
         public void onMouseEnter() {
             width += 20;
             height += 20;
@@ -147,8 +143,8 @@ public class LoginScreen extends AbstractScreen {
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Font oldFont = g.getFont();
             g.setColor(color);
-            g.setFont(new Font(g.getFont().getName(), Font.BOLD, fontSize));
-            g.fillRoundRect(x, y, width, height, arcLength, arcLength);
+            g.setFont(new Font(g.getFont().getName(), Font.BOLD, (width == 120 ? 40 : 46)));
+            g.fillRoundRect(x, y, width, height, 10, 10);
             g.setColor(RGBUtils.getContrastColor(color));
 
             FontMetrics metrics = g.getFontMetrics(g.getFont());
