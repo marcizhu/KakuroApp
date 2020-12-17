@@ -33,9 +33,14 @@ public class KakuroRepositoryDB implements KakuroRepository {
 
     @Override
     public void deleteKakuro(Kakuro kakuro) throws IOException {
+        deleteKakuro(kakuro.getId());
+    }
+
+    @Override
+    public void deleteKakuro(UUID kakuroId) throws IOException {
         ArrayList<Kakuro> kakuroList = this.getAllKakuros();
         for (int i = 0; i<kakuroList.size(); i++) {
-            if (kakuroList.get(i).getId().equals(kakuro.getId())) {
+            if (kakuroList.get(i).getId().equals(kakuroId)) {
                 kakuroList.remove(i);
                 driver.writeToFile(kakuroList, "Kakuro", serializer, Kakuro.class);
                 return;
@@ -45,9 +50,6 @@ public class KakuroRepositoryDB implements KakuroRepository {
 
     @Override
     public void saveKakuro(Kakuro kakuro) throws IOException {
-
-        // TODO FIXME: when saving a kakuro, save its board too!!
-
         ArrayList<Kakuro> kakuroList = this.getAllKakuros();
 
         for (int i = 0; i<kakuroList.size(); i++) {

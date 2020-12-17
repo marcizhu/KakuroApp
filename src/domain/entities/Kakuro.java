@@ -60,9 +60,9 @@ public class Kakuro {
     }
 
     public String toString() {
-        String author = createdBy == null ? "" : createdBy.toString();
+        String author = createdBy == null ? "null" : createdBy.toString();
 
-        return "Id: " + id + ", created by: " + author + ", created at: "
-                + createdAt  + ", difficulty: " + difficulty + "\nBoard:\n" + board.toString();
+        return "Id: " + id + ", created by {" + author + "}, created at: "
+                + createdAt  + ", difficulty: " + difficulty + "\nBoard: " + board.getId().toString() + "\n" + board.toString();
     }
 }

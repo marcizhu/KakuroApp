@@ -23,6 +23,10 @@ public class CellDeserializer implements JsonDeserializer<Cell[][]> {
             JsonArray r = arr.get(i).getAsJsonArray();
 
             for (int j = 0; j < width; ++j) {
+                if (r.get(j).isJsonNull()) {
+                    cells[i][j] = null;
+                    continue;
+                }
                 JsonObject obj = r.get(j).getAsJsonObject();
 
                 boolean isBlack = obj.getAsJsonObject().get("value") == null;

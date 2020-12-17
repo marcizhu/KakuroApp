@@ -23,10 +23,11 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
         BoardRepository boardRepo = new BoardRepositoryDB(driver);
 
         Timestamp createdAt = Timestamp.valueOf(obj.get("createdAt").getAsString());
-        String createdBy = obj.get("createdBy").getAsString();
         Difficulty d = Difficulty.valueOf(obj.get("difficulty").getAsString());
         UUID kakuroId = UUID.fromString(obj.get("id").getAsString());
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
+
+
         Board b;
 
         try {
@@ -37,13 +38,17 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
             b = null;
         }
 
-        User u;
-        try {
-            u = userRepo.getUser(createdBy);
-        } catch (IOException e) {
-            System.err.println("Error getting user " + createdBy + " from database");
-            e.printStackTrace();
-            u = null;
+        User u = null;
+        if (obj.get("createdBy") != null) {
+            String createdBy = obj.get("createdBy").getAsString();
+
+            try {
+                u = userRepo.getUser(createdBy);
+            } catch (IOException e) {
+                System.err.println("Error getting user " + createdBy + " from database");
+                e.printStackTrace();
+                u = null;
+            }
         }
 
         return new Kakuro(kakuroId, createdAt, d, b, u);
