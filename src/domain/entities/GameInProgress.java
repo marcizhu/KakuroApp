@@ -78,4 +78,8 @@ public class GameInProgress extends Game{
     public void setLastPlayedToNow () {
         this.lastPlayed = new Timestamp(System.currentTimeMillis());
     }
+
+    public String toString() {
+        return "Game in Progress\n" + super.toString() + "\nBoard: " + board.toString() + "\nlast played: " + lastPlayed;
+    }
 }
