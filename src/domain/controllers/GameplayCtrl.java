@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class GameCtrl {
+public class GameplayCtrl {
 
     User user;
     Kakuro kakuro;
@@ -48,7 +48,7 @@ public class GameCtrl {
     private int hintAtMove;
     private Pair<Pair<Integer, Integer>, Integer> lastHint;
 
-    public GameCtrl(User user, Kakuro kakuro) {
+    public GameplayCtrl(User user, Kakuro kakuro) {
         this.user = user;
         this.kakuro = kakuro;
         movementCount = 0;

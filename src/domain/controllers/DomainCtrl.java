@@ -74,7 +74,7 @@ public class DomainCtrl {
     }
 
     // TODO: testing purposes, delete when it is properly implemented
-    public GameCtrl newGameInstance(String sessionID, String kakuroID) {
+    public GameplayCtrl newGameInstance(String sessionID, String kakuroID) {
         User user = new User(sessionID);
         Kakuro kakuro;
         try {
@@ -84,11 +84,11 @@ public class DomainCtrl {
             return null;
         }
 
-        return new GameCtrl(user, kakuro);
+        return new GameplayCtrl(user, kakuro);
     }
 
-    public CreatorCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
+    public KakuroCreationCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
         User user = new User(sessionID);
-        return new CreatorCtrl(user, numRows, numCols);
+        return new KakuroCreationCtrl(user, numRows, numCols);
     }
 }

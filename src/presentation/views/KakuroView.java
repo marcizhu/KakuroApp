@@ -29,7 +29,6 @@ public class KakuroView extends JPanel {
     public KakuroView(String board, boolean showValues) {
         blackCellColor = Color.BLACK;
 
-        Matcher m = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$|^#(\\d+)$").matcher("");
         String[] rows = board.split("\\n");
         String[] line1 = rows[0].split(",");
 
@@ -41,6 +40,24 @@ public class KakuroView extends JPanel {
         this.rows = height+1;
         this.columns = width+1;
         cells = new JPanel[height+1][width+1];
+
+        buildFromString(board, showValues);
+    }
+
+    public void updateFromString(String board, boolean showValues) {
+        removeAll();
+        buildFromString(board, showValues);
+    }
+
+    private void buildFromString(String board, boolean showValues) {
+        Matcher m = Pattern.compile("^C(\\d+)$|^F(\\d+)$|^C(\\d+)F(\\d+)$|^#(\\d+)$").matcher("");
+        String[] rows = board.split("\\n");
+        String[] line1 = rows[0].split(",");
+
+        int height = Integer.parseInt(line1[0].trim());
+        int width  = Integer.parseInt(line1[1].trim());
+
+        assert(rows.length - 1 == height);
 
         setLayout(new GridLayout(this.rows, this.columns));
         computeCellSideSize(getWidth(), getHeight());
@@ -158,9 +175,9 @@ public class KakuroView extends JPanel {
         if (cells[r][c] instanceof WhiteCellView) ((WhiteCellView)cells[r][c]).setNotations(notations);
     }
 
-    public void setBlackCellValue(int r, int c, int value, int section) {
+    public void setBlackCellValue(int r, int c, int section, int value) {
         if (r < 0 || c < 0 || r >= rows || c >= columns) return;
-        if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(value, section);
+        if (cells[r][c] instanceof BlackCellView) ((BlackCellView)cells[r][c]).setSectionValue(section, value);
     }
 
     public void setBlackCellColor(Color color) {
@@ -189,6 +206,36 @@ public class KakuroView extends JPanel {
     public void unselectWhiteCell(int r, int c) {
         if (cells[r][c] instanceof BlackCellView) return;
         ((WhiteCellView)cells[r][c]).unselect();
+    }
+
+    public void setCellToWhite(int r, int c) {
+        if (cells[r][c] instanceof WhiteCellView) return;
+        cells[r][c].removeAll();
+        remove(cells[r][c]);
+        cells[r][c] = new WhiteCellView(r, c, 0, 0, true);
+        removeAll();
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                add(cells[row][col]);
+                cells[row][col].revalidate();
+            }
+        }
+        revalidate();
+    }
+
+    public void setCellToBlack(int r, int c) {
+        if (cells[r][c] instanceof BlackCellView) return;
+        cells[r][c].removeAll();
+        remove(cells[r][c]);
+        cells[r][c] = new BlackCellView(r, c, -1, -1, -1, -1, true);
+        removeAll();
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                add(cells[row][col]);
+                cells[row][col].revalidate();
+            }
+        }
+        revalidate();
     }
 
     private class BlackCellView extends JPanel {
@@ -336,8 +383,8 @@ public class KakuroView extends JPanel {
             paintComponents(g);
         }
 
-        public void setSectionValue(int value, int section) {
-            String val = value == 0 ? "" : Integer.toString(value);
+        public void setSectionValue(int section, int value) {
+            String val = value <= 0 ? "" : Integer.toString(value);
 
             switch(section) {
                 case BLACK_SECTION_TOP:

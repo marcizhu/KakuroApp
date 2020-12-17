@@ -1,14 +1,14 @@
 package src.presentation.controllers;
 
-import src.domain.controllers.CreatorCtrl;
+import src.domain.controllers.KakuroCreationCtrl;
 import src.domain.controllers.DomainCtrl;
-import src.domain.controllers.GameCtrl;
 import src.presentation.screens.CreatorScreen;
-import src.presentation.screens.GameScreen;
 import src.presentation.views.KakuroView;
+import src.utils.IntPair;
 import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 public class CreatorScreenCtrl extends AbstractScreenCtrl {
     public static final int WHITE_CELL = -1;
@@ -17,32 +17,72 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     public static final int BLACK_SECTION_LEFT = KakuroView.BLACK_SECTION_LEFT;
     public static final int BLACK_SECTION_RIGHT = KakuroView.BLACK_SECTION_RIGHT;
 
-    private CreatorCtrl creator;
+    private KakuroCreationCtrl creator;
 
     private Pair<Pair<Integer, Integer>, Integer> selectedPos;
+
+    private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictingCoord;
+
+    private boolean blackBrushActive;
+    private boolean whiteBrushActive;
+    private boolean mouseIsPressed;
+    private TreeSet<IntPair> brushPath;
 
     public CreatorScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
     }
 
-    public void setUpCreator(CreatorCtrl creatorInstance) {
+    public void setUpCreator(KakuroCreationCtrl creatorInstance) {
         this.creator = creatorInstance;
         creator.setUp(this);
         selectedPos = new Pair<>(new Pair<>(-1, -1), -2);
+        conflictingCoord = new ArrayList<>();
+        blackBrushActive = false;
+        whiteBrushActive = false;
+        mouseIsPressed = false;
+        brushPath = new TreeSet<>();
     }
 
     public String getBoardToDisplay() {
         return creator.getBoardToString();
     }
+    public void setBoardToDisplay(String board) { ((CreatorScreen)screen).updateWholeBoardFromString(board); }
 
     public void setSelectedPos(int r, int c, int s) {
         selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
     }
 
+    public void setConflictingCoord(ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflicts) {
+        // erase previous conflicts, mark new conflicts
+        unselectConflictingCoord();
+        for (Pair<Pair<Integer, Integer>, Integer> cc : conflicts) {
+            ((CreatorScreen)screen).selectConflictive(cc.first.first, cc.first.second, cc.second);
+        }
+        conflictingCoord = conflicts;
+    }
+    public void repaintPrevConflicts() {
+        for (Pair<Pair<Integer, Integer>, Integer> cc : conflictingCoord) {
+            ((CreatorScreen)screen).selectConflictive(cc.first.first, cc.first.second, cc.second);
+        }
+    }
+
+    private void unselectConflictingCoord() {
+        for (Pair<Pair<Integer, Integer>, Integer> cc : conflictingCoord) {
+            if (cc.second == WHITE_CELL) {
+                ((CreatorScreen)screen).unselectWhiteCell(cc.first.first, cc.first.second);
+                if (cc.first.first == selectedPos.first.first && cc.first.second == selectedPos.first.second)
+                    ((CreatorScreen)screen).selectWhiteCell(selectedPos.first.first, selectedPos.first.second);
+            } else {
+                ((CreatorScreen)screen).unselectBlackCell(cc.first.first, cc.first.second, cc.second);
+            }
+        }
+    }
+
     // Black cell manegent
 
     public void setBlackBrushEnabled(boolean b) {
-
+        blackBrushActive = b;
+        if (b) whiteBrushActive = false;
     }
     public void clearSelectedBlackCellValueClicked () {
 
@@ -50,15 +90,25 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     public void blackCellSelectValueClicked (int value) {
 
     }
-    // possible values and wether black cell has a defined value
+    // possible values and whether black cell has a defined value
     public Pair<ArrayList<Integer>, Boolean> getBlackPossibilitiesList() {
         return new Pair<>(new ArrayList<>(), true);
     }
+    public void setValuesToBlackCells(ArrayList<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>> values) {
+        for (Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> v : values) {
+            ((CreatorScreen)screen).setValueBlackCell(v.first.first, v.first.second, v.second.first, v.second.second);
+        }
+    }
+    public void setCellsToBlack(ArrayList<IntPair> coords) {
+        for (IntPair p : coords) ((CreatorScreen)screen).setCellToBlack((Integer) p.first, (Integer) p.second);
+    }
+
 
     // White cell management
 
     public void setWhiteBrushEnabled(boolean b) {
-
+        whiteBrushActive = b;
+        if (b) blackBrushActive = false;
     }
     public void clearSelectedWhiteCellValueClicked () {
 
@@ -66,22 +116,33 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     public void whiteCellSelectValueClicked (int value) {
 
     }
-    // possible values and wether black cell has a defined value
+    // possible values and whether black cell has a defined value
     public Pair<ArrayList<Integer>, Boolean> getWhitePossibilitiesList() {
         return new Pair<>(new ArrayList<>(), true);
+    }
+    public void setValuesToWhiteCells(ArrayList<Pair<Pair<Integer, Integer>, Integer>> values) {
+        for (Pair<Pair<Integer, Integer>, Integer> v : values) {
+            ((CreatorScreen)screen).setValueWhiteCell(v.first.first, v.first.second, v.second);
+        }
+    }
+    public void setNotationsToWhiteCells(ArrayList<Pair<Pair<Integer, Integer>, Integer>> notations) {
+        for (Pair<Pair<Integer, Integer>, Integer> n : notations) {
+            ((CreatorScreen) screen).setNotationWhiteCell(n.first.first, n.first.second, n.second);
+        }
+    }
+    public void setCellsToWhite(ArrayList<IntPair> coords) {
+        for (IntPair p : coords) ((CreatorScreen)screen).setCellToWhite((Integer) p.first, (Integer) p.second);
     }
 
     // Tab events
     public void onSelectedTabChanged(int tabIdx) {
-
+        if (tabIdx == 0) whiteBrushActive = false;
+        else if (tabIdx == 1) blackBrushActive = false;
     }
 
     // Button events
     public void onKakuroStateButtonPressed(String kakuroName) {
 
-    }
-    public void onImportButtonClicked() {
-        System.out.println("IMPORT");
     }
     public void onExportButtonClicked() {
         System.out.println("EXPORT");
@@ -93,10 +154,33 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         System.out.println("CLEAR BOARD");
     }
 
+    public void setTipMessage(String message) {
+        System.out.println(message);
+    }
+
+    public void onMousePressed(int r, int c) {
+        if (blackBrushActive || whiteBrushActive) {
+            mouseIsPressed = true;
+            brushPath.clear();
+            brushPath.add(new IntPair(r, c));
+        }
+    }
+    public void onMouseEntered(int r, int c) {
+        if (mouseIsPressed && (blackBrushActive || whiteBrushActive)) {
+            brushPath.add(new IntPair(r, c));
+        }
+    }
+    public void onMouseReleased(int r, int c) {
+        mouseIsPressed = false;
+        if (blackBrushActive) creator.setCellsToBlack(brushPath);
+        else if (whiteBrushActive) creator.setCellsToWhite(brushPath);
+    }
+
     @Override
     public void build(int width, int height) {
         screen = new CreatorScreen(this);
         super.build(width, height);
+        creator.initializeCreatorStructures();
     }
 
     @Override

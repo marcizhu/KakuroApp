@@ -1,7 +1,7 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
-import src.domain.controllers.GameCtrl;
+import src.domain.controllers.GameplayCtrl;
 import src.presentation.screens.GameScreen;
 import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
@@ -19,7 +19,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     public static final int BLACK_SECTION_LEFT = KakuroView.BLACK_SECTION_LEFT;
     public static final int BLACK_SECTION_RIGHT = KakuroView.BLACK_SECTION_RIGHT;
 
-    private GameCtrl game;
+    private GameplayCtrl game;
     private String boardToDisplay;
     private boolean notationsMode;
     private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictiveCoord;
@@ -29,7 +29,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         super(presentationCtrl, domainCtrl);
     }
 
-    public void setUpGame(GameCtrl gameInstance) {
+    public void setUpGame(GameplayCtrl gameInstance) {
         this.game = gameInstance;
         boardToDisplay = game.gameSetUp(this);
         notationsMode = false;
@@ -197,7 +197,6 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     public void setNotations(ArrayList<Pair<Pair<Integer, Integer>, Integer>> notations) {
         for (Pair<Pair<Integer, Integer>, Integer> n : notations) {
             ((GameScreen) screen).setNotationWhiteCell(n.first.first, n.first.second, n.second);
-            System.out.println("Setting notations to "+n.first.first + ", " + n.first.second);
         }
     }
 

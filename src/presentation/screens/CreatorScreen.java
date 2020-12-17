@@ -39,7 +39,9 @@ public class CreatorScreen extends AbstractScreen {
         contents = new JPanel();
 
         leftContent = buildLeftContent();
+        leftContent.setSize(width/2, height);
         lowerRightContent = buildRightContent();
+        lowerRightContent.setSize(width/2, lowerRightContent.getHeight());
 
         String initialBoard = ((CreatorScreenCtrl)ctrl).getBoardToDisplay();
         creatorBoard = new KakuroView(initialBoard, true);
@@ -50,7 +52,7 @@ public class CreatorScreen extends AbstractScreen {
 
         contents.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints = new GridBagConstraints();
+        constraints.insets = new Insets(0,10,0,10);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -83,7 +85,10 @@ public class CreatorScreen extends AbstractScreen {
         blackWhiteSelectors.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                ((CreatorScreenCtrl)ctrl).onSelectedTabChanged(blackWhiteSelectors.getSelectedIndex());
+                int tab = blackWhiteSelectors.getSelectedIndex();
+                ((CreatorScreenCtrl)ctrl).onSelectedTabChanged(tab);
+                if (tab == 0) whiteBrushChk.setSelected(false);
+                else if (tab == 1) blackBrushChk.setSelected(false);
             }
         });
 
@@ -153,7 +158,7 @@ public class CreatorScreen extends AbstractScreen {
 
         JLabel brushToolLbl = new JLabel("Brush tool");
         brushToolLbl.setForeground(Color.BLACK);
-        brushToolLbl.setHorizontalAlignment(SwingConstants.CENTER);
+        brushToolLbl.setHorizontalAlignment(SwingConstants.LEFT);
         brushToolLbl.setVerticalAlignment(SwingConstants.CENTER);
         brushToolLbl.setOpaque(false);
         constraints.gridx = 0;
@@ -193,17 +198,23 @@ public class CreatorScreen extends AbstractScreen {
         blackValuesScroll = new JScrollPane(blackPossibleValues);
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.weighty = 5;
+        constraints.weightx = 4;
+        constraints.weighty = 4;
         constraints.fill = GridBagConstraints.BOTH;
         lowerSelector.add(blackValuesScroll, constraints);
 
 
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         selectorBlack.add(upperSelector, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.gridheight = 3;
+        constraints.weightx = 1;
+        constraints.weighty = 3;
         constraints.fill = GridBagConstraints.BOTH;
         selectorBlack.add(lowerSelector, constraints);
     }
@@ -217,8 +228,8 @@ public class CreatorScreen extends AbstractScreen {
             JLabel clearLbl = new JLabel("X");
             clearLbl.setForeground(Color.BLACK);
             clearLbl.setBackground(Palette.WarningLightRed);
-            clearLbl.setAlignmentX(SwingConstants.CENTER);
-            clearLbl.setAlignmentY(SwingConstants.CENTER);
+            clearLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            clearLbl.setVerticalAlignment(SwingConstants.CENTER);
             clearLbl.setOpaque(true);
             clearLbl.addMouseListener(new MouseAdapter() {
                 @Override
@@ -226,6 +237,7 @@ public class CreatorScreen extends AbstractScreen {
                     ((CreatorScreenCtrl)ctrl).clearSelectedBlackCellValueClicked();
                 }
             });
+            clearLbl.setSize(clearLbl.getHeight(), clearLbl.getHeight());
             blackPossibleValues.add(clearLbl);
         }
 
@@ -286,7 +298,7 @@ public class CreatorScreen extends AbstractScreen {
         JPanel lowerSelector = new JPanel();
         lowerSelector.setLayout(new GridBagLayout());
 
-        JLabel valueAssigLbl = new JLabel("Possible value assignations");
+        JLabel valueAssigLbl = new JLabel("Forced initial value assignation");
         valueAssigLbl.setForeground(Color.BLACK);
         valueAssigLbl.setHorizontalAlignment(SwingConstants.LEFT);
         valueAssigLbl.setVerticalAlignment(SwingConstants.CENTER);
@@ -304,17 +316,23 @@ public class CreatorScreen extends AbstractScreen {
         whiteValuesScroll = new JScrollPane(whitePossibleValues);
         constraints.gridx = 0;
         constraints.gridy = 2;
-        constraints.weighty = 5;
+        constraints.weightx = 4;
+        constraints.weighty = 4;
         constraints.fill = GridBagConstraints.BOTH;
         lowerSelector.add(whiteValuesScroll, constraints);
 
 
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         selectorWhite.add(upperSelector, constraints);
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.gridheight = 3;
+        constraints.weightx = 1;
+        constraints.weighty = 3;
         constraints.fill = GridBagConstraints.BOTH;
         selectorWhite.add(lowerSelector, constraints);
     }
@@ -328,8 +346,8 @@ public class CreatorScreen extends AbstractScreen {
             JLabel clearLbl = new JLabel("X");
             clearLbl.setForeground(Color.BLACK);
             clearLbl.setBackground(Palette.WarningLightRed);
-            clearLbl.setAlignmentX(SwingConstants.CENTER);
-            clearLbl.setAlignmentY(SwingConstants.CENTER);
+            clearLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            clearLbl.setVerticalAlignment(SwingConstants.CENTER);
             clearLbl.setOpaque(true);
             clearLbl.addMouseListener(new MouseAdapter() {
                 @Override
@@ -368,18 +386,6 @@ public class CreatorScreen extends AbstractScreen {
         constraints.gridy = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
 
-        // Import button
-        JButton importBtn = new JButton("IMPORT");
-        importBtn.setForeground(Color.BLACK);
-        importBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((CreatorScreenCtrl)ctrl).onImportButtonClicked();
-            }
-        });
-        constraints.gridx = 0;
-        buttonPanel.add(importBtn, constraints);
-
         // Export button
         JButton exportBtn = new JButton("EXPORT");
         exportBtn.setForeground(Color.BLACK);
@@ -389,7 +395,7 @@ public class CreatorScreen extends AbstractScreen {
                 ((CreatorScreenCtrl)ctrl).onExportButtonClicked();
             }
         });
-        constraints.gridx = 1;
+        constraints.gridx = 0;
         buttonPanel.add(exportBtn, constraints);
 
         // Fill kakuro button
@@ -401,8 +407,14 @@ public class CreatorScreen extends AbstractScreen {
                 ((CreatorScreenCtrl)ctrl).onFillKakuroButtonClicked();
             }
         });
-        constraints.gridx = 2;
+        constraints.gridx = 1;
         buttonPanel.add(fillKakuroBtn, constraints);
+
+        // Separator
+        JSeparator separator = new JSeparator();
+        separator.setVisible(false);
+        constraints.gridx = 2;
+        buttonPanel.add(separator, constraints);
 
         // Clear values button
         JButton clearValuesBtn = new JButton("CLEAR ALL VALUES");
@@ -422,6 +434,43 @@ public class CreatorScreen extends AbstractScreen {
     public void updateWhitePossibleValues() {
         buildWhitePossibleValues();
         whiteValuesScroll.setViewportView(whitePossibleValues);
+    }
+
+
+    public void selectWhiteCell(int r, int c) {
+        creatorBoard.setWhiteCellSelectedColor(r, c, Palette.SelectionBlue);
+    }
+    public void selectWhiteCellColor(int r, int c, Color col) { creatorBoard.setWhiteCellSelectedColor(r, c, col); }
+    public void unselectWhiteCell(int r, int c) {
+        creatorBoard.unselectWhiteCell(r, c);
+    }
+    public void setValueWhiteCell(int r, int c, int value) {
+        creatorBoard.setWhiteCellValue(r, c, value);
+    }
+    public void setNotationWhiteCell(int r, int c, int notations) { creatorBoard.setWhiteCellNotations(r, c, notations); }
+    public void selectBlackCell(int r, int c, int s) { creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.SelectionBlue); }
+    public void unselectBlackCell(int r, int c, int s) { creatorBoard.unselectBlackCell(r, c, s); }
+    public void setValueBlackCell(int r, int c, int s, int value) { creatorBoard.setBlackCellValue(r, c, s, value); }
+    public void selectConflictive(int r, int c, int s) {
+        if (s == CreatorScreenCtrl.WHITE_CELL) {
+            creatorBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
+        } else {
+            creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.WarningLightRed);
+        }
+    }
+    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
+    //  it only works if there is a resize for some reason
+    public void setCellToWhite(int r, int c) {
+        creatorBoard.setCellToWhite(r, c);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
+    public void setCellToBlack(int r, int c) {
+        creatorBoard.setCellToBlack(r, c);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
+    public void updateWholeBoardFromString(String b) {
+        creatorBoard.updateFromString(b, true);
+        onResize(contents.getWidth(), contents.getHeight());
     }
 
     @Override
@@ -447,6 +496,7 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBoardMouseEventListener(new KakuroView.BoardMouseEventListener() {
             @Override
             public void onBlackCellViewClicked(int row, int col, int section) {
+                System.out.println("Black cell clicked");
                 ((CreatorScreenCtrl)ctrl).setSelectedPos(row, col, section);
             }
 
@@ -456,16 +506,24 @@ public class CreatorScreen extends AbstractScreen {
             }
 
             @Override
-            public void onBlackCellViewEntered(int row, int col) { }
+            public void onBlackCellViewEntered(int row, int col) {
+                ((CreatorScreenCtrl)ctrl).onMouseEntered(row, col);
+            }
 
             @Override
-            public void onWhiteCellViewEntered(int row, int col) { }
+            public void onWhiteCellViewEntered(int row, int col) {
+                ((CreatorScreenCtrl)ctrl).onMouseEntered(row, col);
+            }
 
             @Override
-            public void onCellInBoardPressed(int row, int col) { }
+            public void onCellInBoardPressed(int row, int col) {
+                ((CreatorScreenCtrl)ctrl).onMousePressed(row, col);
+            }
 
             @Override
-            public void onCellInBoardReleased(int row, int col) { }
+            public void onCellInBoardReleased(int row, int col) {
+                ((CreatorScreenCtrl)ctrl).onMouseReleased(row, col);
+            }
 
             @Override
             public void onListenerDetached() { }
