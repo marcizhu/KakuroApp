@@ -44,12 +44,12 @@ public class KakuroFunctions {
     }
 
     public KakuroFunctions(KakuroFunctionsMaster m) {
-        this.master = m;
+        master = m;
         abort = false;
     }
 
     public void setCellValueAssignationListener(CellValueAssignationListener listener) {
-        this.cellValueAssignationListener = listener;
+        cellValueAssignationListener = listener;
     }
 
     public boolean cellValueAssignation(int r, int c, int value) {

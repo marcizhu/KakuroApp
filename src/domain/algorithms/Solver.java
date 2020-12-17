@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Solver {
     private final Board initialBoard;
     private Board workingBoard;
-    private final ArrayList<Board> solutions;
+    private final ArrayList<Board> solutions = new ArrayList<>();
 
     private SwappingCellQueue notationsQueue;
     private KakuroFunctions assigFunctions;
@@ -37,15 +37,16 @@ public class Solver {
     /**
      * Constructor.
      * Initializes the solver to solve the given board
-     * @param b Board to solve
+     * @param board Board to solve
      */
-    public Solver(Board b) {
-        initialBoard = b;
-        solutions = new ArrayList<>();
-        rows = b.getHeight();
-        columns = b.getWidth();
-        rowLine = new int[b.getHeight()][b.getWidth()];
-        colLine = new int[b.getHeight()][b.getWidth()];
+    public Solver(Board board) {
+        initialBoard = board;
+
+        rows    = board.getHeight();
+        columns = board.getWidth();
+
+        rowLine = new int[board.getHeight()][board.getWidth()];
+        colLine = new int[board.getHeight()][board.getWidth()];
     }
 
     /**
@@ -223,15 +224,15 @@ public class Solver {
 
     private int getPossibleValues(int row, int col) {
         // Get options for each row and column
-        int rowID = rowLine[row][col];
-        int colID = colLine[row][col];
+        final int rowID = rowLine[row][col];
+        final int colID = colLine[row][col];
         int hAvailable = 0;
         int vAvailable = 0;
 
-        ArrayList<Integer> hOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                rowSize[rowID], rowSums[rowID], rowValuesUsed[rowID]);
-        ArrayList<Integer> vOptions = KakuroConstants.INSTANCE.getPossibleCasesWithValues(
-                colSize[colID], colSums[colID], colValuesUsed[colID]);
+        ArrayList<Integer> hOptions =
+                KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSums[rowID], rowValuesUsed[rowID]);
+        ArrayList<Integer> vOptions =
+                KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSums[colID], colValuesUsed[colID]);
 
         // Calculate available options for this row
         for (Integer i : hOptions)
@@ -258,8 +259,6 @@ public class Solver {
 
         int row = cells.get(idx).first;
         int col = cells.get(idx).second;
-
-        if (!workingBoard.isEmpty(row, col)) return;
 
         int possibleValues = getPossibleValues(row, col);
 
@@ -373,39 +372,5 @@ public class Solver {
                 return notationsQueue;
             }
         });
-    }
-
-    // FIXME: DEBUGGING PURPOSES
-    private void printNotations() {
-        System.out.println();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (workingBoard.isWhiteCell(i, j)) {
-                    if (workingBoard.isEmpty(i, j)) {
-                        int b = workingBoard.getCellNotations(i, j);
-                        System.out.print("[");
-                        for (int k = 0; k < 9; k++) {
-                            if ((b&(1<<k)) != 0) System.out.print((k+1)+"");
-                            else System.out.print("-");
-                        }
-                        System.out.print("] ");
-                    } else {
-                        System.out.print("[++++" + workingBoard.getValue(i,j) + "++++] ");
-                    }
-                }
-                else {
-                    int hs = workingBoard.getHorizontalSum(i, j);
-                    if (rowLine[i][j] != -1) hs = rowSums[rowLine[i][j]];
-                    int vs = workingBoard.getVerticalSum(i, j);
-                    if (colLine[i][j] != -1) vs = colSums[colLine[i][j]];
-                    if (hs / 10 > 0) System.out.print("[*" + hs + "*-*");
-                    else System.out.print("[**" + hs + "*-*");
-                    if (vs / 10 > 0) System.out.print(vs + "*] ");
-                    else System.out.print("*" + vs + "*] ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 }

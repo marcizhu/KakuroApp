@@ -2,7 +2,6 @@ package src.presentation.screens;
 
 import src.presentation.controllers.MyKakurosScreenCtrl;
 import src.presentation.views.KakuroInfoCardView;
-import src.utils.Pair;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class MyKakurosScreen extends AbstractScreen {
-
     JLabel title;
     JScrollPane kakuroListPane;
     JPanel kakuroListLayout;
