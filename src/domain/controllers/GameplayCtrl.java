@@ -643,15 +643,28 @@ public class GameplayCtrl {
         final Pair<Integer, Integer> currentAssignation = new Pair<>(-1, -1);
         final Pair<Pair<Integer, Integer>, Integer> finalHint = new Pair<>(new Pair<>(-1, -1), -1);
 
-        testingFunctions.setCellValueAssignationListener(new KakuroFunctions.CellValueAssignationListener() {
+        testingFunctions.setAssignationEventListener(new KakuroFunctions.AssignationEventListener() {
             @Override
-            public boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig) {
-                if (!currentGame.getBoard().isEmpty(assig.first.first, assig.first.second)) return false;
-                finalHint.first.first = assig.first.first;
-                finalHint.first.second = assig.first.second;
-                finalHint.second = assig.second;
-                return true;
+            public void onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {
+                if (!currentGame.getBoard().isEmpty(coord_value.first.first, coord_value.first.second)) return;
+                finalHint.first.first = coord_value.first.first;
+                finalHint.first.second = coord_value.first.second;
+                finalHint.second = coord_value.second;
+                testingFunctions.abortOperation();
             }
+
+            @Override
+            public void onCellNotationsChanged(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> coord_prev_post) {}
+            @Override
+            public void onRowSumAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {}
+            @Override
+            public void onColSumAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {}
+            @Override
+            public void onCellNoValuesLeft(Pair<Integer, Integer> coord) {}
+            @Override
+            public void onRowNoValuesLeft(Pair<Integer, Integer> coord) {}
+            @Override
+            public void onColNoValuesLeft(Pair<Integer, Integer> coord) {}
         });
 
         for (Pair<Pair<Integer, Integer>, Integer> f : forcedValues) {

@@ -476,6 +476,14 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBlackCellValue(r, c, s, value);
         onResize(contents.getWidth(), contents.getHeight());
     }
+    public void selectModified(int r, int c, int s) {
+        if (s == CreatorScreenCtrl.WHITE_CELL) {
+            creatorBoard.setWhiteCellSelectedColor(r, c, Palette.HintGreen);
+        } else {
+            creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.HintGreen);
+            onResize(contents.getWidth(), contents.getHeight());
+        }
+    }
     public void selectConflictive(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);

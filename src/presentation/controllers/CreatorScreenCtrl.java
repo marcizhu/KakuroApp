@@ -21,6 +21,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     private Pair<Pair<Integer, Integer>, Integer> selectedPos;
 
+    private ArrayList<Pair<Pair<Integer, Integer>, Integer>> modifiedCoord;
     private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictingCoord;
 
     private int currentTab;
@@ -37,6 +38,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         this.creator = creatorInstance;
         creator.setUp(this);
         selectedPos = new Pair<>(new Pair<>(-1, -1), -2);
+        modifiedCoord = new ArrayList<>();
         conflictingCoord = new ArrayList<>();
         currentTab = 0;
         blackBrushActive = false;
@@ -52,7 +54,9 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     private void unselectPrevPos() {
         if (selectedPos.first.first == -1 && selectedPos.first.second == -1 && selectedPos.second == -2) return;
-        if (selectedPos.second == WHITE_CELL) ((CreatorScreen)screen).unselectWhiteCell(selectedPos.first.first, selectedPos.first.second);
+        if (selectedPos.second == WHITE_CELL) {
+            ((CreatorScreen)screen).unselectWhiteCell(selectedPos.first.first, selectedPos.first.second);
+        }
         else {
             ((CreatorScreen)screen).unselectBlackCell(selectedPos.first.first, selectedPos.first.second, selectedPos.second);
             Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(selectedPos.first.first, selectedPos.first.second, selectedPos.second);
@@ -61,10 +65,18 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         selectedPos.first.first = -1; selectedPos.first.second = -1; selectedPos.second = -2;
     }
     public void setSelectedPos(int r, int c, int s) {
+        if (r == -1 && c == -1 && s == -2) {
+            unselectPrevPos();
+            ((CreatorScreen)screen).updateWhitePossibleValues(new Pair<>(new ArrayList<>(), false));
+            ((CreatorScreen)screen).updateBlackPossibleValues(new Pair<>(new ArrayList<>(), false));
+            return;
+        }
         if (s == WHITE_CELL) {
             if (currentTab != 1) ((CreatorScreen)screen).setTab(1);
             if (creator.selectWhiteCell(r, c)) {
                 unselectPrevPos();
+                unselectConflictingCoord();
+                unselectModifiedCoord();
                 ((CreatorScreen)screen).selectWhiteCell(r, c);
                 selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
             }
@@ -72,10 +84,37 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
             if (currentTab != 0) ((CreatorScreen)screen).setTab(0);
             if (creator.selectBlackCell(r, c, s)) {
                 unselectPrevPos();
+                unselectConflictingCoord();
+                unselectModifiedCoord();
                 ((CreatorScreen)screen).selectBlackCell(r, c, s);
                 Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(r, c, s);
                 ((CreatorScreen)screen).selectBlackCell(symm.first.first, symm.first.second, symm.second);
                 selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
+            }
+        }
+    }
+
+    public void setModifiedCoord (ArrayList<Pair<Pair<Integer, Integer>, Integer>> modifications) {
+        // erase previous modifications, mark new modifications
+        unselectModifiedCoord();
+        for (Pair<Pair<Integer, Integer>, Integer> m : modifications) {
+            ((CreatorScreen)screen).selectModified(m.first.first, m.first.second, m.second);
+        }
+        modifiedCoord = modifications;
+    }
+    private void unselectModifiedCoord() {
+        for (Pair<Pair<Integer, Integer>, Integer> m : modifiedCoord) {
+            if (m.second == WHITE_CELL) {
+                ((CreatorScreen)screen).unselectWhiteCell(m.first.first, m.first.second);
+                if (m.first.first == selectedPos.first.first && m.first.second == selectedPos.first.second)
+                    ((CreatorScreen)screen).selectWhiteCell(selectedPos.first.first, selectedPos.first.second);
+            } else {
+                ((CreatorScreen)screen).unselectBlackCell(m.first.first, m.first.second, m.second);
+                if (m.first.first == selectedPos.first.first && m.first.second == selectedPos.first.second) {
+                    ((CreatorScreen) screen).selectBlackCell(m.first.first, m.first.second, m.second);
+                    Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(m.first.first, m.first.second, m.second);
+                    ((CreatorScreen)screen).selectBlackCell(symm.first.first, symm.first.second, symm.second);
+                }
             }
         }
     }
@@ -102,21 +141,30 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
                     ((CreatorScreen)screen).selectWhiteCell(selectedPos.first.first, selectedPos.first.second);
             } else {
                 ((CreatorScreen)screen).unselectBlackCell(cc.first.first, cc.first.second, cc.second);
+                if (cc.first.first == selectedPos.first.first && cc.first.second == selectedPos.first.second) {
+                    ((CreatorScreen) screen).selectBlackCell(cc.first.first, cc.first.second, cc.second);
+                    Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(cc.first.first, cc.first.second, cc.second);
+                    ((CreatorScreen)screen).selectBlackCell(symm.first.first, symm.first.second, symm.second);
+                }
             }
         }
     }
 
-    // Black cell manegent
+    // Black cell management
 
     public void setBlackBrushEnabled(boolean b) {
         blackBrushActive = b;
         if (b) whiteBrushActive = false;
     }
     public void clearSelectedBlackCellValueClicked () {
-
+        unselectConflictingCoord();
+        unselectModifiedCoord();
+        creator.clearBlackCell(selectedPos.first.first, selectedPos.first.second, selectedPos.second);
     }
     public void blackCellSelectValueClicked (int value) {
-
+        unselectConflictingCoord();
+        unselectModifiedCoord();
+        creator.blackCellAssignation(selectedPos.first.first, selectedPos.first.second, selectedPos.second, value);
     }
     // possible values and whether black cell has a defined value
     public void setBlackPossibilitiesList(Pair<ArrayList<Integer>, Boolean> blackPossibilitiesList) {

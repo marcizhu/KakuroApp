@@ -188,9 +188,12 @@ public class KakuroCreationCtrl {
         if (invalidSizes) {
             sendMessageToPresentation(LINE_SIZES_MESSAGE);
             sendConflictingToPresentation();
+            viewCtrl.setSelectedPos(-1, -1, -2);
             return;
         }
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> forcedInitial = new ArrayList<>();
+        //ArrayList<Pair<Pair<Integer, Integer>, Integer>> rowSumAssig = new ArrayList<>();
+        //ArrayList<Pair<Pair<Integer, Integer>, Integer>> colSumAssig = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 if (workingBoard.isWhiteCell(r, c)) {
@@ -300,8 +303,8 @@ public class KakuroCreationCtrl {
         //check last row and col
         for (int c = 0; c < columns; c++) {
             if (workingBoard.isWhiteCell(rows-1, c)) {
-                if (rowSums[rowIDs[rows-1][c]] == 0)  blackCellValues.add(new Pair<>(new Pair<>(rows, c), new Pair<>(CreatorScreenCtrl.BLACK_SECTION_TOP, -1)));
-                else blackCellValues.add(new Pair<>(new Pair<>(rows, c), new Pair<>(CreatorScreenCtrl.BLACK_SECTION_TOP, rowSums[rowIDs[rows-1][c]])));
+                if (colSums[colIDs[rows-1][c]] == 0)  blackCellValues.add(new Pair<>(new Pair<>(rows, c), new Pair<>(CreatorScreenCtrl.BLACK_SECTION_TOP, -1)));
+                else blackCellValues.add(new Pair<>(new Pair<>(rows, c), new Pair<>(CreatorScreenCtrl.BLACK_SECTION_TOP, colSums[colIDs[rows-1][c]])));
             } else {
                 blackCellValues.add(new Pair<>(new Pair<>(rows, c), new Pair<>(CreatorScreenCtrl.BLACK_SECTION_TOP, 0)));
             }
@@ -451,6 +454,26 @@ public class KakuroCreationCtrl {
         viewCtrl.setTipMessage(message);
     }
 
+    private void sendModifiedToPresentation() {
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> modifications = new ArrayList<>();
+        for (int r : modifiedRowSums) {
+            modifications.add(new Pair( new Pair(firstRowCoord[r].first, firstRowCoord[r].second-1), CreatorScreenCtrl.BLACK_SECTION_RIGHT));
+            modifications.add(new Pair( new Pair(firstRowCoord[r].first, firstRowCoord[r].second + rowSize[r]), CreatorScreenCtrl.BLACK_SECTION_LEFT));
+        }
+        for (int c : modifiedColSums) {
+            modifications.add(new Pair( new Pair(firstColCoord[c].first-1, firstColCoord[c].second), CreatorScreenCtrl.BLACK_SECTION_BOTTOM));
+            modifications.add(new Pair( new Pair(firstColCoord[c].first + colSize[c], firstColCoord[c].second), CreatorScreenCtrl.BLACK_SECTION_TOP));
+        }
+        for (Pair<Integer, Integer> p : modifiedCellValues) {
+            modifications.add(new Pair(p, CreatorScreenCtrl.WHITE_CELL));
+        }
+        for (IntPair ip : modifiedCellNotations) {
+            modifications.add(new Pair(ip, CreatorScreenCtrl.WHITE_CELL));
+        }
+
+        viewCtrl.setModifiedCoord(modifications);
+    }
+
     private void sendConflictingToPresentation() {
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflicts = new ArrayList<>();
         for (int r : conflictingRowSums) {
@@ -507,19 +530,34 @@ public class KakuroCreationCtrl {
         }
     }
 
+    private boolean isBlackCellValid(int r, int c, int s) {
+        if (r == rows && s != CreatorScreenCtrl.BLACK_SECTION_TOP) return false;
+        if (r == 0 && s != CreatorScreenCtrl.BLACK_SECTION_BOTTOM) return false;
+        if (c == columns && s != CreatorScreenCtrl.BLACK_SECTION_LEFT) return false;
+        if (c == 0 && s != CreatorScreenCtrl.BLACK_SECTION_RIGHT) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP && !(r>0 && workingBoard.isWhiteCell(r-1, c))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_BOTTOM && !(r<rows-1 && workingBoard.isWhiteCell(r+1, c))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT && !(c>0 && workingBoard.isWhiteCell(r, c-1))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_RIGHT && !(c<columns-1 && workingBoard.isWhiteCell(r, c+1))) return false;
+        return true;
+    }
+
     public boolean selectBlackCell(int r, int c, int s) {
         // Cases where can't be selected
         if (invalidSizes) {
             sendMessageToPresentation(LINE_SIZES_MESSAGE);
             return false;
         }
-        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP && !(r>0 && workingBoard.isWhiteCell(r-1, c))) return false;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_BOTTOM && !(r<rows-1 && workingBoard.isWhiteCell(r+1, c))) return false;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT && !(c>0 && workingBoard.isWhiteCell(r, c-1))) return false;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_RIGHT && !(c<columns-1 && workingBoard.isWhiteCell(r, c+1))) return false;
+        if (!isBlackCellValid(r, c, s)) return false;
 
-        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) r = firstColCoord[colIDs[r-1][c]].first-1;
-        else if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT) c = firstRowCoord[rowIDs[r][c-1]].second-1;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
+            r = firstColCoord[colIDs[r-1][c]].first-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_BOTTOM;
+        }
+        else if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT) {
+            c = firstRowCoord[rowIDs[r][c-1]].second-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+        }
 
         boolean isRow = s == CreatorScreenCtrl.BLACK_SECTION_LEFT || s == CreatorScreenCtrl.BLACK_SECTION_RIGHT;
         int lineSize;
@@ -571,9 +609,9 @@ public class KakuroCreationCtrl {
                 allSums.remove(workingBoard.getHorizontalSum(r,c));
             }
         } else {
-            if (workingBoard.getHorizontalSum(r,c) != 0) {
+            if (workingBoard.getVerticalSum(r,c) != 0) {
                 hadValue = true;
-                allSums.remove(workingBoard.getHorizontalSum(r,c));
+                allSums.remove(workingBoard.getVerticalSum(r,c));
             }
         }
 
@@ -586,10 +624,7 @@ public class KakuroCreationCtrl {
     public Pair<Pair<Integer, Integer>, Integer> getMatchingBlackPos(int r, int c, int s) {
         Pair<Pair<Integer, Integer>, Integer> result = new Pair<>(new Pair<>(-1, -1), -2);
         if (invalidSizes) return result; //shouldn't ask for it in this case
-        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP && !(r>0 && workingBoard.isWhiteCell(r-1, c))) return result;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_BOTTOM && !(r<rows-1 && workingBoard.isWhiteCell(r+1, c))) return result;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT && !(c>0 && workingBoard.isWhiteCell(r, c-1))) return result;
-        if (s == CreatorScreenCtrl.BLACK_SECTION_RIGHT && !(c<columns-1 && workingBoard.isWhiteCell(r, c+1))) return result;
+        if (!isBlackCellValid(r, c, s)) return result;
 
         switch (s) {
             case CreatorScreenCtrl.BLACK_SECTION_TOP :
@@ -632,6 +667,76 @@ public class KakuroCreationCtrl {
         return true;
     }
 
+    public void blackCellAssignation(int r, int c, int s, int value) {
+        if (invalidSizes) return; //shouldn't ask for it in this case
+        if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
+
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
+            r = firstColCoord[colIDs[r-1][c]].first-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_BOTTOM;
+        }
+        else if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT) {
+            c = firstRowCoord[rowIDs[r][c-1]].second-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+        }
+        boolean isRow = s == CreatorScreenCtrl.BLACK_SECTION_LEFT || s == CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+
+        if ((isRow && value == workingBoard.getHorizontalSum(r,c)) || (!isRow && value == workingBoard.getVerticalSum(r,c))) return;
+
+        if ((isRow && value != workingBoard.getHorizontalSum(r,c)) || (!isRow && value != workingBoard.getVerticalSum(r,c)))
+            clearBlackCell(r, c, s);
+
+        clearModified();
+        clearConflicting();
+
+        boolean successfulAssignation;
+        if (isRow) successfulAssignation = assigFunctions.rowSumAssignation(r, c+1, value);
+        else successfulAssignation = assigFunctions.colSumAssignation(r+1, c, value);
+
+        if (successfulAssignation) {
+            // update row and column sums in board, assigFunctions only changes the data structures.
+            for (int rowID : modifiedRowSums) {
+                int rr = firstRowCoord[rowID].first;
+                int cc = firstRowCoord[rowID].second -1;
+                workingBoard.setCell(new BlackCell(workingBoard.getVerticalSum(rr, cc), rowSums[rowID]), rr, cc);
+            }
+            for (int colID : modifiedColSums) {
+                int rr = firstColCoord[colID].first -1;
+                int cc = firstColCoord[colID].second;
+                workingBoard.setCell(new BlackCell(colSums[colID], workingBoard.getHorizontalSum(rr, cc)), rr, cc);
+            }
+            sendReshapedBoard();
+            selectBlackCell(r, c, s);
+            sendModifiedToPresentation();
+        } else {
+            sendConflictingToPresentation();
+        }
+    }
+    public void clearBlackCell(int r, int c, int s) {
+        if (invalidSizes) return; //shouldn't ask for it in this case
+        if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
+
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
+            r = firstColCoord[colIDs[r-1][c]].first-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_BOTTOM;
+        }
+        else if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT) {
+            c = firstRowCoord[rowIDs[r][c-1]].second-1;
+            s = CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+        }
+        boolean isRow = s == CreatorScreenCtrl.BLACK_SECTION_LEFT || s == CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+
+        if (isRow) {
+            if (workingBoard.getHorizontalSum(r, c) == 0) return;
+            workingBoard.setCell(new BlackCell(workingBoard.getVerticalSum(r, c), 0), r, c);
+        } else {
+            if (workingBoard.getVerticalSum(r, c) == 0) return;
+            workingBoard.setCell(new BlackCell(0, workingBoard.getHorizontalSum(r, c)), r, c);
+        }
+
+        recomputeBoardStructures();
+        selectBlackCell(r, c, s);
+    }
 
 
     private void initializeAssigFunctions() {
@@ -731,11 +836,40 @@ public class KakuroCreationCtrl {
             }
         });
 
-        assigFunctions.setCellValueAssignationListener(new KakuroFunctions.CellValueAssignationListener() {
+        assigFunctions.setAssignationEventListener(new KakuroFunctions.AssignationEventListener() {
             @Override
-            public boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig) {
-                modifiedCellValues.add(assig.first);
-                return false;
+            public void onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {
+                modifiedCellValues.add(coord_value.first);
+            }
+
+            @Override
+            public void onCellNotationsChanged(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> coord_prev_post) {
+                modifiedCellNotations.add(new IntPair(coord_prev_post.first.first, coord_prev_post.first.second));
+            }
+
+            @Override
+            public void onRowSumAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {
+                modifiedRowSums.add(rowIDs[coord_value.first.first][coord_value.first.second]);
+            }
+
+            @Override
+            public void onColSumAssignation(Pair<Pair<Integer, Integer>, Integer> coord_value) {
+                modifiedColSums.add(colIDs[coord_value.first.first][coord_value.first.second]);
+            }
+
+            @Override
+            public void onCellNoValuesLeft(Pair<Integer, Integer> coord) {
+                conflictingWhiteCells.add(new IntPair(coord.first, coord.second));
+            }
+
+            @Override
+            public void onRowNoValuesLeft(Pair<Integer, Integer> coord) {
+                conflictingRowSums.add(rowIDs[coord.first][coord.second]);
+            }
+
+            @Override
+            public void onColNoValuesLeft(Pair<Integer, Integer> coord) {
+                conflictingColSums.add(colIDs[coord.first][coord.second]);
             }
         });
     }
