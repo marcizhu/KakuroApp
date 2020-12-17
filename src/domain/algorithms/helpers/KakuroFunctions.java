@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class KakuroFunctions {
 
     private final KakuroFunctionsMaster master;
-    private CellValueAssignationListener cellValueAssignationListener;
+    private AssignationEventListener assignationEventListener;
     private boolean abort;
 
     public interface KakuroFunctionsMaster {
@@ -39,8 +39,20 @@ public class KakuroFunctions {
         SwappingCellQueue getNotationsQueue();
     }
 
-    public interface CellValueAssignationListener {
-        boolean onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> assig);
+    public interface AssignationEventListener {
+        // Non-confirmed modifications, only acceptable if operation is successful.
+        // Called right before change is updated.
+        void onCellValueAssignation (Pair<Pair<Integer, Integer>, Integer> coord_value);
+        void onCellNotationsChanged (Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> coord_prev_post);
+        void onRowSumAssignation (Pair<Pair<Integer, Integer>, Integer> coord_value);
+        void onColSumAssignation (Pair<Pair<Integer, Integer>, Integer> coord_value);
+
+        // Confirmed conflicting events, cause the operation to fail.
+        void onCellNoValuesLeft (Pair<Integer, Integer> coord);
+        void onRowNoValuesLeft (Pair<Integer, Integer> coord);
+        void onColNoValuesLeft (Pair<Integer, Integer> coord);
+
+        //Note: Row and col related pass coordinates of some cell inside the row/col.
     }
 
     public KakuroFunctions(KakuroFunctionsMaster m) {
@@ -48,12 +60,16 @@ public class KakuroFunctions {
         abort = false;
     }
 
-    public void setCellValueAssignationListener(CellValueAssignationListener listener) {
-        cellValueAssignationListener = listener;
+    public void setAssignationEventListener(AssignationEventListener listener) {
+        assignationEventListener = listener;
+    }
+    public void abortOperation() {
+        abort = true;
     }
 
     public boolean cellValueAssignation(int r, int c, int value) {
         if (value == 0) return false;
+        abort = false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -71,6 +87,7 @@ public class KakuroFunctions {
     public boolean rowSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initRowSumAssignation(r, c, value, true); }
     private boolean initRowSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
         if (value == 0) return false;
+        abort = false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -87,6 +104,7 @@ public class KakuroFunctions {
     public boolean colSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initColSumAssignation(r, c, value, true); }
     private boolean initColSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
         if (value == 0) return false;
+        abort = false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -103,6 +121,7 @@ public class KakuroFunctions {
     public boolean bothRowColSumAssignationAssertCellValueAssigned(int r, int c, int rowValue, int colValue) { return initBothRowColSumAssignation(r, c, rowValue, colValue, true); }
     private boolean initBothRowColSumAssignation(int r, int c, int rowValue, int colValue, boolean assertRCValueAssigned) {
         if (rowValue == 0 || colValue == 0) return false;
+        abort = false;
         ArrayList<Pair<Integer, Integer>> rowSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> colSumRollBack = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValueRollBack = new ArrayList<>();
@@ -176,6 +195,7 @@ public class KakuroFunctions {
             if (master.getRowSum(r, c) == value) return true; //the assignation has already happened, no problem
             return false; //already has a sum value assigned
         }
+        if (assignationEventListener != null) assignationEventListener.onRowSumAssignation(new Pair<>(new Pair<>(r, c), value));
         master.setRowSum(r, c, value);
         modifiedRows[master.getRowID(r, c)] = true;
         rowSumRollBack.add(new Pair<>(r, c));
@@ -192,6 +212,7 @@ public class KakuroFunctions {
             if (master.getColSum(r, c) == value) return true; //the assignation has already happened, no problem
             return false; //already has a sum value assigned
         }
+        if (assignationEventListener != null) assignationEventListener.onColSumAssignation(new Pair<>(new Pair<>(r, c), value));
         master.setColSum(r, c, value);
         modifiedCols[master.getColID(r, c)] = true;
         colSumRollBack.add(new Pair<>(r, c));
@@ -199,6 +220,7 @@ public class KakuroFunctions {
     }
 
     private boolean cellValueAssignation(int r, int c, int value, ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack, boolean[] modifiedRows, boolean[] modifiedCols) {
+        if (abort) return false;
         // Should update the assignation for that cell, set the value, update the orderedCells data structure
         //  and its pointers with removeOrderedCell, update valuesUsed for row and col, and add it to rollback.
         //  Could call other assignations recursively
@@ -220,16 +242,15 @@ public class KakuroFunctions {
                 return false; //new sum would be greater than it should
         }
 
-        cellValueRollBack.add(new Pair<>(r, c)); //if rollback we clear this coordinates and insert in notationsQueue
+        cellValueRollBack.add(new Pair<>(r, c)); //if rollback we clear these coordinates and insert in notationsQueue
         if (master.getWorkingBoard().getCellNotationSize(r, c) > 1) { //cell notations should be removed (important in ambiguity checking), this won't be checked before then.
             int cellNotations = master.getWorkingBoard().getCellNotations(r, c);
             if (master.getNotationsQueue().isHiding(r, c)) hidingCellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             else cellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             master.getNotationsQueue().eraseNotationsFromCell(r, c, (cellNotations & ~(1<<(value-1))));
         }
-        if (cellValueAssignationListener != null) abort = cellValueAssignationListener.onCellValueAssignation(new Pair<>(new Pair<>(r, c), value));
-        if (abort) return false;
-        master.getNotationsQueue().removeOrderedCell(r, c); // removes it from queue but notations are mantained
+        if (assignationEventListener != null) assignationEventListener.onCellValueAssignation(new Pair<>(new Pair<>(r, c), value));
+        master.getNotationsQueue().removeOrderedCell(r, c); // removes it from queue but notations are maintained
         master.getWorkingBoard().setCellValue(r, c, value);
         master.setRowValuesUsed(r, c, master.getRowValuesUsed(r, c) | 1 << (value-1));
         master.setColValuesUsed(r, c, master.getColValuesUsed(r, c) | 1 << (value-1));
@@ -284,6 +305,11 @@ public class KakuroFunctions {
             if (!isCombinationPossible(p, containingCells)) possibleCases.remove(i);
         }
 
+        if (possibleCases.size() == 0) {
+            if (assignationEventListener != null) assignationEventListener.onRowNoValuesLeft(new Pair<>(r, c));
+            return false; //No possible assignations for row.
+        }
+
         int rowOptions = 0;
         for(int p : possibleCases) rowOptions |= p;
 
@@ -317,6 +343,8 @@ public class KakuroFunctions {
                 }
             }
             deepNotationAnalysis(num_cells, size, notations, insertPtrs, allToErase);
+            for(int it = 0; superPermissive && it < master.getRowSize(r, c); it++)
+                superPermissive = allToErase.get(it) == 0;
         }
 
         // check for each non-set white-cell if its notations have some notation that is not in commonRowNotations
@@ -329,6 +357,7 @@ public class KakuroFunctions {
                 int valuesToErase = (cellNotations & ~commonRowNotations) | allToErase.get(it - master.getFirstRowCoord(r, c).second);
 
                 if (valuesToErase != 0) { // we need to erase some notations
+                    if (assignationEventListener != null) assignationEventListener.onCellNotationsChanged(new Pair<>(new Pair<>(r, it), new Pair<>(cellNotations, cellNotations & ~valuesToErase)));
                     modifiedRows[master.getRowID(r, c)] = true;
                     modifiedCols[master.getColID(r, it)] = true;
                     affectedColumns.add(it);
@@ -344,6 +373,7 @@ public class KakuroFunctions {
         for (int affected : affectedColumns) {
             int notationSize = master.getWorkingBoard().getCellNotationSize(r, affected);
             if (notationSize == 0) {
+                if (assignationEventListener != null) assignationEventListener.onCellNoValuesLeft(new Pair<>(r, affected));
                 return false; // no values are possible for this empty cell, whole branch must do rollback
             }
             if (notationSize == 1) { // only one value possible, we assign it
@@ -406,6 +436,11 @@ public class KakuroFunctions {
             if (!isCombinationPossible(p, containingCells)) possibleCases.remove(i);
         }
 
+        if (possibleCases.size() == 0) {
+            if (assignationEventListener != null) assignationEventListener.onColNoValuesLeft(new Pair<>(r, c));
+            return false; //No possible assignations for col.
+        }
+
         int colOptions = 0;
         for(int p : possibleCases) colOptions |= p;
 
@@ -433,6 +468,8 @@ public class KakuroFunctions {
                 notations[it] = master.getWorkingBoard().getCellNotations(it + master.getFirstColCoord(r, c).first, c);
             }
             deepNotationAnalysis(num_cells, size, notations, insertPtrs, allToErase);
+            for(int it = 0; superPermissive && it < master.getColSize(r, c); it++)
+                superPermissive = allToErase.get(it) == 0;
         }
 
         for(int it = master.getFirstColCoord(r, c).first; !superPermissive && it < master.getFirstColCoord(r, c).first+master.getColSize(r, c); it++) {
@@ -442,6 +479,7 @@ public class KakuroFunctions {
                 int valuesToErase = (cellNotations & ~commonColNotations) | allToErase.get(it - master.getFirstColCoord(r, c).first);
 
                 if (valuesToErase != 0) { // we need to erase some notations
+                    if (assignationEventListener != null) assignationEventListener.onCellNotationsChanged(new Pair<>(new Pair<>(it, c), new Pair<>(cellNotations, cellNotations & ~valuesToErase)));
                     modifiedRows[master.getRowID(it, c)] = true;
                     modifiedCols[master.getColID(r, c)] = true;
                     affectedRows.add(it);
@@ -457,6 +495,7 @@ public class KakuroFunctions {
         for (int affected : affectedRows) {
             int notationSize = master.getWorkingBoard().getCellNotationSize(affected, c);
             if (notationSize == 0) {
+                if (assignationEventListener != null) assignationEventListener.onCellNoValuesLeft(new Pair<>(affected, c));
                 return false; // no values are possible for this empty cell, whole branch must do rollback
             }
             if (notationSize == 1) { // only one value possible, we assign it
