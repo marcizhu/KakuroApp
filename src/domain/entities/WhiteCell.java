@@ -60,6 +60,20 @@ public class WhiteCell extends Cell {
     }
 
     /**
+     * Constructor
+     * Initializes a white cell with all its attributes (used by CellDeserializer)
+     * @param row Vertical position of the cell relative to the board
+     * @param col Horizontal position of the cell relative to the board
+     * @param value Value to set the cell to
+     * @param notations the value for the notations
+     */
+    public WhiteCell(int row, int col, int value, int notations) {
+        this.value = value;
+        this.notations = notations;
+        this.setCoordinates(row, col);
+    }
+
+    /**
      * Get value of the cell
      * @return the value of the cell
      */

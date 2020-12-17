@@ -17,14 +17,6 @@ public class Board {
     private final int height;
     private Cell[][] cells;
 
-    /**
-     * Default constructor. Creates an empty board.
-     */
-    public Board() {
-        this.id = UUID.randomUUID();
-        width = 0;
-        height = 0;
-    }
 
     /**
      * Creates a board with dimensions width x height.

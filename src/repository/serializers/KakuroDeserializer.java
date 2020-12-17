@@ -5,9 +5,7 @@ import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
-import src.repository.DB;
-import src.repository.UserRepository;
-import src.repository.UserRepositoryDB;
+import src.repository.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -19,18 +17,32 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
     @Override
     public Kakuro deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject obj = jsonElement.getAsJsonObject();
-        UserRepository repo = new UserRepositoryDB(new DB());
+
+        DB driver = new DB();
+        UserRepository userRepo = new UserRepositoryDB(driver);
+        BoardRepository boardRepo = new BoardRepositoryDB(driver);
 
         Timestamp createdAt = Timestamp.valueOf(obj.get("createdAt").getAsString());
         String createdBy = obj.get("createdBy").getAsString();
         Difficulty d = Difficulty.valueOf(obj.get("difficulty").getAsString());
         UUID kakuroId = UUID.fromString(obj.get("id").getAsString());
-        Board b = new Board(10, 10); // FIXME: get board with boardId with boardRepository
+        UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
+        Board b;
+
+        try {
+            b = boardRepo.getBoard(boardId);
+        } catch (IOException e) {
+            System.err.println("Error getting board " + boardId.toString() + " from database");
+            e.printStackTrace();
+            b = null;
+        }
+
         User u;
         try {
-            u = repo.getUser(createdBy);
+            u = userRepo.getUser(createdBy);
         } catch (IOException e) {
             System.err.println("Error getting user " + createdBy + " from database");
+            e.printStackTrace();
             u = null;
         }
 

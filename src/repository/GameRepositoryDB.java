@@ -58,6 +58,10 @@ public class GameRepositoryDB implements GameRepository {
 
     @Override
     public void saveGame(Game game) throws IOException {
+
+        //TODO FIXME: when a game in progress is saved, its board should be saved too!!!
+
+
         ArrayList<Game> gamesList = this.getAllGames();
 
         for (int i = 0; i<gamesList.size(); i++) {

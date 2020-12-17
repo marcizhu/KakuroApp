@@ -9,7 +9,6 @@ public class KakuroSeializer implements JsonSerializer<Kakuro> {
 
     @Override
     public JsonElement serialize(Kakuro kakuro, Type type, JsonSerializationContext jsonSerializationContext) {
-        System.out.println("We gone serialize this kakuro");
         JsonObject obj = new JsonObject();
         obj.addProperty("id", kakuro.getId().toString());
         obj.addProperty("createdAt", kakuro.getCreatedAt().toString());

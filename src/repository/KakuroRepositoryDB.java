@@ -45,6 +45,9 @@ public class KakuroRepositoryDB implements KakuroRepository {
 
     @Override
     public void saveKakuro(Kakuro kakuro) throws IOException {
+
+        // TODO FIXME: when saving a kakuro, save its board too!!
+
         ArrayList<Kakuro> kakuroList = this.getAllKakuros();
 
         for (int i = 0; i<kakuroList.size(); i++) {
@@ -57,6 +60,9 @@ public class KakuroRepositoryDB implements KakuroRepository {
 
         kakuroList.add(kakuro);
         driver.writeToFile(kakuroList, "Kakuro", serializer, Kakuro.class);
+
+        BoardRepository boardRepo = new BoardRepositoryDB(driver);
+        boardRepo.saveBoard(kakuro.getBoard());
     }
 
     @Override

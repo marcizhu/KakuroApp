@@ -22,10 +22,10 @@ public class KakuroRepositoryDBTest {
     public void testGetKakuro () throws IOException {
         DB dbMock = mock(DB.class);
 
-        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(), new User("Larry"));
+        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(1, 1), new User("Larry"));
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
-        expectedKakuros.add(new Kakuro(Difficulty.MEDIUM, new Board(), new User("Kanye")));
+        expectedKakuros.add(new Kakuro(Difficulty.MEDIUM, new Board(1, 1), new User("Kanye")));
 
         when(dbMock.readAll(any(), any(JsonDeserializer.class))).thenReturn(expectedKakuros);
 
@@ -42,7 +42,7 @@ public class KakuroRepositoryDBTest {
     public void testDeleteKakuro () throws IOException {
         DB dbMock = mock(DB.class);
 
-        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(), new User("Larry"));
+        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(1, 1), new User("Larry"));
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
 
@@ -60,7 +60,7 @@ public class KakuroRepositoryDBTest {
     public void testSaveKakuro () throws IOException {
         DB dbMock = mock(DB.class);
 
-        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(), new User("Larry"));
+        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(1, 1), new User("Larry"));
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
 
@@ -79,8 +79,8 @@ public class KakuroRepositoryDBTest {
     public void testGetAllKakuros () throws IOException {
         DB dbMock = mock(DB.class);
 
-        Kakuro expectedKakuro1 = new Kakuro(Difficulty.EXTREME, new Board(), new User("Larry"));
-        Kakuro expectedKakuro2 = new Kakuro(Difficulty.EASY, new Board(), new User("Kanye"));
+        Kakuro expectedKakuro1 = new Kakuro(Difficulty.EXTREME, new Board(1, 1), new User("Larry"));
+        Kakuro expectedKakuro2 = new Kakuro(Difficulty.EASY, new Board(1, 1), new User("Kanye"));
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro1);
         expectedKakuros.add(expectedKakuro2);
@@ -103,10 +103,10 @@ public class KakuroRepositoryDBTest {
         DB dbMock = mock(DB.class);
 
         User larry = new User("Larry");
-        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(), larry);
+        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(1, 1), larry);
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
-        expectedKakuros.add(new Kakuro(Difficulty.EASY, new Board(), new User("Kanye")));
+        expectedKakuros.add(new Kakuro(Difficulty.EASY, new Board(1, 1), new User("Kanye")));
 
         when(dbMock.readAll(any(), any(JsonDeserializer.class)
         )).thenReturn(expectedKakuros);
@@ -129,10 +129,10 @@ public class KakuroRepositoryDBTest {
     public void testGetAllKakurosByDifficulty () throws IOException {
         DB dbMock = mock(DB.class);
 
-        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(), new User("Larry"));
+        Kakuro expectedKakuro = new Kakuro(Difficulty.EXTREME, new Board(1, 1), new User("Larry"));
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
-        expectedKakuros.add(new Kakuro(Difficulty.EASY, new Board(), new User("Kanye")));
+        expectedKakuros.add(new Kakuro(Difficulty.EASY, new Board(1, 1), new User("Kanye")));
 
         when(dbMock.readAll(any(), any(JsonDeserializer.class))).thenReturn(expectedKakuros);
 
