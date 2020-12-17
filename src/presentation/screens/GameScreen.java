@@ -503,14 +503,19 @@ public class GameScreen extends AbstractScreen {
     public void setNotationWhiteCell(int r, int c, int notations) {
         gameBoard.setWhiteCellNotations(r, c, notations);
     }
+
+    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
+    //  it only works if there is a resize for some reason
     public void unselectBlackCell(int r, int c, int s) {
         gameBoard.unselectBlackCell(r, c, s);
+        onResize(contents.getWidth(), contents.getHeight());
     }
     public void selectConflictive(int r, int c, int s) {
         if (s == GameScreenCtrl.WHITE_CELL) {
             gameBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
         } else {
             gameBoard.setBlackCellSelectedColor(r, c, s, Palette.WarningLightRed);
+            onResize(contents.getWidth(), contents.getHeight());
         }
     }
     public void tintValuePanelButtonText(int value, Color tint) {

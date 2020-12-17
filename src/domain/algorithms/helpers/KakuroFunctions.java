@@ -223,11 +223,6 @@ public class KakuroFunctions {
         cellValueRollBack.add(new Pair<>(r, c)); //if rollback we clear this coordinates and insert in notationsQueue
         if (master.getWorkingBoard().getCellNotationSize(r, c) > 1) { //cell notations should be removed (important in ambiguity checking), this won't be checked before then.
             int cellNotations = master.getWorkingBoard().getCellNotations(r, c);
-            // because cellNotations might get modified if we have to erase, rollback holds the original values
-            // FIXME DEBUGGING
-            //ArrayList<Integer> toErase = new ArrayList<>(); //new ArrayList<>();
-            //for (int i = 0; i < 9; i++)
-            //    if(i+1 != value && (cellNotations & (1<<i)) != 0) toErase.add(i + 1); // if it's not the value
             if (master.getNotationsQueue().isHiding(r, c)) hidingCellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             else cellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             master.getNotationsQueue().eraseNotationsFromCell(r, c, (cellNotations & ~(1<<(value-1))));
@@ -473,7 +468,7 @@ public class KakuroFunctions {
             }
             else {
                 success = success && updateRowNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful
-                if (modifiedCols[master.getColID(r, c)]) success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful //TODO: analyze if this recursive call is actually needed
+                if (modifiedCols[master.getColID(r, c)]) success = success && updateColNotations(affected, c, rowSumRollBack, colSumRollBack, cellValueRollBack, cellNotationsRollBack, hidingCellNotationsRollBack, modifiedRows, modifiedCols); //all must be successful
             }
             if (!success) return false; // responsible for the call will do rollbacks
         }

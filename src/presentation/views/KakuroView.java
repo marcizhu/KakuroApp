@@ -297,8 +297,8 @@ public class KakuroView extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int section;
-                    int relative_x = e.getX() - getLocation().x;
-                    int relative_y = e.getY() - getLocation().y;
+                    int relative_x = e.getXOnScreen() - cells[row][col].getLocationOnScreen().x;
+                    int relative_y = e.getYOnScreen() - cells[row][col].getLocationOnScreen().y;
 
                     //this works because cells are always squares, if they weren't just multiply by ratio
                     if (relative_x > relative_y) {
@@ -429,6 +429,7 @@ public class KakuroView extends JPanel {
                     break;
             }
             revalidate();
+            System.out.println("Marked with color!");
         }
         public void unselectSection(int section) {
             Color fontColor = RGBUtils.getContrastColor(blackCellColor);

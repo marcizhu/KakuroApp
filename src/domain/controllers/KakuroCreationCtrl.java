@@ -1,6 +1,7 @@
 package src.domain.controllers;
 
 import src.domain.algorithms.Generator;
+import src.domain.algorithms.helpers.KakuroConstants;
 import src.domain.algorithms.helpers.KakuroFunctions;
 import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.BlackCell;
@@ -504,6 +505,131 @@ public class KakuroCreationCtrl {
                 viewCtrl.repaintPrevConflicts();
             }
         }
+    }
+
+    public boolean selectBlackCell(int r, int c, int s) {
+        // Cases where can't be selected
+        if (invalidSizes) {
+            sendMessageToPresentation(LINE_SIZES_MESSAGE);
+            return false;
+        }
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP && !(r>0 && workingBoard.isWhiteCell(r-1, c))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_BOTTOM && !(r<rows-1 && workingBoard.isWhiteCell(r+1, c))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT && !(c>0 && workingBoard.isWhiteCell(r, c-1))) return false;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_RIGHT && !(c<columns-1 && workingBoard.isWhiteCell(r, c+1))) return false;
+
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) r = firstColCoord[colIDs[r-1][c]].first-1;
+        else if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT) c = firstRowCoord[rowIDs[r][c-1]].second-1;
+
+        boolean isRow = s == CreatorScreenCtrl.BLACK_SECTION_LEFT || s == CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+        int lineSize;
+        int valUsed;
+        int firstCrossCoord;
+        if (isRow) {
+            int rowID = rowIDs[r][c+1];
+            lineSize = rowSize[rowID];
+            valUsed = rowValuesUsed[rowID];
+            firstCrossCoord = firstRowCoord[rowID].second;
+        } else {
+            int colID = colIDs[r+1][c];
+            lineSize = colSize[colID];
+            valUsed = colValuesUsed[colID];
+            firstCrossCoord = firstColCoord[colID].first;
+        }
+
+        ArrayList<Pair<Integer, Integer>> possibleCases = KakuroConstants.INSTANCE.getPossibleCasesUnspecifiedSum(lineSize, valUsed);
+        TreeSet<Integer> allSums = new TreeSet<>();
+
+        int lastValueAdded = -1;
+        for (int i = possibleCases.size()-1; i >= 0 ; i--) {
+            while (i >= 0 && possibleCases.get(i).first == lastValueAdded) i--;
+            if (i < 0) break;
+
+            int pCase = possibleCases.get(i).second;
+            ArrayList<Integer> p = new ArrayList<>();
+            for (int j = 0; j < 9; j++) if ((pCase & (1<<j)) != 0) p.add(j+1);
+            ArrayList<WhiteCell> containingCells = new ArrayList<>();
+            for (int it = firstCrossCoord; it < firstCrossCoord+lineSize; it++) {
+                Pair<Integer, Integer> coord = isRow ? new Pair<>(r, it) : new Pair<>(it, c);
+                for (int digit : p) {
+                    if ((!workingBoard.isEmpty(coord.first, coord.second) && workingBoard.getValue(coord.first, coord.second) == digit) || workingBoard.cellHasNotation(coord.first, coord.second, digit)) {
+                        containingCells.add((WhiteCell)workingBoard.getCell(coord.first, coord.second));
+                        break;
+                    }
+                }
+            }
+            if (assigFunctions.isCombinationPossible(p, containingCells)) {
+                lastValueAdded = possibleCases.get(i).first;
+                allSums.add(lastValueAdded);
+            }
+        }
+
+        boolean hadValue = false;
+        if (isRow) {
+            if (workingBoard.getHorizontalSum(r,c) != 0) {
+                hadValue = true;
+                allSums.remove(workingBoard.getHorizontalSum(r,c));
+            }
+        } else {
+            if (workingBoard.getHorizontalSum(r,c) != 0) {
+                hadValue = true;
+                allSums.remove(workingBoard.getHorizontalSum(r,c));
+            }
+        }
+
+        ArrayList<Integer> blackCellPossibilities = new ArrayList<>(allSums);
+
+        viewCtrl.setBlackPossibilitiesList(new Pair<>(blackCellPossibilities, hadValue));
+
+        return true;
+    }
+    public Pair<Pair<Integer, Integer>, Integer> getMatchingBlackPos(int r, int c, int s) {
+        Pair<Pair<Integer, Integer>, Integer> result = new Pair<>(new Pair<>(-1, -1), -2);
+        if (invalidSizes) return result; //shouldn't ask for it in this case
+        if (s == CreatorScreenCtrl.BLACK_SECTION_TOP && !(r>0 && workingBoard.isWhiteCell(r-1, c))) return result;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_BOTTOM && !(r<rows-1 && workingBoard.isWhiteCell(r+1, c))) return result;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_LEFT && !(c>0 && workingBoard.isWhiteCell(r, c-1))) return result;
+        if (s == CreatorScreenCtrl.BLACK_SECTION_RIGHT && !(c<columns-1 && workingBoard.isWhiteCell(r, c+1))) return result;
+
+        switch (s) {
+            case CreatorScreenCtrl.BLACK_SECTION_TOP :
+                result.first.first = firstColCoord[colIDs[r-1][c]].first-1;
+                result.first.second = c;
+                result.second = CreatorScreenCtrl.BLACK_SECTION_BOTTOM;
+                break;
+            case CreatorScreenCtrl.BLACK_SECTION_BOTTOM :
+                result.first.first = firstColCoord[colIDs[r+1][c]].first+colSize[colIDs[r+1][c]];
+                result.first.second = c;
+                result.second = CreatorScreenCtrl.BLACK_SECTION_TOP;
+                break;
+            case CreatorScreenCtrl.BLACK_SECTION_LEFT :
+                result.first.first = r;
+                result.first.second = firstRowCoord[rowIDs[r][c-1]].second-1;
+                result.second = CreatorScreenCtrl.BLACK_SECTION_RIGHT;
+                break;
+            case CreatorScreenCtrl.BLACK_SECTION_RIGHT :
+                result.first.first = r;
+                result.first.second = firstRowCoord[rowIDs[r][c+1]].second+rowSize[rowIDs[r][c+1]];
+                result.second = CreatorScreenCtrl.BLACK_SECTION_LEFT;
+                break;
+        }
+        return result;
+    }
+
+    public boolean selectWhiteCell(int r, int c) {
+        // Cases where can't be selected
+        if (invalidSizes) {
+            sendMessageToPresentation(LINE_SIZES_MESSAGE);
+            return false;
+        }
+
+        ArrayList<Integer> whiteCellPossibilities = new ArrayList<>();
+
+        for (int i = 0; i < 9; i++) if (workingBoard.cellHasNotation(r, c, i+1)) whiteCellPossibilities.add(i+1);
+
+        viewCtrl.setWhitePossibilitiesList(new Pair<>(whiteCellPossibilities, forcedInitialValues[r][c]));
+
+        return true;
     }
 
 

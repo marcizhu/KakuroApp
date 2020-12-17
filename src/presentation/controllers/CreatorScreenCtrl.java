@@ -23,6 +23,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictingCoord;
 
+    private int currentTab;
     private boolean blackBrushActive;
     private boolean whiteBrushActive;
     private boolean mouseIsPressed;
@@ -37,6 +38,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         creator.setUp(this);
         selectedPos = new Pair<>(new Pair<>(-1, -1), -2);
         conflictingCoord = new ArrayList<>();
+        currentTab = 0;
         blackBrushActive = false;
         whiteBrushActive = false;
         mouseIsPressed = false;
@@ -48,8 +50,34 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     }
     public void setBoardToDisplay(String board) { ((CreatorScreen)screen).updateWholeBoardFromString(board); }
 
+    private void unselectPrevPos() {
+        if (selectedPos.first.first == -1 && selectedPos.first.second == -1 && selectedPos.second == -2) return;
+        if (selectedPos.second == WHITE_CELL) ((CreatorScreen)screen).unselectWhiteCell(selectedPos.first.first, selectedPos.first.second);
+        else {
+            ((CreatorScreen)screen).unselectBlackCell(selectedPos.first.first, selectedPos.first.second, selectedPos.second);
+            Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(selectedPos.first.first, selectedPos.first.second, selectedPos.second);
+            if (symm.first.first != -1) ((CreatorScreen)screen).unselectBlackCell(symm.first.first, symm.first.second, symm.second);
+        }
+        selectedPos.first.first = -1; selectedPos.first.second = -1; selectedPos.second = -2;
+    }
     public void setSelectedPos(int r, int c, int s) {
-        selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
+        if (s == WHITE_CELL) {
+            if (currentTab != 1) ((CreatorScreen)screen).setTab(1);
+            if (creator.selectWhiteCell(r, c)) {
+                unselectPrevPos();
+                ((CreatorScreen)screen).selectWhiteCell(r, c);
+                selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
+            }
+        } else {
+            if (currentTab != 0) ((CreatorScreen)screen).setTab(0);
+            if (creator.selectBlackCell(r, c, s)) {
+                unselectPrevPos();
+                ((CreatorScreen)screen).selectBlackCell(r, c, s);
+                Pair<Pair<Integer, Integer>, Integer> symm = creator.getMatchingBlackPos(r, c, s);
+                ((CreatorScreen)screen).selectBlackCell(symm.first.first, symm.first.second, symm.second);
+                selectedPos.first.first = r; selectedPos.first.second = c; selectedPos.second = s;
+            }
+        }
     }
 
     public void setConflictingCoord(ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflicts) {
@@ -91,8 +119,8 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     }
     // possible values and whether black cell has a defined value
-    public Pair<ArrayList<Integer>, Boolean> getBlackPossibilitiesList() {
-        return new Pair<>(new ArrayList<>(), true);
+    public void setBlackPossibilitiesList(Pair<ArrayList<Integer>, Boolean> blackPossibilitiesList) {
+        ((CreatorScreen)screen).updateBlackPossibleValues(blackPossibilitiesList);
     }
     public void setValuesToBlackCells(ArrayList<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>> values) {
         for (Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> v : values) {
@@ -117,8 +145,8 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     }
     // possible values and whether black cell has a defined value
-    public Pair<ArrayList<Integer>, Boolean> getWhitePossibilitiesList() {
-        return new Pair<>(new ArrayList<>(), true);
+    public void setWhitePossibilitiesList(Pair<ArrayList<Integer>, Boolean> whitePossibilitiesList) {
+        ((CreatorScreen)screen).updateWhitePossibleValues(whitePossibilitiesList);
     }
     public void setValuesToWhiteCells(ArrayList<Pair<Pair<Integer, Integer>, Integer>> values) {
         for (Pair<Pair<Integer, Integer>, Integer> v : values) {
@@ -136,8 +164,18 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     // Tab events
     public void onSelectedTabChanged(int tabIdx) {
-        if (tabIdx == 0) whiteBrushActive = false;
-        else if (tabIdx == 1) blackBrushActive = false;
+        if (tabIdx == 0 && currentTab == 1) {
+            currentTab = 0;
+            whiteBrushActive = false;
+            ((CreatorScreen)screen).updateWhitePossibleValues(new Pair<>(new ArrayList<>(), false));
+            if (selectedPos.second == WHITE_CELL) unselectPrevPos();
+        }
+        else if (tabIdx == 1 && currentTab == 0) {
+            currentTab = 1;
+            blackBrushActive = false;
+            ((CreatorScreen)screen).updateBlackPossibleValues(new Pair<>(new ArrayList<>(), false));
+            if (selectedPos.second != WHITE_CELL) unselectPrevPos();
+        }
     }
 
     // Button events

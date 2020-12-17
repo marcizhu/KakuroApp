@@ -194,7 +194,7 @@ public class CreatorScreen extends AbstractScreen {
         constraints.gridy = 1;
         lowerSelector.add(separator, constraints);
 
-        buildBlackPossibleValues();
+        buildBlackPossibleValues(new Pair<>(new ArrayList<>(), false));
         blackValuesScroll = new JScrollPane(blackPossibleValues);
         constraints.gridx = 0;
         constraints.gridy = 2;
@@ -219,10 +219,13 @@ public class CreatorScreen extends AbstractScreen {
         selectorBlack.add(lowerSelector, constraints);
     }
 
-    private void buildBlackPossibleValues() {
-        Pair<ArrayList<Integer>, Boolean> allPossibilities = ((CreatorScreenCtrl)ctrl).getBlackPossibilitiesList();
+    private void buildBlackPossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
         blackPossibleValues = new JPanel();
-        blackPossibleValues.setLayout(new GridLayout(1, allPossibilities.first.size() + (allPossibilities.second ? 1 : 0)));
+        int numItems = allPossibilities.first.size() + (allPossibilities.second ? 1 : 0);
+        int gridWidth = 6 < numItems ? 6 : numItems;
+        if (gridWidth == 0) gridWidth = 1;
+        int gridHeight = numItems / gridWidth + (numItems%gridWidth == 0 ? 0 : 1);
+        blackPossibleValues.setLayout(new GridLayout(gridHeight, gridWidth, 2, 2));
 
         if (allPossibilities.second) { //black cell has value, offer to clear it
             JLabel clearLbl = new JLabel("X");
@@ -231,6 +234,7 @@ public class CreatorScreen extends AbstractScreen {
             clearLbl.setHorizontalAlignment(SwingConstants.CENTER);
             clearLbl.setVerticalAlignment(SwingConstants.CENTER);
             clearLbl.setOpaque(true);
+            clearLbl.setBorder(BorderFactory.createLineBorder(Palette.StrongRed));
             clearLbl.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -248,9 +252,10 @@ public class CreatorScreen extends AbstractScreen {
             JLabel valueOptLbl = new JLabel(""+value);
             valueOptLbl.setForeground(Color.BLACK);
             valueOptLbl.setBackground(Palette.SelectionBlue);
-            valueOptLbl.setAlignmentX(SwingConstants.CENTER);
-            valueOptLbl.setAlignmentY(SwingConstants.CENTER);
+            valueOptLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            valueOptLbl.setVerticalAlignment(SwingConstants.CENTER);
             valueOptLbl.setOpaque(true);
+            valueOptLbl.setBorder(BorderFactory.createLineBorder(Palette.StrongBlue));
             valueOptLbl.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -261,8 +266,8 @@ public class CreatorScreen extends AbstractScreen {
         }
     }
 
-    public void updateBlackPossibleValues() {
-        buildBlackPossibleValues();
+    public void updateBlackPossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
+        buildBlackPossibleValues(allPossibilities);
         blackValuesScroll.setViewportView(blackPossibleValues);
     }
 
@@ -312,7 +317,7 @@ public class CreatorScreen extends AbstractScreen {
         constraints.gridy = 1;
         lowerSelector.add(separator, constraints);
 
-        buildWhitePossibleValues();
+        buildWhitePossibleValues(new Pair<>(new ArrayList<>(), false));
         whiteValuesScroll = new JScrollPane(whitePossibleValues);
         constraints.gridx = 0;
         constraints.gridy = 2;
@@ -337,10 +342,13 @@ public class CreatorScreen extends AbstractScreen {
         selectorWhite.add(lowerSelector, constraints);
     }
 
-    private void buildWhitePossibleValues() {
-        Pair<ArrayList<Integer>, Boolean> allPossibilities = ((CreatorScreenCtrl)ctrl).getWhitePossibilitiesList();
+    private void buildWhitePossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
         whitePossibleValues = new JPanel();
-        whitePossibleValues.setLayout(new GridLayout(1, allPossibilities.first.size() + (allPossibilities.second ? 1 : 0)));
+        int numItems = allPossibilities.first.size() + (allPossibilities.second ? 1 : 0);
+        int gridWidth = 3 < numItems ? 3 : numItems;
+        if (gridWidth == 0) gridWidth = 1;
+        int gridHeight = numItems / gridWidth + (numItems%gridWidth == 0 ? 0 : 1);
+        whitePossibleValues.setLayout(new GridLayout(gridHeight, gridWidth, 2, 2));
 
         if (allPossibilities.second) { //black cell has value, offer to clear it
             JLabel clearLbl = new JLabel("X");
@@ -349,6 +357,7 @@ public class CreatorScreen extends AbstractScreen {
             clearLbl.setHorizontalAlignment(SwingConstants.CENTER);
             clearLbl.setVerticalAlignment(SwingConstants.CENTER);
             clearLbl.setOpaque(true);
+            clearLbl.setBorder(BorderFactory.createLineBorder(Palette.StrongRed));
             clearLbl.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -365,9 +374,10 @@ public class CreatorScreen extends AbstractScreen {
             JLabel valueOptLbl = new JLabel(""+value);
             valueOptLbl.setForeground(Color.BLACK);
             valueOptLbl.setBackground(Palette.SelectionBlue);
-            valueOptLbl.setAlignmentX(SwingConstants.CENTER);
-            valueOptLbl.setAlignmentY(SwingConstants.CENTER);
+            valueOptLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            valueOptLbl.setVerticalAlignment(SwingConstants.CENTER);
             valueOptLbl.setOpaque(true);
+            valueOptLbl.setBorder(BorderFactory.createLineBorder(Palette.StrongBlue));
             valueOptLbl.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -431,11 +441,17 @@ public class CreatorScreen extends AbstractScreen {
         return buttonPanel;
     }
 
-    public void updateWhitePossibleValues() {
-        buildWhitePossibleValues();
+    public void updateWhitePossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
+        buildWhitePossibleValues(allPossibilities);
         whiteValuesScroll.setViewportView(whitePossibleValues);
     }
 
+    public void setTab(int tabIdx) {
+        blackWhiteSelectors.setSelectedIndex(tabIdx);
+    }
+
+    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
+    //  it only works if there is a resize for some reason
 
     public void selectWhiteCell(int r, int c) {
         creatorBoard.setWhiteCellSelectedColor(r, c, Palette.SelectionBlue);
@@ -448,18 +464,26 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setWhiteCellValue(r, c, value);
     }
     public void setNotationWhiteCell(int r, int c, int notations) { creatorBoard.setWhiteCellNotations(r, c, notations); }
-    public void selectBlackCell(int r, int c, int s) { creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.SelectionBlue); }
-    public void unselectBlackCell(int r, int c, int s) { creatorBoard.unselectBlackCell(r, c, s); }
-    public void setValueBlackCell(int r, int c, int s, int value) { creatorBoard.setBlackCellValue(r, c, s, value); }
+    public void selectBlackCell(int r, int c, int s) {
+        creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.SelectionBlue);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
+    public void unselectBlackCell(int r, int c, int s) {
+        creatorBoard.unselectBlackCell(r, c, s);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
+    public void setValueBlackCell(int r, int c, int s, int value) {
+        creatorBoard.setBlackCellValue(r, c, s, value);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
     public void selectConflictive(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
         } else {
             creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.WarningLightRed);
+            onResize(contents.getWidth(), contents.getHeight());
         }
     }
-    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
-    //  it only works if there is a resize for some reason
     public void setCellToWhite(int r, int c) {
         creatorBoard.setCellToWhite(r, c);
         onResize(contents.getWidth(), contents.getHeight());
@@ -496,7 +520,6 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBoardMouseEventListener(new KakuroView.BoardMouseEventListener() {
             @Override
             public void onBlackCellViewClicked(int row, int col, int section) {
-                System.out.println("Black cell clicked");
                 ((CreatorScreenCtrl)ctrl).setSelectedPos(row, col, section);
             }
 
