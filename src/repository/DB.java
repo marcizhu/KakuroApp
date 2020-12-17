@@ -12,9 +12,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import src.domain.entities.GameFinished;
-import src.domain.entities.GameInProgress;
-
 
 public class DB {
     private final String path;
@@ -60,8 +57,6 @@ public class DB {
         Gson g;
 
         if (serializer != null) {
-            g = new GsonBuilder().registerTypeAdapter(GameFinished.class, serializer).registerTypeAdapter(GameInProgress.class, serializer).create();
-            // FIXME: find out why the lines below dont work!!!
             GsonBuilder builder = new GsonBuilder();
             for (Class c : serializedClasses) builder.registerTypeAdapter(c, serializer);
             g = builder.create();
@@ -69,7 +64,6 @@ public class DB {
         else g = new Gson();
 
         String rawJSON = g.toJson(col);
-        System.out.println(rawJSON);
 
         FileWriter writer = new FileWriter(path + fileName + ".json", false);
 
@@ -78,7 +72,7 @@ public class DB {
     }
 
     public void writeToFile(Collection<?> col, String fileName) throws IOException {
-        writeToFile(col, fileName, null, Object.class); // Fixme: Object.classs looks dirty af
+        writeToFile(col, fileName, null, Object.class); // Fixme: replace Object.class with the actual type of the Collection elements
     }
 
 }

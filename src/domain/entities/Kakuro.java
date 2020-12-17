@@ -9,7 +9,6 @@ public class Kakuro {
     private final Timestamp createdAt;
     private final UUID id;
     private final Difficulty difficulty;
-    private final UUID boardId; // FIXME: remove
     private final Board board;
 
     // Creates a Kakuro that's not assigned to any user (created by the program)
@@ -18,7 +17,6 @@ public class Kakuro {
         this.id = UUID.randomUUID();
         this.difficulty = difficulty;
         this.createdAt = new Timestamp(System.currentTimeMillis());;
-        this.boardId = board.getId(); // FIXME: remove
         this.board = board;
     }
 
@@ -29,7 +27,6 @@ public class Kakuro {
         this.id = UUID.randomUUID();
         this.difficulty = difficulty;
         this.createdAt = new Timestamp(System.currentTimeMillis());
-        this.boardId = board.getId(); // FIXME: remove
     }
 
     // Creates a Kakuro with a given Id and creation date assigned to a User (Used by the Deserializer)
@@ -39,18 +36,8 @@ public class Kakuro {
         this.id = id;
         this.difficulty = difficulty;
         this.createdAt = createdAt;
-        this.boardId = UUID.randomUUID(); // board.getId(); // FIXME: remove
     }
 
-    // TODO: remove (here for compatibility)
-    public Kakuro(Difficulty difficulty, UUID boardId, String createdBy, Board board) {
-        this.createdBy = null;
-        this.board = new Board(); // TODO: fix this
-        this.id = UUID.randomUUID();
-        this.difficulty = difficulty;
-        this.createdAt = new Timestamp(System.currentTimeMillis());;
-        this.boardId = boardId;
-    }
 
     public UUID getId() {
         return this.id;
@@ -60,13 +47,8 @@ public class Kakuro {
         return this.difficulty;
     }
 
-    public UUID getBoardId() {
-        return this.boardId;
-    }
+    public User getCreatedBy() { return this.createdBy; } // FIXME: remove
 
-    public User getCreatedBy() { return this.createdBy; }
-
-    // FIXME: remove
     public User getUser() { return this.createdBy; }
 
     public Timestamp getCreatedAt() {
@@ -78,9 +60,9 @@ public class Kakuro {
     }
 
     public String toString() {
-        String author = createdBy == null ? "" : createdBy.toString();
+        String author = createdBy == null ? "null" : createdBy.toString();
 
-        return "Id: " + id + ", created by: " + author + ", created at: "
-                + createdAt  + ", difficulty: " + difficulty + "\nBoard:\n" + board.toString();
+        return "Id: " + id + ", created by {" + author + "}, created at: "
+                + createdAt  + ", difficulty: " + difficulty + "\nBoard: " + board.getId().toString() + "\n" + board.toString();
     }
 }

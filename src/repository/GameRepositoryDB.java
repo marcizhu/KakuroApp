@@ -70,6 +70,12 @@ public class GameRepositoryDB implements GameRepository {
 
         gamesList.add(game);
         driver.writeToFile(gamesList, "game", serializer, subclasses);
+
+        if (game instanceof GameInProgress) {
+            // Save board
+            BoardRepository boardRepo = new BoardRepositoryDB(driver);
+            boardRepo.saveBoard(((GameInProgress)game).getBoard());
+        }
     }
 
     @Override

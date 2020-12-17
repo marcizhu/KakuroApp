@@ -27,4 +27,8 @@ public class GameFinished extends Game{
     public Timestamp getTimeFinished() {
         return this.timeFinished;
     }
+
+    public String toString() {
+        return "Game Finished\n" + super.toString() + "\ntimne finished: " + timeFinished + ", score: " + score;
+    }
 }

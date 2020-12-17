@@ -38,6 +38,19 @@ public class BlackCell extends Cell {
     }
 
     /**
+     * Constructor. Initializes a black cell with given horizontal and vertical sums
+     * @param row Vertical position of the cell relative to the board
+     * @param col Horizontal position of the cell relative to the board
+     * @param vert  Vertical sum indicated by this black cell
+     * @param horiz Horizontal sum indicated by this black cell
+     */
+    public BlackCell(int row, int col, int vert, int horiz) {
+        this.horizontalSum = horiz;
+        this.verticalSum = vert;
+        this.setCoordinates(row, col);
+    }
+
+    /**
      * Get vertical sum indicated by this cell
      * @return 0 if no sum is indicated, a number from 1 to 45 otherwise
      */

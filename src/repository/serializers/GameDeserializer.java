@@ -4,10 +4,8 @@ import com.google.gson.*;
 import src.domain.entities.*;
 import src.repository.*;
 
-import javax.management.timer.TimerMBean;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -22,7 +20,7 @@ public class GameDeserializer implements JsonDeserializer<Game> {
         UserRepository userRepo = new UserRepositoryDB(databseDriver);
         KakuroRepository kakuroRepo = new KakuroRepositoryDB(databseDriver);
 
-        Boolean inProgress = obj.get("inProgress").getAsBoolean();
+        boolean inProgress = obj.get("inProgress").getAsBoolean();
         UUID id = UUID.fromString(obj.get("id").getAsString());
         Timestamp startTime = Timestamp.valueOf(obj.get("startTime").getAsString());
         float timeSpent = obj.get("timeSpent").getAsFloat();
