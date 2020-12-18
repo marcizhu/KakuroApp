@@ -25,6 +25,8 @@ public class CreatorScreen extends AbstractScreen {
     JScrollPane whiteValuesScroll;
     JPanel whitePossibleValues;
 
+    JLabel tipBox;
+
     JTextField kakuroName;
     JButton kakuroStateBtn;
 
@@ -39,9 +41,7 @@ public class CreatorScreen extends AbstractScreen {
         contents = new JPanel();
 
         leftContent = buildLeftContent();
-        leftContent.setSize(width/2, height);
         lowerRightContent = buildRightContent();
-        lowerRightContent.setSize(width/2, lowerRightContent.getHeight());
 
         String initialBoard = ((CreatorScreenCtrl)ctrl).getBoardToDisplay();
         creatorBoard = new KakuroView(initialBoard, true);
@@ -68,6 +68,8 @@ public class CreatorScreen extends AbstractScreen {
         constraints.gridy = 1;
         contents.add(lowerRightContent, constraints);
         contents.setVisible(true);
+
+        onResize(width, height);
     }
 
     private JPanel buildLeftContent() {
@@ -95,23 +97,19 @@ public class CreatorScreen extends AbstractScreen {
         JPanel lowerLeft = new JPanel();
         lowerLeft.setLayout(new GridBagLayout());
 
-        JPanel namePanel = new JPanel();
-        namePanel.setLayout(new GridBagLayout());
-        constraints.insets = new Insets(2, 5, 2, 5);
+        tipBox = new JLabel("<html><body>Hi! I'm the TipBox that will help you throughout the process of generating a Kakuro. Thank me later!</body></html>");
+        tipBox.setForeground(Color.BLACK);
+        tipBox.setHorizontalAlignment(SwingConstants.LEFT);
+        tipBox.setVerticalAlignment(SwingConstants.CENTER);
+        tipBox.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         JLabel setNameLbl = new JLabel("<html><body>Give it a unique and memorable name ;)</body></html>");
         setNameLbl.setForeground(Color.BLACK);
         setNameLbl.setOpaque(false);
-        setNameLbl.setAlignmentX(SwingConstants.LEFT);
-        setNameLbl.setAlignmentY(SwingConstants.CENTER);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        namePanel.add(setNameLbl, constraints);
+        setNameLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        setNameLbl.setVerticalAlignment(SwingConstants.CENTER);
 
         kakuroName = new JTextField("");
-        constraints.gridy = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        namePanel.add(kakuroName, constraints);
 
         kakuroStateBtn = new JButton("VALIDATE");
         kakuroStateBtn.setForeground(Palette.HintOrange);
@@ -125,23 +123,38 @@ public class CreatorScreen extends AbstractScreen {
         constraints.insets = new Insets(5, 20, 5, 20);
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.weightx = 4;
+        constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        lowerLeft.add(namePanel, constraints);
+        lowerLeft.add(setNameLbl, constraints);
 
-        constraints.insets = new Insets(5, 5, 5, 20);
-        constraints.gridx = 1;
-        constraints.weightx = 1;
-        constraints.fill = GridBagConstraints.VERTICAL;
+        constraints.insets = new Insets(5, 20, 5, 20);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 5;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        lowerLeft.add(kakuroName, constraints);
+
+        constraints.insets = new Insets(5, 20, 5, 20);
+        constraints.gridx = 4;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.NONE;
         lowerLeft.add(kakuroStateBtn, constraints);
 
-        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.insets = new Insets(10, 5, 10, 5);
+        //left.setLayout(new GridLayout(3,1,5,10));
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.weighty = 4;
         constraints.fill = GridBagConstraints.BOTH;
         left.add(blackWhiteSelectors, constraints);
 
         constraints.gridy = 1;
+        constraints.weighty = 2;
+        constraints.fill = GridBagConstraints.BOTH;
+        left.add(tipBox, constraints);
+
+        constraints.gridy = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         left.add(lowerLeft, constraints);
 
@@ -476,6 +489,14 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBlackCellValue(r, c, s, value);
         onResize(contents.getWidth(), contents.getHeight());
     }
+    public void selectModified(int r, int c, int s) {
+        if (s == CreatorScreenCtrl.WHITE_CELL) {
+            creatorBoard.setWhiteCellSelectedColor(r, c, Palette.HintGreen);
+        } else {
+            creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.HintGreen);
+            onResize(contents.getWidth(), contents.getHeight());
+        }
+    }
     public void selectConflictive(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
@@ -495,6 +516,22 @@ public class CreatorScreen extends AbstractScreen {
     public void updateWholeBoardFromString(String b) {
         creatorBoard.updateFromString(b, true);
         onResize(contents.getWidth(), contents.getHeight());
+    }
+
+    public void setTipBoxText(String tip) {
+        tipBox.setText("<html><body>"+tip+"</body></html>");
+        tipBox.revalidate();
+    }
+
+    public void setKakuroStateBtn(boolean toPublish) {
+        if (toPublish) {
+            kakuroStateBtn.setText("PUBLISH");
+            kakuroStateBtn.setForeground(Palette.StrongGreen);
+        } else {
+            kakuroStateBtn.setText("VALIDATE");
+            kakuroStateBtn.setForeground(Palette.HintOrange);
+        }
+        kakuroStateBtn.revalidate();
     }
 
     @Override

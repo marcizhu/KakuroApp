@@ -281,13 +281,13 @@ public class KakuroView extends JPanel {
 
                 setLayout(new GridLayout(3,3));
                 add(new TransparentPanel());
-                add(showTopLbl ? topLbl : new TransparentPanel());
+                add(topLbl);
                 add(new TransparentPanel());
-                add(showLeftLbl ? leftLbl : new TransparentPanel());
+                add(leftLbl);
                 add(new TransparentPanel());
-                add(showRightLbl ? rightLbl : new TransparentPanel());
+                add(rightLbl);
                 add(new TransparentPanel());
-                add(showBottomLbl ? bottomLbl : new TransparentPanel());
+                add(bottomLbl);
                 add(new TransparentPanel());
             }
 
@@ -429,7 +429,6 @@ public class KakuroView extends JPanel {
                     break;
             }
             revalidate();
-            System.out.println("Marked with color!");
         }
         public void unselectSection(int section) {
             Color fontColor = RGBUtils.getContrastColor(blackCellColor);

@@ -10,4 +10,8 @@ public class Dialogs {
     public static void showInfoDialog(String msg, String title) {
         JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
     }
+
+    public static boolean showYesNoOptionDialog(String msg, String title) {
+        return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+    }
 }

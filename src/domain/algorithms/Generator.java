@@ -27,6 +27,7 @@ public class Generator {
     private final Difficulty difficulty;
     private final long seed;
     private final boolean forceUniqueSolution;
+    private Board initialBoard;
 
     private Random random;
 
@@ -77,6 +78,17 @@ public class Generator {
      */
     public Generator(int rows, int columns, Difficulty difficulty, boolean forceUniqueSolution) {
         this(rows, columns, difficulty, (new Random()).nextLong(), forceUniqueSolution);
+    }
+
+    /**
+     * Constructor.
+     * Initializes a generator to generate a kakuro from a given initial board
+     * @param board                 Initial board containing valid black cell structure.
+     * @param forceUniqueSolution   Whether the generated board should be forced into having unique solution.
+     */
+    public Generator(Board board, boolean forceUniqueSolution) {
+        this(board.getHeight(), board.getWidth(), Difficulty.MEDIUM, (new Random()).nextLong(), forceUniqueSolution);
+        this.initialBoard = board;
     }
 
     /**
@@ -477,6 +489,7 @@ public class Generator {
      * This function generates the new board using the given dimensions, difficulty and (optionally) seed.
      */
     public void generate() {
+        if (initialBoard != null) return;
         // Fill the black cells in an empty board, all white cells should have all 9 values in anotations, should fill
         // the data structure to keep white cells ordered increasingly by number of anotations.
         workingBoard = prepareWorkingBoard();
@@ -534,6 +547,50 @@ public class Generator {
             }
         }
 
+        commonGenerationProcess();
+    }
+
+    public void generateFromInitialBoard() {
+        if (initialBoard == null) return;
+
+        // Prepare working board
+        workingBoard = new Board(initialBoard.getWidth(), initialBoard.getHeight());
+
+        ArrayList<Pair<Coordinates, Integer>> initialCellValueAssig = new ArrayList<>();
+        ArrayList<Pair<Coordinates, Integer>> initialRowSumAssig = new ArrayList<>();
+        ArrayList<Pair<Coordinates, Integer>> initialColSumAssig = new ArrayList<>();
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (initialBoard.isBlackCell(r, c)) {
+                    if (initialBoard.getHorizontalSum(r, c) != 0) initialRowSumAssig.add(new Pair<>(new Coordinates(r, c), initialBoard.getHorizontalSum(r, c)));
+                    if (initialBoard.getVerticalSum(r, c) != 0) initialColSumAssig.add(new Pair<>(new Coordinates(r, c), initialBoard.getVerticalSum(r, c)));
+                    workingBoard.setCell(new BlackCell(), r, c);
+                } else {
+                    if (!initialBoard.isEmpty(r, c)) initialCellValueAssig.add(new Pair<>(new Coordinates(r, c), initialBoard.getValue(r, c)));
+                    workingBoard.setCell(new WhiteCell(true), r, c);
+                }
+            }
+        }
+
+        notationsQueue = new SwappingCellQueue(workingBoard);
+
+        preprocessRows();
+        preprocessCols();
+
+        initializeAssigFunctions();
+
+        for (Pair<Coordinates, Integer> rowS : initialRowSumAssig)
+            assigFunctions.rowSumAssignation(rowS.first.r, rowS.first.c, rowS.second);
+        for (Pair<Coordinates, Integer> colS : initialColSumAssig)
+            assigFunctions.colSumAssignation(colS.first.r, colS.first.c, colS.second);
+        for (Pair<Coordinates, Integer> cellV : initialCellValueAssig)
+            assigFunctions.cellValueAssignation(cellV.first.r, cellV.first.c, cellV.second);
+
+        commonGenerationProcess();
+    }
+
+    private void commonGenerationProcess() {
         // At this point we've had a number of successful starting point assignments, now we assign the WhiteCell
         // that has the least notations (possible values) in a way that makes it non ambiguous
         TreeSet<Coordinates> possibleAmbiguities = new TreeSet<>();
@@ -609,9 +666,7 @@ public class Generator {
     }
 
     private void resolveEnqueuedCellValues(TreeSet<Coordinates> possibleAmbiguities) {
-        int iter = 0;
         while (!notationsQueue.isEmpty()) {
-            iter++;
             //System.out.println("Notations at iter: " + iter);
             //printNotations();
             //System.out.println();
