@@ -1,30 +1,35 @@
 package src.domain.controllers;
 
 import src.domain.algorithms.Generator;
+import src.domain.algorithms.Solver;
 import src.domain.algorithms.helpers.KakuroConstants;
 import src.domain.algorithms.helpers.KakuroFunctions;
 import src.domain.algorithms.helpers.SwappingCellQueue;
-import src.domain.entities.BlackCell;
-import src.domain.entities.Board;
-import src.domain.entities.User;
-import src.domain.entities.WhiteCell;
+import src.domain.entities.*;
 import src.presentation.controllers.CreatorScreenCtrl;
 import src.presentation.controllers.GameScreenCtrl;
 import src.utils.IntPair;
 import src.utils.Pair;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class KakuroCreationCtrl {
 
     private static final String LINE_SIZES_MESSAGE = "Please make sure that there are no rows/columns of more than 9 cells. Use the black cell brush tool to solve the issues";
-    private static final String CONFLICTS_ON_REBUILD_MESSAGE = "After recomputing the board some cells had invalid assignations, we've cleared them to avoid these conflicts.";
-    private static final String ASSIGNATION_FAILURE = "Sorry! After a deeper analysis we discovered that the cells marked in red would be left without options. Please choose a different value.";
+    private static final String CONFLICTS_ON_REBUILD_MESSAGE = "After recomputing the board some cells had invalid assignations, I've cleared them to avoid these conflicts.";
+    private static final String ASSIGNATION_FAILURE = "Sorry! After a deeper analysis I discovered that the cells marked in red would be left without options. Please choose a different value.";
     private static final String ASSIGNATION_SUCCESSFUL = "Nice choice! In the board you can see the cells that have been affected by this assignation marked in green.";
     private static final String BLACK_CELL_SELECTION = "These values above me are the possible values for the selected line sum. Choose wisely!";
     private static final String WHITE_CELL_SELECTION = "These values above me are the possible values for the selected white cell. If you assign one of them to it, this cell will have an initial value on the finished kakuro you are creating.";
     private static final String CLEAR_BLACK_CELL_FAILURE = "This cell cannot be cleared as its value was inferred from other assignations. It is its only possible value in the current state of the board.";
+    private static final String BOARD_FILLED = "This is what the generator has come up with, I have checked it for you and it has ";
+    private static final String BOARD_CLEARED = "I have erased all the values from the board, but keeping the black/white cell structure you created.";
+    private static final String NAME_REQUESTED = "Please enter a name for your creation.";
+    private static final String NAME_INVALID = "Oh no! Someone is already using this name... Please come up with a different one and try again, you're very close to publishing your creation!";
+    private static final String KAKURO_VALIDATION_FAILED = "Oupsie... Seems like the kakuro you created has no solutions! In order to publish it please change it so it has at least one solution.";
 
     private CreatorScreenCtrl viewCtrl;
 
@@ -53,6 +58,7 @@ public class KakuroCreationCtrl {
     private boolean[][] forcedInitialValues;
 
     private boolean invalidSizes;
+    private boolean validatedKakuro;
 
     // To be able to send feedback to presentation layer when doing assignations.
 
@@ -78,6 +84,7 @@ public class KakuroCreationCtrl {
         }
         forcedInitialValues = new boolean[rows][columns];
         invalidSizes = false;
+        validatedKakuro = false;
     }
 
     public KakuroCreationCtrl(User user, Board initialBoard) {
@@ -197,8 +204,6 @@ public class KakuroCreationCtrl {
             return;
         }
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> forcedInitial = new ArrayList<>();
-        //ArrayList<Pair<Pair<Integer, Integer>, Integer>> rowSumAssig = new ArrayList<>();
-        //ArrayList<Pair<Pair<Integer, Integer>, Integer>> colSumAssig = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 if (workingBoard.isWhiteCell(r, c)) {
@@ -303,6 +308,7 @@ public class KakuroCreationCtrl {
                     if (forcedInitialValues[r][c]) {
                         whiteCellForcedValues.add(new Pair<>(new Pair<>(r, c), workingBoard.getValue(r, c)));
                     } else {
+                        whiteCellForcedValues.add(new Pair<>(new Pair<>(r, c), 0));
                         whiteCellNotations.add(new Pair<>(new Pair<>(r, c), workingBoard.getCellNotations(r, c)));
                     }
                 } else {
@@ -535,6 +541,7 @@ public class KakuroCreationCtrl {
             }
         }
         if (changes.size() > 0) {
+            validatedKakuro = false;
             viewCtrl.setCellsToBlack(changes);
             recomputeBoardStructures();
             if (invalidSizes) {
@@ -558,6 +565,7 @@ public class KakuroCreationCtrl {
             viewCtrl.setCellsToWhite(changes);
             recomputeBoardStructures();
             if (invalidSizes) {
+                validatedKakuro = false;
                 viewCtrl.setBoardToDisplay(getBoardToString());
                 viewCtrl.repaintPrevConflicts();
             }
@@ -708,6 +716,7 @@ public class KakuroCreationCtrl {
 
     public void blackCellAssignation(int r, int c, int s, int value) {
         if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
+        validatedKakuro = false;
 
         if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
             r = firstColCoord[colIDs[r-1][c]].first-1;
@@ -757,6 +766,7 @@ public class KakuroCreationCtrl {
     }
     public void clearBlackCell(int r, int c, int s) {
         if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
+        validatedKakuro = false;
 
         if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
             r = firstColCoord[colIDs[r-1][c]].first-1;
@@ -784,6 +794,7 @@ public class KakuroCreationCtrl {
 
     public void whiteCellAssignation(int r, int c, int value) {
         if (invalidSizes || r <= 0 || r >= rows || c <= 0 || c >= columns || workingBoard.isBlackCell(r, c)) return;
+        validatedKakuro = false;
 
         clearModified();
         clearConflicting();
@@ -816,6 +827,7 @@ public class KakuroCreationCtrl {
     public boolean clearWhiteCell(int r, int c) {
         if (invalidSizes || r <= 0 || r >= rows || c <= 0 || c >= columns || !forcedInitialValues[r][c] || workingBoard.isBlackCell(r, c)) return false;
         if (workingBoard.isEmpty(r,c)) return false;
+        validatedKakuro = false;
 
         if (!forcedInitialValues[r][c])
 
@@ -823,6 +835,126 @@ public class KakuroCreationCtrl {
         workingBoard.setCell(new WhiteCell(true), r, c);
         recomputeBoardStructures();
         viewCtrl.setSelectedPos(r, c, CreatorScreenCtrl.WHITE_CELL);
+        return true;
+    }
+
+    public void fillKakuro() {
+        if (invalidSizes) {
+            sendMessageToPresentation(LINE_SIZES_MESSAGE);
+            return;
+        }
+        // prepare kakuro for generator
+        Board toFill = new Board(columns, rows);
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (workingBoard.isBlackCell(r, c)) {
+                    toFill.setCell(new BlackCell((BlackCell) workingBoard.getCell(r, c)), r, c);
+                } else {
+                    if (forcedInitialValues[r][c] && !workingBoard.isEmpty(r, c)) toFill.setCell(new WhiteCell(workingBoard.getValue(r, c)), r, c);
+                    else toFill.setCell(new WhiteCell(), r, c);
+                }
+            }
+        }
+
+        Generator generator = new Generator(toFill, true);
+        generator.generateFromInitialBoard();
+
+        Solver solver = new Solver(generator.getGeneratedBoard());
+        int numSolutions = solver.solve();
+
+        if (numSolutions == 0) {
+            fillKakuro();
+            return;
+        }
+
+        workingBoard = generator.getGeneratedBoard();
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                forcedInitialValues[r][c] = false;
+                if (workingBoard.isWhiteCell(r, c) && !workingBoard.isEmpty(r, c)) {
+                    forcedInitialValues[r][c] = true;
+                }
+            }
+        }
+
+        validatedKakuro = true;
+        viewCtrl.setKakuroStateButtonPublish();
+
+        recomputeBoardStructures();
+        sendMessageToPresentation(BOARD_FILLED + (numSolutions == 1 ? "unique solution!" : "more than one solution... Oh well :)"));
+    }
+
+    public Pair<Boolean, String> exportKakuro(String file) {
+        // prepare board to export:
+        Board toExport = new Board(columns, rows);
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (workingBoard.isBlackCell(r, c)) {
+                    toExport.setCell(new BlackCell((BlackCell) workingBoard.getCell(r, c)), r, c);
+                } else {
+                    if (forcedInitialValues[r][c] && !workingBoard.isEmpty(r, c)) toExport.setCell(new WhiteCell(workingBoard.getValue(r, c)), r, c);
+                    else toExport.setCell(new WhiteCell(), r, c);
+                }
+            }
+        }
+        try {
+            FileWriter myWriter = new FileWriter(file+".wip");
+            myWriter.write(toExport.toString() + "\n");
+            myWriter.close();
+            return new Pair<>(true, null);
+        } catch(IOException e) {
+            return new Pair<>(false, e.getMessage());
+        }
+    }
+
+    public void clearWholeBoard() {
+        validatedKakuro = false;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (workingBoard.isBlackCell(r, c)) {
+                    workingBoard.setCell(new BlackCell(), r, c);
+                } else {
+                    workingBoard.setCell(new WhiteCell(), r, c);
+                }
+                forcedInitialValues[r][c] = false;
+            }
+        }
+
+        recomputeBoardStructures();
+        sendMessageToPresentation(BOARD_CLEARED);
+    }
+
+    private void invalidate() {
+        if (!validatedKakuro) return;
+        validatedKakuro = false;
+        viewCtrl.setKakuroStateButtonValidate();
+    }
+
+    public boolean publishKakuro(String kakuroName) {
+        if (!validatedKakuro) {
+            Solver solver = new Solver(workingBoard);
+            if (solver.solve() > 0) {
+                validatedKakuro = true;
+                viewCtrl.setKakuroStateButtonPublish();
+            } else {
+                sendMessageToPresentation(KAKURO_VALIDATION_FAILED);
+            }
+            return false;
+        }
+
+        if (kakuroName.equals("")) {
+            sendMessageToPresentation(NAME_REQUESTED);
+            return false;
+        }
+
+        // TODO: check if name is taken
+        if (true) {
+            sendMessageToPresentation(NAME_INVALID);
+            return false;
+        }
+
+        // TODO: publish "save to database" the generated kakuro
         return true;
     }
 

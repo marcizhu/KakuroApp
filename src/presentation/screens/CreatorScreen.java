@@ -523,12 +523,21 @@ public class CreatorScreen extends AbstractScreen {
         tipBox.revalidate();
     }
 
+    public void setKakuroStateBtn(boolean toPublish) {
+        if (toPublish) {
+            kakuroStateBtn.setText("PUBLISH");
+            kakuroStateBtn.setForeground(Palette.StrongGreen);
+        } else {
+            kakuroStateBtn.setText("VALIDATE");
+            kakuroStateBtn.setForeground(Palette.HintOrange);
+        }
+        kakuroStateBtn.revalidate();
+    }
+
     @Override
     public void onResize(int width, int height) {
         contents.setSize(width, height);
         leftContent.setSize(width/2, height);
-        //blackWhiteSelectors.setSize(width/2, height/3);
-        //tipBox.setSize(width/2, height/2);
         lowerRightContent.setSize(width/2, lowerRightContent.getHeight());
         int remainingWidth = width - leftContent.getWidth();
         int remainingHeight = height - lowerRightContent.getHeight();

@@ -3,10 +3,12 @@ package src.presentation.controllers;
 import src.domain.controllers.KakuroCreationCtrl;
 import src.domain.controllers.DomainCtrl;
 import src.presentation.screens.CreatorScreen;
+import src.presentation.utils.Dialogs;
 import src.presentation.views.KakuroView;
 import src.utils.IntPair;
 import src.utils.Pair;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -233,16 +235,37 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     // Button events
     public void onKakuroStateButtonPressed(String kakuroName) {
+        creator.publishKakuro(kakuroName);
+    }
+    public void setKakuroStateButtonValidate() {
+        ((CreatorScreen)screen).setKakuroStateBtn(false);
+    }
+    public void setKakuroStateButtonPublish() {
+        ((CreatorScreen)screen).setKakuroStateBtn(true);
+    }
+    public void onKakuroPublished() {
 
     }
     public void onExportButtonClicked() {
-        System.out.println("EXPORT");
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export kakuro");
+
+        int userSelection = fileChooser.showSaveDialog(getContents());
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String file = fileChooser.getSelectedFile().getAbsolutePath();
+            Pair<Boolean, String> ret = creator.exportKakuro(file);
+
+            if(!ret.first) {
+                Dialogs.showErrorDialog("Error while exporting kakuro: " + ret.second, "Error");
+            }
+        }
     }
     public void onFillKakuroButtonClicked() {
-        System.out.println("FILL KAKURO");
+        creator.fillKakuro();
     }
     public void onClearBoardButtonClicked() {
-        System.out.println("CLEAR BOARD");
+        creator.clearWholeBoard();
     }
 
     public void setTipMessage(String message) {
@@ -272,6 +295,16 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         screen = new CreatorScreen(this);
         super.build(width, height);
         creator.initializeCreatorStructures();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (Dialogs.showYesNoOptionDialog(
+                "The system doesn't save half-built kakuros. If you want to be able to work on your creation later, export your progress.",
+                "Export?"
+        )) {
+            onExportButtonClicked();
+        }
     }
 
     @Override
