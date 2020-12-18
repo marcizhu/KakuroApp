@@ -7,6 +7,9 @@ import src.domain.algorithms.helpers.KakuroFunctions;
 import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.*;
 import src.presentation.controllers.GameScreenCtrl;
+import src.repository.DB;
+import src.repository.GameRepository;
+import src.repository.GameRepositoryDB;
 import src.utils.Pair;
 
 import java.io.FileWriter;
@@ -47,6 +50,10 @@ public class GameplayCtrl {
 
     private int hintAtMove;
     private Pair<Pair<Integer, Integer>, Integer> lastHint;
+    private int totalNumOfHints;
+
+    private boolean isCurrentGameInDB;
+    private long initialTime;
 
     public GameplayCtrl(User user, Kakuro kakuro) {
         this.user = user;
@@ -56,31 +63,33 @@ public class GameplayCtrl {
         hintAtMove = -1;
         lastHint = new Pair<>(new Pair<>(-1, -1), -1);
         // First we check if there's a game in progress for this kakuro and this userName, if not we create a new game.
-        ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = dades.getAllGamesInProgress(user.getName());
-        boolean shouldCreateNewGame = true;
+        isCurrentGameInDB = false;
+        ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = GameCtrl.getAllGamesInProgress(user.getName());
         for (GameInProgress g : allGamesInProgress) {
-            if (g.getKakuro().getName().toString().equals(kakuro.getName().toString())) {
+            if (g.getKakuro().getName().equals(kakuro.getName())) {
                 currentGame = g;
                 movementCount = currentGame.getMovements().size();
                 currentMovement = movementCount;
-                shouldCreateNewGame = false;
+                isCurrentGameInDB = true;
                 break;
             }
         }
 
-        if (shouldCreateNewGame) {
+        if (!isCurrentGameInDB) {
             currentGame = new GameInProgress(user, kakuro);
         }
 
         usedValuesHelpIsActive = false;
         combinationsHelpIsActive = false;
         autoEraseHelpIsActive = false;
+        totalNumOfHints = 0;
     }
 
     public String gameSetUp(GameScreenCtrl view) {
         this.viewCtrl = view;
         preprocessRows();
         preprocessCols();
+        initialTime = System.currentTimeMillis();
         return currentGame.getBoard().toString();
     }
 
@@ -479,10 +488,13 @@ public class GameplayCtrl {
 
     public Pair<Pair<Integer, Integer>, Integer> getHint() {
         currentMovement = movementCount; // always give hint for most advanced move
+        totalNumOfHints++;
         if (hintAtMove != -1 && hintAtMove == currentMovement) {
             // We already asked for a hint, just write the value
             if (lastHint.second != -1) { // write the value if it wasn't a move problem
                 playMove(lastHint.first.first, lastHint.first.second, lastHint.second);
+            } else {
+                totalNumOfHints--;
             }
             return lastHint;
         }
@@ -713,7 +725,54 @@ public class GameplayCtrl {
         }
     }*/
 
+    public void persistProgress() {
+        currentGame.setLastPlayedToNow();
+        currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+
+
+        // FIXME : alex, estem esperant el GameCtrl
+
+        GameRepository gr = new GameRepositoryDB(new DB());
+        try {
+            gr.saveGame(currentGame);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void surrender() {
+        currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+
+        // Correct solution
+        GameFinished finished = new GameFinished(currentGame);
+        // TODO: set surrendered.
+
+        // FIXME: alex...
+        System.out.println("Creating repo and database");
+        GameRepository gr = new GameRepositoryDB(new DB());
+        try {
+            System.out.println("Deleting game in progress");
+            if (isCurrentGameInDB) gr.deleteGame(currentGame);
+            System.out.println("Saving finished game");
+            gr.saveGame(finished);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Solver solver = new Solver(kakuro.getBoard());
+
+        long init = System.currentTimeMillis();
+        int numSolutions = solver.solve();
+        float timeSolving = (float)(System.currentTimeMillis() - init);
+
+        String board = "";
+        if (numSolutions > 0) board = solver.getSolutions().get(0).toString();
+
+        viewCtrl.onSurrender(finished.getTimeSpent(), board, numSolutions, timeSolving);
+    }
+
     private void validateKakuro() { // when this function is called it should always be valid
+        System.out.println("Starting verification");
         // verify rows
         for (int rowID = 0; rowID < rowLineSize; rowID++) {
             int expectedSum = currentGame.getBoard().getHorizontalSum(firstRowCoord[rowID].first, firstRowCoord[rowID].second-1);
@@ -738,6 +797,27 @@ public class GameplayCtrl {
             if (currentSum != expectedSum) return;
         }
 
+        System.out.println("Setting time spent");
+        currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+
         // Correct solution
+        System.out.println("Creating game finished");
+        GameFinished finished = new GameFinished(currentGame);
+        finished.computeScore(totalNumOfHints);
+
+        // FIXME: alex...
+        System.out.println("Creating repo and database");
+        GameRepository gr = new GameRepositoryDB(new DB());
+        try {
+            System.out.println("Deleting game in progress");
+            if (isCurrentGameInDB) gr.deleteGame(currentGame);
+            System.out.println("Saving finished game");
+            gr.saveGame(finished);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Back to presentation");
+        viewCtrl.onKakuroSolutionValidated(finished.getScore(), finished.getTimeSpent());
     }
 }

@@ -32,6 +32,8 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     private boolean mouseIsPressed;
     private TreeSet<IntPair> brushPath;
 
+    private boolean ignoreDestroy;
+
     public CreatorScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
     }
@@ -47,6 +49,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         whiteBrushActive = false;
         mouseIsPressed = false;
         brushPath = new TreeSet<>();
+        ignoreDestroy = false;
     }
 
     public String getBoardToDisplay() {
@@ -244,7 +247,9 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         ((CreatorScreen)screen).setKakuroStateBtn(true);
     }
     public void onKakuroPublished() {
-
+        ignoreDestroy = true;
+        Dialogs.showInfoDialog("Successfully saved to database!", "Congrats!");
+        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.MY_KAKUROS));
     }
     public void onExportButtonClicked() {
         JFileChooser fileChooser = new JFileChooser();
@@ -299,6 +304,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
 
     @Override
     public void onDestroy() {
+        if (ignoreDestroy) return;
         if (Dialogs.showYesNoOptionDialog(
                 "The system doesn't save half-built kakuros. If you want to be able to work on your creation later, export your progress.",
                 "Export?"

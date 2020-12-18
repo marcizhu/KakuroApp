@@ -25,6 +25,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     private ArrayList<Pair<Pair<Integer, Integer>, Integer>> conflictiveCoord;
     private Pair<Integer, Integer> selectedPos;
 
+    private boolean ignoreDestroy;
+
     public GameScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
     }
@@ -35,17 +37,13 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         notationsMode = false;
         conflictiveCoord = new ArrayList<>();
         selectedPos = new Pair<>(-1, -1);
+        ignoreDestroy = false;
     }
 
     @Override
     public void build(int width, int height) {
         screen = new GameScreen(this);
         super.build(width, height);
-    }
-
-    public void kakuroSolvedCorrectly() {
-        // TODO: Show alert indicating kakuro solved, the time, top 3 or whatever
-        Dialogs.showInfoDialog("You solved the kakuro!", "Kakuro solved");
     }
 
     public String getBoardToDisplay() {
@@ -240,20 +238,43 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void onSolveClick() {
-
+        game.surrender();
     }
 
-    public void onKakuroSolutionValidated() {
+    public void onKakuroSolutionValidated(float score, float timeUsed) {
+        ignoreDestroy = true;
 
+        Dialogs.showInfoDialog("Time spent: " + secondsToStringTime(timeUsed) + "\nTotal score: " + score, "Completed successfully!");
+        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
     }
 
-    public void onSurrender() {
+    public void onSurrender(float timeUsed, String board, int numSolutions, float timeSolving) {
+        ignoreDestroy = true;
 
+        Dialogs.showInfoDialog("Time spent: " + secondsToStringTime(timeUsed) + "\nTotal score: 0.0", "You surrendered...");
+        Dialogs.showInfoDialog("Num solutions: " + numSolutions + "\nTime solving: " + timeSolving +" ms", "Should show KakuroDisplayScreen");
+    }
+
+    private String secondsToStringTime(float time) {
+        int hours = (int)time/3600;
+        int minutes = (int)time/60 - hours*60;
+        int seconds = (int)time - minutes*60 - hours*3600;
+        String timeStr = "";
+        if (hours > 0) {
+            timeStr += hours+":";
+            if (minutes < 10) timeStr += "0";
+        }
+        timeStr += minutes+":";
+        if (seconds < 10) timeStr += "0";
+        timeStr += seconds;
+
+        return timeStr;
     }
 
     @Override
     public void onDestroy() {
-
+        if (ignoreDestroy) return;
+        game.persistProgress();
     }
 
     @Override

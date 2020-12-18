@@ -18,7 +18,7 @@ import java.util.TreeSet;
 
 public class KakuroCreationCtrl {
 
-    private static final String LINE_SIZES_MESSAGE = "Please make sure that there are no rows/columns of more than 9 cells. Use the black cell brush tool to solve the issues";
+    private static final String LINE_SIZES_MESSAGE = "Please make sure that there are no rows/columns of more than 9 cells. Use the black cell brush tool to solve the issues.";
     private static final String CONFLICTS_ON_REBUILD_MESSAGE = "After recomputing the board some cells had invalid assignations, I've cleared them to avoid these conflicts.";
     private static final String ASSIGNATION_FAILURE = "Sorry! After a deeper analysis I discovered that the cells marked in red would be left without options. Please choose a different value.";
     private static final String ASSIGNATION_SUCCESSFUL = "Nice choice! In the board you can see the cells that have been affected by this assignation marked in green.";
@@ -29,6 +29,7 @@ public class KakuroCreationCtrl {
     private static final String BOARD_CLEARED = "I have erased all the values from the board, but keeping the black/white cell structure you created.";
     private static final String NAME_REQUESTED = "Please enter a name for your creation.";
     private static final String NAME_INVALID = "Oh no! Someone is already using this name... Please come up with a different one and try again, you're very close to publishing your creation!";
+    private static final String KAKURO_VALIDATION_SUCCESSFUL = "The kakuro you created has been successfully validated! It seems to have ";
     private static final String KAKURO_VALIDATION_FAILED = "Oupsie... Seems like the kakuro you created has no solutions! In order to publish it please change it so it has at least one solution.";
 
     private CreatorScreenCtrl viewCtrl;
@@ -544,7 +545,7 @@ public class KakuroCreationCtrl {
             }
         }
         if (changes.size() > 0) {
-            validatedKakuro = false;
+            invalidate();
             viewCtrl.setCellsToBlack(changes);
             recomputeBoardStructures();
             if (invalidSizes) {
@@ -565,10 +566,10 @@ public class KakuroCreationCtrl {
             }
         }
         if (changes.size() > 0) {
+            invalidate();
             viewCtrl.setCellsToWhite(changes);
             recomputeBoardStructures();
             if (invalidSizes) {
-                validatedKakuro = false;
                 viewCtrl.setBoardToDisplay(getBoardToString());
                 viewCtrl.repaintPrevConflicts();
             }
@@ -719,7 +720,7 @@ public class KakuroCreationCtrl {
 
     public void blackCellAssignation(int r, int c, int s, int value) {
         if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
-        validatedKakuro = false;
+        invalidate();
 
         if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
             r = firstColCoord[colIDs[r-1][c]].first-1;
@@ -769,7 +770,7 @@ public class KakuroCreationCtrl {
     }
     public void clearBlackCell(int r, int c, int s) {
         if (invalidSizes || !isBlackCellValid(r, c, s) || s == CreatorScreenCtrl.WHITE_CELL) return;
-        validatedKakuro = false;
+        invalidate();
 
         if (s == CreatorScreenCtrl.BLACK_SECTION_TOP) {
             r = firstColCoord[colIDs[r-1][c]].first-1;
@@ -797,7 +798,7 @@ public class KakuroCreationCtrl {
 
     public void whiteCellAssignation(int r, int c, int value) {
         if (invalidSizes || r <= 0 || r >= rows || c <= 0 || c >= columns || workingBoard.isBlackCell(r, c)) return;
-        validatedKakuro = false;
+        invalidate();
 
         clearModified();
         clearConflicting();
@@ -830,7 +831,7 @@ public class KakuroCreationCtrl {
     public boolean clearWhiteCell(int r, int c) {
         if (invalidSizes || r <= 0 || r >= rows || c <= 0 || c >= columns || !forcedInitialValues[r][c] || workingBoard.isBlackCell(r, c)) return false;
         if (workingBoard.isEmpty(r,c)) return false;
-        validatedKakuro = false;
+        invalidate();
 
         if (!forcedInitialValues[r][c])
 
@@ -912,7 +913,7 @@ public class KakuroCreationCtrl {
     }
 
     public void clearWholeBoard() {
-        validatedKakuro = false;
+        invalidate();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 if (workingBoard.isBlackCell(r, c)) {
@@ -934,21 +935,25 @@ public class KakuroCreationCtrl {
         viewCtrl.setKakuroStateButtonValidate();
     }
 
-    public boolean publishKakuro(String kakuroName) {
+    public void publishKakuro(String kakuroName) {
         if (!validatedKakuro) {
             Solver solver = new Solver(workingBoard);
-            if (solver.solve() > 0) {
+            int numSol = solver.solve();
+            if (numSol > 0) {
                 validatedKakuro = true;
+                String sufix = numSol == 1 ? "only one solution!" : "multiple solutions.";
+                sendMessageToPresentation(KAKURO_VALIDATION_SUCCESSFUL + sufix);
                 viewCtrl.setKakuroStateButtonPublish();
             } else {
                 sendMessageToPresentation(KAKURO_VALIDATION_FAILED);
+                viewCtrl.setKakuroStateButtonValidate();
             }
-            return false;
+            return;
         }
 
         if (kakuroName.equals("")) {
             sendMessageToPresentation(NAME_REQUESTED);
-            return false;
+            return;
         }
 
         Board toPublish = new Board(columns, rows);
@@ -965,14 +970,12 @@ public class KakuroCreationCtrl {
 
         try {
             if(kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user))) {
-                sendMessageToPresentation("Successfully saved to database!!");
-                return true;
+                viewCtrl.onKakuroPublished();
+                return;
             }
             sendMessageToPresentation(NAME_INVALID);
-            return false;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 

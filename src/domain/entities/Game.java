@@ -13,11 +13,15 @@ public abstract class Game {
     private final Timestamp startTime;
 
     public Game(User player, Kakuro kakuro) {
+        this(player, kakuro, new Timestamp(System.currentTimeMillis()));
+    }
+
+    public Game(User player, Kakuro kakuro, Timestamp startTime) {
         this.id = UUID.randomUUID();
         this.player = player;
         this.kakuro = kakuro;
-        this.startTime = new Timestamp(System.currentTimeMillis());
-        this.timeSpent = 0;
+        this.timeSpent = 5;
+        this.startTime = startTime;
     }
 
     // For deserializing purposes

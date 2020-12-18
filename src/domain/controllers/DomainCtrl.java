@@ -78,7 +78,8 @@ public class DomainCtrl {
         User user = new User(sessionID);
         Kakuro kakuro;
         try {
-            kakuro = new Kakuro("Fix this!!", Difficulty.HARD, Reader.fromFile("data/kakuros/generated/20_20_extreme_unique.kak"));
+            kakuro = new Kakuro("Fix this!!", Difficulty.HARD, Reader.fromFile("data/kakuros/unsolved/cpu_burner.kak"));
+            kakuroRepository.saveKakuro(kakuro);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

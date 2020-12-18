@@ -27,11 +27,24 @@ public class PresentationCtrl {
 
     // App content
     private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
-    private final MyKakurosScreenCtrl myKakurosScreenCtrl; ///< "My Kakuros" Screen controller
     private final LoginScreenCtrl loginScreenCtrl;         ///< "Login" Screen controller
+    private final MyKakurosScreenCtrl myKakurosScreenCtrl; ///< "My Kakuros" Screen controller
+
+    // FIXME: temporary
+    private final DemoScreenCtrl dashboardScreenCtrl;
+    private final DemoScreenCtrl kakuroListScreenCtrl;
+    private final DemoScreenCtrl statisticsScreenCtrl;
+    private final DemoScreenCtrl rankingsScreenCtrl;
 
     // List of all screen controllers to handle screen switching
     //private DemoScreenCtrl demoScreenCtrl;
+
+    // ScreenCtrl ids
+    public static final int DASHBOARD = 1;
+    public static final int KAKURO_LIST = 2;
+    public static final int MY_KAKUROS = 3;
+    public static final int STATISTICS = 4;
+    public static final int RANKINGS = 5;
 
     public PresentationCtrl() {
         // Initialize JFrame;
@@ -43,7 +56,9 @@ public class PresentationCtrl {
         // Initialize screen controllers
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
         loginScreenCtrl = new LoginScreenCtrl(this, domainCtrl);
-        //demoScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
+
+        // FIXME: temporary
+        dashboardScreenCtrl = kakuroListScreenCtrl = statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -166,6 +181,7 @@ public class PresentationCtrl {
 
         menu.getComponent(3).setForeground(Color.BLUE);
         //setScreen(statisticsScreenCtrl);
+        startNewCreation(10,10);
     }
 
     private void onRankingsMenuItemClicked() {
@@ -203,6 +219,23 @@ public class PresentationCtrl {
         else currentScreenCtrl.onFocusRegained(app.getWidth(), app.getHeight()-2*windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();
+    }
+
+    public AbstractScreenCtrl getScreenCtrl(int screenID) {
+        switch (screenID) {
+            case DASHBOARD:
+                return dashboardScreenCtrl;
+            case KAKURO_LIST:
+                return kakuroListScreenCtrl;
+            case MY_KAKUROS:
+                return myKakurosScreenCtrl;
+            case STATISTICS:
+                return statisticsScreenCtrl;
+            case RANKINGS:
+                return rankingsScreenCtrl;
+        }
+        // Should never happen
+        return loginScreenCtrl;
     }
 
     // Domain communication
