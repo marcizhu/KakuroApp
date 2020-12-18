@@ -71,6 +71,7 @@ public class MyKakurosScreen extends AbstractScreen {
         kakuroListPane.getVerticalScrollBar().setUnitIncrement(20);
         contents.add(kakuroListPane);
         contents.setVisible(true);
+        onResize(width, height);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class MyKakurosScreen extends AbstractScreen {
         if (numComp > 0) {
             if (width < 2*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 1;
             else if (width < 3*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 2;
-            kakuroListLayout.setLayout(new GridLayout(numComp/rowSize  + ((numComp%3 != 0) ? 1 : 0), rowSize));
+            kakuroListLayout.setLayout(new GridLayout(numComp / rowSize  + ((numComp % rowSize != 0) ? 1 : 0), rowSize));
         }
         for (Component c : kakuroListLayout.getComponents()) {
             c.setSize(contents.getWidth()/4, height*2/3);
