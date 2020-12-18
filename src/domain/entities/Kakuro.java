@@ -38,6 +38,7 @@ public class Kakuro {
         this.createdAt = createdAt;
     }
 
+    public String getName() { return this.name; }
 
     public UUID getId() {
         return this.id;

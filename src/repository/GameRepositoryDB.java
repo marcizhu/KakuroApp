@@ -3,18 +3,11 @@ package src.repository;
 import src.domain.entities.*;
 import src.repository.serializers.GameDeserializer;
 import src.repository.serializers.GameSerializer;
-import src.repository.serializers.KakuroSeializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-/*
-    FIXME:
-    when deserializing games, Gson will try to instantiate them with the Game constructor,
-    which will throw an exception because Game is abstract and cannot be instantiated.
-    Here is the fix TODO: https://www.javacodegeeks.com/2012/04/json-with-gson-and-abstract-classes.html
- */
 
 public class GameRepositoryDB implements GameRepository {
 
@@ -79,32 +72,76 @@ public class GameRepositoryDB implements GameRepository {
     }
 
     @Override
-    public ArrayList<Game> getAllGamesByUser(User user) {
-        //TODO
-        return null;
+    public ArrayList<Game> getAllGamesByUser(User user) throws IOException {
+        return getAllGamesByUser(user.getName());
     }
 
     @Override
-    public ArrayList<Game> getAllGamesByUser(String userName) {
-        //TODO
-        return null;
+    public ArrayList<Game> getAllGamesByUser(String userName) throws IOException {
+        ArrayList<Game> allGames = getAllGames();
+        ArrayList<Game> res = new ArrayList<>();
+
+        for (Game g : allGames) {
+            if (g.getPlayerName().equals(userName)) {
+                res.add(g);
+            }
+        }
+
+        return res;
     }
 
     @Override
-    public ArrayList<Game> getAllGamesInKakuro(Kakuro kak) {
-        //TODO
-        return null;
+    public ArrayList<Game> getAllGamesInKakuro(Kakuro kak) throws IOException {
+        return getAllGamesInKakuro(kak.getName());
     }
 
     @Override
-    public ArrayList<Game> getAllGamesInKakuro(String kakuroName) {
-        //TODO
-        return null;
+    public ArrayList<Game> getAllGamesInKakuro(String kakuroName) throws IOException {
+        ArrayList<Game> allGames = getAllGames();
+        ArrayList<Game> res = new ArrayList<>();
+
+        for (Game g : allGames) {
+            if (g.getKakuro().getName().equals(kakuroName)) res.add(g);
+        }
+
+        return res;
+    }
+
+    @Override
+    public float getBestTime(String kakuroName) throws IOException {
+        // TODO maybe implement this in the use case
+        return 0;
+    }
+
+    @Override
+    public int getKakuroState(String kakuroName) throws IOException {
+        // TODO:
+        return 0;
     }
 
     @Override
     public ArrayList<Game> getAllGames() throws IOException {
         return (ArrayList<Game>)(ArrayList<?>) driver.readAll(Game.class, deserializer);
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesByDifficultyAndUser(Difficulty diff, User user) throws IOException {
+        ArrayList<Game> games = getAllGamesByDifficulty(diff);
+        ArrayList<Game> res = new ArrayList<>();
+
+        for (Game g : games) if (g.getPlayerName().equals(user.getName())) res.add(g);
+
+        return res;
+    }
+
+    @Override
+    public ArrayList<Game> getAllGamesByDifficulty(Difficulty diff) throws IOException {
+        ArrayList<Game> allGames = getAllGames();
+        ArrayList<Game> res = new ArrayList<>();
+
+        for (Game g : allGames) if (g.getKakuro().getDifficulty() == diff) res.add(g);
+
+        return res;
     }
 
     @Override
