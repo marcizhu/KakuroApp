@@ -187,10 +187,15 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         if (b) blackBrushActive = false;
     }
     public void clearSelectedWhiteCellValueClicked () {
-
+        unselectConflictingCoord();
+        unselectModifiedCoord();
+        if (creator.clearWhiteCell(selectedPos.first.first, selectedPos.first.second))
+            ((CreatorScreen)screen).setValueWhiteCell(selectedPos.first.first, selectedPos.first.second, 0);
     }
     public void whiteCellSelectValueClicked (int value) {
-
+        unselectConflictingCoord();
+        unselectModifiedCoord();
+        creator.whiteCellAssignation(selectedPos.first.first, selectedPos.first.second, value);
     }
     // possible values and whether black cell has a defined value
     public void setWhitePossibilitiesList(Pair<ArrayList<Integer>, Boolean> whitePossibilitiesList) {
@@ -241,7 +246,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void setTipMessage(String message) {
-        System.out.println(message);
+        ((CreatorScreen)screen).setTipBoxText(message);
     }
 
     public void onMousePressed(int r, int c) {
