@@ -89,6 +89,6 @@ public class DomainCtrl {
 
     public KakuroCreationCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
         User user = new User(sessionID);
-        return new KakuroCreationCtrl(user, numRows, numCols);
+        return new KakuroCreationCtrl(user, numRows, numCols, kakuroCtrl);
     }
 }

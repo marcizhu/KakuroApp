@@ -200,6 +200,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         }
     }
 
+    /*
     public void onExportClick() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Export kakuro");
@@ -214,7 +215,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
                 Dialogs.showErrorDialog("Error while exporting kakuro: " + ret.second, "Error");
             }
         }
-    }
+    }*/
 
     public void onHintClick() {
         Pair<Pair<Integer, Integer>, Integer> response = game.getHint();
@@ -239,6 +240,19 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void onSolveClick() {
+
+    }
+
+    public void onKakuroSolutionValidated() {
+
+    }
+
+    public void onSurrender() {
+
+    }
+
+    @Override
+    public void onDestroy() {
 
     }
 

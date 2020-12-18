@@ -175,21 +175,21 @@ public class GameScreen extends AbstractScreen {
         constraints.fill = GridBagConstraints.BOTH;
 
         // Button export
-        JButton exportBtn = new JButton("EXPORT MY PROGRESS");
+        /*JButton exportBtn = new JButton("EXPORT MY PROGRESS");
         exportBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onExportClick());
         constraints.gridy = 0;
-        bigButtonsPanel.add(exportBtn, constraints);
+        bigButtonsPanel.add(exportBtn, constraints);*/
 
         // Button hint
         JButton hintBtn = new JButton("I'M STUCK, GIVE ME A HINT");
         hintBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onHintClick());
-        constraints.gridy = 1;
+        constraints.gridy = 0;
         bigButtonsPanel.add(hintBtn, constraints);
 
         // Button hint
         JButton solveBtn = new JButton("I GIVE UP, SOLVE IT FOR ME");
         solveBtn.addActionListener(e -> ((GameScreenCtrl)ctrl).onSolveClick());
-        constraints.gridy = 2;
+        constraints.gridy = 1;
         bigButtonsPanel.add(solveBtn, constraints);
 
         return bigButtonsPanel;

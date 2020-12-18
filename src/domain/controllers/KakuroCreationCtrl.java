@@ -32,6 +32,7 @@ public class KakuroCreationCtrl {
     private static final String KAKURO_VALIDATION_FAILED = "Oupsie... Seems like the kakuro you created has no solutions! In order to publish it please change it so it has at least one solution.";
 
     private CreatorScreenCtrl viewCtrl;
+    private final KakuroCtrl kakuroCtrl;
 
     private User user;
     private Board workingBoard;
@@ -71,8 +72,9 @@ public class KakuroCreationCtrl {
     private ArrayList<Integer> conflictingColSums; //saves colID, always clear before an assignation process
     private ArrayList<IntPair> conflictingWhiteCells; //saves cell coordinates, always clear before an assignation process
 
-    public KakuroCreationCtrl(User user, int numRows, int numColumns) {
+    public KakuroCreationCtrl(User user, int numRows, int numColumns, KakuroCtrl kakuroCtrl) {
         this.user = user;
+        this.kakuroCtrl = kakuroCtrl;
         workingBoard = new Board(numColumns, numRows);
         rows = numRows;
         columns = numColumns;
@@ -87,8 +89,9 @@ public class KakuroCreationCtrl {
         validatedKakuro = false;
     }
 
-    public KakuroCreationCtrl(User user, Board initialBoard) {
+    public KakuroCreationCtrl(User user, Board initialBoard, KakuroCtrl kakuroCtrl) {
         this.user = user;
+        this.kakuroCtrl = kakuroCtrl;
         this.rows = initialBoard.getHeight();
         this.columns = initialBoard.getWidth();
         this.workingBoard = initialBoard;
@@ -948,14 +951,29 @@ public class KakuroCreationCtrl {
             return false;
         }
 
-        // TODO: check if name is taken
-        if (true) {
-            sendMessageToPresentation(NAME_INVALID);
-            return false;
+        Board toPublish = new Board(columns, rows);
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (workingBoard.isBlackCell(r, c)) {
+                    toPublish.setCell(new BlackCell((BlackCell) workingBoard.getCell(r, c)), r, c);
+                } else {
+                    if (forcedInitialValues[r][c] && !workingBoard.isEmpty(r, c)) toPublish.setCell(new WhiteCell(workingBoard.getValue(r, c)), r, c);
+                    else toPublish.setCell(new WhiteCell(), r, c);
+                }
+            }
         }
 
-        // TODO: publish "save to database" the generated kakuro
-        return true;
+        try {
+            if(kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user))) {
+                sendMessageToPresentation("Successfully saved to database!!");
+                return true;
+            }
+            sendMessageToPresentation(NAME_INVALID);
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 

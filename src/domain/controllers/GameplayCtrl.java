@@ -702,7 +702,7 @@ public class GameplayCtrl {
         return new Pair<>(new Pair<>(-1, -1), -1);
     }
 
-    public Pair<Boolean, String> exportKakuro(String file) {
+    /*public Pair<Boolean, String> exportKakuro(String file) {
         try {
             FileWriter myWriter = new FileWriter(file);
             myWriter.write(currentGame.getBoard().toString() + "\n");
@@ -711,12 +711,33 @@ public class GameplayCtrl {
         } catch(IOException e) {
             return new Pair<>(false, e.getMessage());
         }
-    }
+    }*/
 
-    private void validateKakuro() {
-        Solver solver = new Solver(currentGame.getBoard());
+    private void validateKakuro() { // when this function is called it should always be valid
+        // verify rows
+        for (int rowID = 0; rowID < rowLineSize; rowID++) {
+            int expectedSum = currentGame.getBoard().getHorizontalSum(firstRowCoord[rowID].first, firstRowCoord[rowID].second-1);
+            int currentSum = 0;
+            for (int it = firstRowCoord[rowID].second; it < firstRowCoord[rowID].second+rowSize[rowID]; it++) {
+                int value = currentGame.getBoard().getValue(firstRowCoord[rowID].first, it);
+                if (value == 0) return;
+                currentSum += value;
+            }
+            if (currentSum != expectedSum) return;
+        }
 
-        if(solver.solve() == 1)
-            viewCtrl.kakuroSolvedCorrectly();
+        // verify cols
+        for (int colID = 0; colID < colLineSize; colID++) {
+            int expectedSum = currentGame.getBoard().getVerticalSum(firstColCoord[colID].first-1, firstColCoord[colID].second);
+            int currentSum = 0;
+            for (int it = firstColCoord[colID].first; it < firstColCoord[colID].first+colSize[colID]; it++) {
+                int value = currentGame.getBoard().getValue(it, firstColCoord[colID].second);
+                if (value == 0) return;
+                currentSum += value;
+            }
+            if (currentSum != expectedSum) return;
+        }
+
+        // Correct solution
     }
 }

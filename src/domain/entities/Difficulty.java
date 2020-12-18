@@ -23,7 +23,12 @@ public enum Difficulty {
     HARD,
 
     /**
-     * Extreme/expert difficulty
+     * Extreme difficulty
      */
-    EXTREME
+    EXTREME,
+
+    /**
+     * Special difficulty for user-made kakuros
+     */
+    USER_MADE
 }

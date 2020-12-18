@@ -34,7 +34,6 @@ public class MyKakurosScreen extends AbstractScreen {
         kakuroListLayout = new JPanel(new GridLayout(info.size()/3 + ((info.size()%3 != 0) ? 1 : 0), 3));
 
         for (Map<String, Object> kakuroData : info) {
-            System.out.println("Creating kakuroCardView");
             String state = (String) kakuroData.get("state");
             int stateCode = 0;
 

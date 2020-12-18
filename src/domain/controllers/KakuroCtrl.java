@@ -34,6 +34,20 @@ public class KakuroCtrl {
         return computeResultFromKakuroList(kakuroList);
     }
 
+    // returns whether kakuro instance could be saved to database.
+    public boolean saveKakuro(Kakuro kakuro) throws Exception {
+        User user = userRepository.getUser(kakuro.getUser().getName());
+        if (user == null) {
+            throw new Exception("User not found"); // TODO: maybe create custom exception obejcts for each case and use them?
+        }
+
+        Kakuro kak = kakuroRepository.getKakuro(kakuro.getName());
+        if (kak != null) return false;
+
+        kakuroRepository.saveKakuro(kakuro);
+        return true;
+    }
+
     private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList) {
         ArrayList<Map<String, Object>> result = new ArrayList<>();
 
