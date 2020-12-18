@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public interface KakuroRepository {
-    Kakuro getKakuro (UUID id) throws IOException;
+    Kakuro getKakuro (String name) throws IOException;
     void deleteKakuro (Kakuro kakuro) throws IOException;
-    void deleteKakuro (UUID kakuroID) throws IOException;
+    void deleteKakuro (String kakuroName) throws IOException;
     void saveKakuro (Kakuro kakuro) throws IOException;
     ArrayList<Kakuro> getAllKakuros () throws IOException;
     ArrayList<Kakuro> getAllKakurosByUser (User user) throws IOException; // Get all kakuros created by a concrete user

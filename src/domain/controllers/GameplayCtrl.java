@@ -59,7 +59,7 @@ public class GameplayCtrl {
         ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = dades.getAllGamesInProgress(user.getName());
         boolean shouldCreateNewGame = true;
         for (GameInProgress g : allGamesInProgress) {
-            if (g.getKakuro().getId().toString().equals(kakuro.getId().toString())) {
+            if (g.getKakuro().getName().toString().equals(kakuro.getName().toString())) {
                 currentGame = g;
                 movementCount = currentGame.getMovements().size();
                 currentMovement = movementCount;

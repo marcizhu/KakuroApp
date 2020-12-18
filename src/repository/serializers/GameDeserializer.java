@@ -25,7 +25,7 @@ public class GameDeserializer implements JsonDeserializer<Game> {
         Timestamp startTime = Timestamp.valueOf(obj.get("startTime").getAsString());
         float timeSpent = obj.get("timeSpent").getAsFloat();
         String playerName = obj.get("playerName").getAsString();
-        UUID kakuroId = UUID.fromString(obj.get("kakuroId").getAsString());
+        String kakuroName = obj.get("kakuroName").getAsString();
 
         User player;
         try {
@@ -37,9 +37,9 @@ public class GameDeserializer implements JsonDeserializer<Game> {
 
         Kakuro kakuro;
         try {
-            kakuro = kakuroRepo.getKakuro(kakuroId);
+            kakuro = kakuroRepo.getKakuro(kakuroName);
         } catch (IOException e) {
-            System.err.println("Error getting kakuro " + kakuroId.toString() + " from database");
+            System.err.println("Error getting kakuro " + kakuroName + " from database");
             kakuro = null;
         }
 

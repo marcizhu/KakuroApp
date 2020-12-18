@@ -8,7 +8,6 @@ import java.util.UUID;
 public abstract class Game {
     private final UUID id;
     private final User player;
-    private final UUID kakuroId; // FIXME: remove
     private final Kakuro kakuro;
     private float timeSpent;
     private final Timestamp startTime;
@@ -16,7 +15,6 @@ public abstract class Game {
     public Game(User player, Kakuro kakuro) {
         this.id = UUID.randomUUID();
         this.player = player;
-        this.kakuroId = kakuro.getId(); // FIXME: remove
         this.kakuro = kakuro;
         this.startTime = new Timestamp(System.currentTimeMillis());
         this.timeSpent = 0;
@@ -26,7 +24,6 @@ public abstract class Game {
     public Game(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
         this.id = id;
         this.player = player;
-        this.kakuroId = kakuro.getId(); // FIXME: remove
         this.kakuro = kakuro;
         this.startTime = startTime;
         this.timeSpent = timeSpent;
@@ -38,8 +35,8 @@ public abstract class Game {
         return this.kakuro;
     }
 
-    public UUID getKakuroId() {
-        return this.kakuro == null ? null : this.kakuro.getId();
+    public String getKakuroName() {
+        return this.kakuro == null ? null : this.kakuro.getName();
     }
 
     public UUID getId () { return this.id; }

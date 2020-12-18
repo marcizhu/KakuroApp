@@ -14,7 +14,7 @@ public class GameSerializer implements JsonSerializer<Game> {
         JsonObject obj = new JsonObject();
         obj.addProperty("id", game.getId().toString());
         obj.addProperty("playerName", game.getPlayerName());
-        obj.addProperty("kakuroId", game.getKakuroId().toString());
+        obj.addProperty("kakuroName", game.getKakuro().getName());
         obj.addProperty("timeSpent", game.getTimeSpent());
         obj.addProperty("startTime", game.getStartTime().toString());
 

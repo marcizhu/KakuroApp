@@ -23,24 +23,24 @@ public class KakuroRepositoryDB implements KakuroRepository {
     }
 
     @Override
-    public Kakuro getKakuro(UUID id) throws IOException {
+    public Kakuro getKakuro(String name) throws IOException {
         // Returns null if kakuro is not found
         ArrayList<Kakuro> kakuros = getAllKakuros();
-        for (Kakuro k : kakuros) if (k.getId().equals(id)) return k;
+        for (Kakuro k : kakuros) if (k.getName().equals(name)) return k;
 
         return null;
     }
 
     @Override
     public void deleteKakuro(Kakuro kakuro) throws IOException {
-        deleteKakuro(kakuro.getId());
+        deleteKakuro(kakuro.getName());
     }
 
     @Override
-    public void deleteKakuro(UUID kakuroId) throws IOException {
+    public void deleteKakuro(String kakuroName) throws IOException {
         ArrayList<Kakuro> kakuroList = this.getAllKakuros();
         for (int i = 0; i<kakuroList.size(); i++) {
-            if (kakuroList.get(i).getId().equals(kakuroId)) {
+            if (kakuroList.get(i).getName().equals(kakuroName)) {
                 kakuroList.remove(i);
                 driver.writeToFile(kakuroList, "Kakuro", serializer, Kakuro.class);
                 return;
@@ -53,7 +53,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
         ArrayList<Kakuro> kakuroList = this.getAllKakuros();
 
         for (int i = 0; i<kakuroList.size(); i++) {
-            if (kakuroList.get(i).getId().equals(kakuro.getId())) {
+            if (kakuroList.get(i).getName().equals(kakuro.getName())) {
                 kakuroList.set(i, kakuro);
                 driver.writeToFile(kakuroList, "Kakuro", serializer, Kakuro.class);
                 return;
@@ -76,7 +76,12 @@ public class KakuroRepositoryDB implements KakuroRepository {
     public ArrayList<Kakuro> getAllKakurosByUser(User user) throws IOException {
         ArrayList<Kakuro> kakuros = getAllKakuros();
         ArrayList<Kakuro> res = new ArrayList<>();
-        for (Kakuro k : kakuros) if (k.getCreatedBy().getName().equals(user.getName())) res.add(k);
+        for (Kakuro k : kakuros) {
+            if (user == null && k.getCreatedBy() == null) {
+                res.add(k);
+            } else if (k.getCreatedBy() == null) continue;
+            else if (k.getCreatedBy().getName().equals(user.getName())) res.add(k);
+        }
 
         return res;
     }
