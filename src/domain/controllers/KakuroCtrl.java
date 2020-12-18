@@ -37,18 +37,10 @@ public class KakuroCtrl {
     private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList) {
         ArrayList<Map<String, Object>> result = new ArrayList<>();
 
-        // TODO: unhardcode this
-        String board = "";
-        try {
-            board = Reader.fromFile("data/kakuros/solved/jutge.kak").toString();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
         for (Kakuro kakuro : kakuroList) {
             HashMap<String, Object> kakuroData = new HashMap<>();
-            kakuroData.put("board", board); // TODO: unhardcode this
-            kakuroData.put("name", "Breakfast Kakuro"); // TODO: unhardcode this
+            kakuroData.put("board", kakuro.getBoard().toString());
+            kakuroData.put("name", kakuro.getName());
             kakuroData.put("difficulty", kakuro.getDifficulty().toString());
             kakuroData.put("timesPlayed", 12); // TODO: compute this
             kakuroData.put("createdBy", kakuro.getCreatedBy().getName());

@@ -37,7 +37,9 @@ public class Kakuro {
         this.createdAt = createdAt;
     }
 
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 
     public Difficulty getDifficulty() {
         return this.difficulty;
