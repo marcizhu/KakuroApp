@@ -49,7 +49,7 @@ public class GameRepositoryDB implements GameRepository {
                 if (g instanceof GameInProgress) {
                     boardRepository.deleteBoard(((GameInProgress) g).getBoard());
                 }
-                driver.writeToFile(gamesList, "game", serializer, subclasses);
+                driver.writeToFile(gamesList, "Game", serializer, subclasses);
                 return;
             }
         }
@@ -62,13 +62,13 @@ public class GameRepositoryDB implements GameRepository {
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(game.getId())) {
                 gamesList.set(i, game);
-                driver.writeToFile(gamesList, "game", serializer, subclasses);
+                driver.writeToFile(gamesList, "Game", serializer, subclasses);
                 return;
             }
         }
 
         gamesList.add(game);
-        driver.writeToFile(gamesList, "game", serializer, subclasses);
+        driver.writeToFile(gamesList, "Game", serializer, subclasses);
 
         if (game instanceof GameInProgress) {
             // Save board
