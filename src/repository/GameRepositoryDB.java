@@ -15,12 +15,14 @@ public class GameRepositoryDB implements GameRepository {
     private final GameSerializer serializer;
     private final GameDeserializer deserializer;
     private final ArrayList<Class> subclasses;
+    private final BoardRepository boardRepository;
 
     public GameRepositoryDB (DB driver) {
         this.driver = driver;
         this.serializer = new GameSerializer();
         this.deserializer = new GameDeserializer();
         this.subclasses = new ArrayList<>();
+        this.boardRepository = new BoardRepositoryDB(driver);
         subclasses.add(GameInProgress.class);
         subclasses.add(GameFinished.class);
     }
@@ -38,12 +40,15 @@ public class GameRepositoryDB implements GameRepository {
 
     @Override
     public void deleteGame(UUID gameId) throws IOException {
-        // TODO: delete board!!!
         ArrayList<Game> gamesList = this.getAllGames();
 
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(gameId)) {
                 gamesList.remove(i);
+                Game g = gamesList.get(i);
+                if (g instanceof GameInProgress) {
+                    boardRepository.deleteBoard(((GameInProgress) g).getBoard());
+                }
                 driver.writeToFile(gamesList, "game", serializer, subclasses);
                 return;
             }
