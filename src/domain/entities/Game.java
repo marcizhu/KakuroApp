@@ -20,7 +20,7 @@ public abstract class Game {
         this.id = UUID.randomUUID();
         this.player = player;
         this.kakuro = kakuro;
-        this.timeSpent = 5;
+        this.timeSpent = 5; // FIXME: ???
         this.startTime = startTime;
     }
 

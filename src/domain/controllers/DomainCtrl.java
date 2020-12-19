@@ -81,6 +81,17 @@ public class DomainCtrl {
         return new Pair<>(result, null);
     }
 
+    public Pair<ArrayList<Map<String, Object>>, String> getGameHistory(String username) {
+        ArrayList<Map<String, Object>> result;
+        try {
+            result = gameCtrl.getGameHistory(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Pair<>(null, e.getMessage());
+        }
+        return new Pair<>(result, null);
+    }
+
     public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {
         try {
             User user = userCtrl.getUser(username);
