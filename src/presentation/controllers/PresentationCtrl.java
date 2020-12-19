@@ -28,12 +28,13 @@ public class PresentationCtrl {
 
     // App content
     private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
-    private final LoginScreenCtrl loginScreenCtrl;         ///< "Login" Screen controller
-    private final DashboardScreenCtrl dashboardScreenCtrl; ///< "Dashboard" Screen controller
-    private final MyKakurosScreenCtrl myKakurosScreenCtrl; ///< "My Kakuros" Screen controller
+
+    private final LoginScreenCtrl loginScreenCtrl;           ///< "Login" Screen controller
+    private final DashboardScreenCtrl dashboardScreenCtrl;   ///< "Dashboard" Screen controller
+    private final MyKakurosScreenCtrl myKakurosScreenCtrl;   ///< "My Kakuros" Screen controller
+    private final KakuroListScreenCtrl kakuroListScreenCtrl; ///< "Kakuro List" Screen controller
 
     // FIXME: temporary
-    private final DemoScreenCtrl kakuroListScreenCtrl;
     private final DemoScreenCtrl statisticsScreenCtrl;
     private final DemoScreenCtrl rankingsScreenCtrl;
 
@@ -58,9 +59,10 @@ public class PresentationCtrl {
         loginScreenCtrl = new LoginScreenCtrl(this, domainCtrl);
         dashboardScreenCtrl = new DashboardScreenCtrl(this, domainCtrl);
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
+        kakuroListScreenCtrl = new KakuroListScreenCtrl(this, domainCtrl);
 
         // FIXME: temporary
-        kakuroListScreenCtrl = statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
+        statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -161,7 +163,7 @@ public class PresentationCtrl {
             menu.getComponent(i).setForeground(Color.BLACK);
 
         menu.getComponent(1).setForeground(Color.BLUE);
-        //setScreen(kakuroListScreenCtrl);
+        setScreen(kakuroListScreenCtrl);
     }
 
     private void onMyKakurosMenuItemClicked() {
