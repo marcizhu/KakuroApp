@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,17 @@ public class Reader {
      * @return the board represented by the contents of the string
      */
     public static Board fromString(String input) {
+        return fromString(UUID.randomUUID(), null, input);
+    }
+
+    /**
+     * Read a board from string, initializing its Id and notations
+     * @param boardId UUID representing the board identifier
+     * @param notations String representing the notations of the cells
+     * @param input String representing the board
+     * @return the board represented by the Id, notations and the contents of the string
+     */
+    public static Board fromString(UUID boardId, String notations, String input) {
         Matcher m = pattern.matcher("");
         String[] rows = input.split("\\n");
         String[] line1 = rows[0].split(",");
@@ -48,7 +60,7 @@ public class Reader {
         int height = Integer.parseInt(line1[0].trim());
         int width  = Integer.parseInt(line1[1].trim());
 
-        Board board = new Board(width, height);
+        Board board = new Board(boardId, width, height);
         assert(rows.length - 1 == height);
 
         for(int i = 0; i < height; i++) {
@@ -76,7 +88,9 @@ public class Reader {
                     cell = new BlackCell(col, row);
                 } else {
                     int val = Integer.parseInt(cols[j]);
-                    cell = new WhiteCell(val);
+                    int notation = 0;
+                    if (notations != null) notation = Character.getNumericValue(notations.charAt(width*i + j));
+                    cell = new WhiteCell(i, j, val, notation);
                 }
 
                 board.setCell(cell, i, j);

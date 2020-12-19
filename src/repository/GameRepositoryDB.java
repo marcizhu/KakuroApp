@@ -38,6 +38,7 @@ public class GameRepositoryDB implements GameRepository {
 
     @Override
     public void deleteGame(UUID gameId) throws IOException {
+        // TODO: delete board!!!
         ArrayList<Game> gamesList = this.getAllGames();
 
         for (int i = 0; i<gamesList.size(); i++) {

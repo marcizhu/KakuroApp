@@ -1,8 +1,8 @@
 package src.repository;
 
 import src.domain.entities.Board;
-import src.domain.entities.User;
 import src.repository.serializers.BoardDeserializer;
+import src.repository.serializers.BoardSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,9 +12,11 @@ public class BoardRepositoryDB implements BoardRepository {
 
     private final DB driver;
     private final BoardDeserializer deserializer;
+    private final BoardSerializer serializer;
 
     public BoardRepositoryDB (DB driver) {
         this.deserializer = new BoardDeserializer();
+        this.serializer = new BoardSerializer();
         this.driver = driver;
     }
 
@@ -41,7 +43,7 @@ public class BoardRepositoryDB implements BoardRepository {
         for (int i = 0; i<boardsList.size(); i++) {
             if (boardsList.get(i).getId().equals(id)) {
                 boardsList.remove(i);
-                driver.writeToFile(boardsList, "Board");
+                driver.writeToFile(boardsList, "Board", serializer, Board.class);
                 return;
             }
         }
@@ -60,12 +62,12 @@ public class BoardRepositoryDB implements BoardRepository {
         for (int i = 0; i<boardsList.size(); i++) {
             if (boardsList.get(i).getId().equals(board.getId())) {
                 boardsList.set(i, board);
-                driver.writeToFile(boardsList, "Board");
+                driver.writeToFile(boardsList, "Board", serializer, Board.class);
                 return;
             }
         }
 
         boardsList.add(board);
-        driver.writeToFile(boardsList, "Board");
+        driver.writeToFile(boardsList, "Board", serializer, Board.class);
     }
 }

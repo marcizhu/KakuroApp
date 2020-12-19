@@ -171,7 +171,9 @@ public class WhiteCell extends Cell {
         return (value == 0 ? "?" : Integer.toString(value));
     }
 
-    private void initAllNotations(boolean b) {
+    private void
+
+    initAllNotations(boolean b) {
         notations = b ? 0b111111111 : 0b000000000;
     }
 }

@@ -31,6 +31,19 @@ public class Board {
     }
 
     /**
+     * Creates a board with dimensions width x height and a given id.
+     * @param id  The board's unique identifier
+     * @param width  The width of the board
+     * @param height The height of the board
+     */
+    public Board(UUID id, int width, int height) {
+        this.id = id;
+        this.width = width;
+        this.height = height;
+        cells = new Cell[height][width]; // Reminder: cells is declared but no cells are created.
+    }
+
+    /**
      * Constructor.
      * Initializes a board with the given size and all cells set to the given one
      * @param width  The width of the board
@@ -299,6 +312,26 @@ public class Board {
     }
 
     /**
+     * Converts a board's cells to string
+     * @return A string that represents this board's cells
+     */
+    public String cellsToString() {
+        String[] row = new String[height];
+        String[] col = new String[width];
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                String c = cells[i][j] == null ? "x" : cells[i][j].toString();
+                col[j] = c;
+            }
+
+            row[i] = String.join(",", col);
+        }
+
+        return  String.join("\n", row);
+    }
+
+    /**
      * Converts a board's notations to string
      * @return A string that represents this board's notations
      */
@@ -312,10 +345,9 @@ public class Board {
                 else if (cells[i][j] instanceof BlackCell) col[j] = "*";
                 else col[j] = ""+cells[i][j].getNotations();
             }
-            row[i] = String.join(",", col);
+            row[i] = String.join("", col);
         }
 
-        String header = height + "," + width + "\n";
-        return header + String.join("\n", row);
+        return String.join("", row);
     }
 }

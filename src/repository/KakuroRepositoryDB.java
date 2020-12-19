@@ -15,11 +15,13 @@ public class KakuroRepositoryDB implements KakuroRepository {
     private final DB driver;
     private final KakuroSeializer serializer;
     private final KakuroDeserializer deserializer;
+    private final BoardRepository boardRepository;
 
     public KakuroRepositoryDB (DB driver) {
         this.driver = driver;
         this.serializer = new KakuroSeializer();
         this.deserializer = new KakuroDeserializer();
+        this.boardRepository = new BoardRepositoryDB(driver);
     }
 
     @Override
@@ -46,6 +48,9 @@ public class KakuroRepositoryDB implements KakuroRepository {
                 return;
             }
         }
+
+        // TODO: delete board!
+        //boardRepository.deleteBoard(kakuro.getBoard().getId());
     }
 
     @Override
@@ -63,8 +68,7 @@ public class KakuroRepositoryDB implements KakuroRepository {
         kakuroList.add(kakuro);
         driver.writeToFile(kakuroList, "Kakuro", serializer, Kakuro.class);
 
-        BoardRepository boardRepo = new BoardRepositoryDB(driver);
-        boardRepo.saveBoard(kakuro.getBoard());
+        boardRepository.saveBoard(kakuro.getBoard());
     }
 
     @Override
