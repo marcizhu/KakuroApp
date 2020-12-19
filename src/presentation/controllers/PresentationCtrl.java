@@ -1,6 +1,7 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
+import src.domain.controllers.GameplayCtrl;
 import src.presentation.utils.Palette;
 import src.utils.Pair;
 
@@ -276,8 +277,13 @@ public class PresentationCtrl {
         for (int i = 0; i < 5; i++)
             menu.getComponent(i).setForeground(Color.BLACK);
 
+        Pair<GameplayCtrl, String> result = domainCtrl.newGameInstance(userSessionId, kakuroID);
+        if (result.second != null) {
+            // TODO: handle error
+        }
+
         currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
-        ((GameScreenCtrl)currentScreenCtrl).setUpGame(domainCtrl.newGameInstance(userSessionId, kakuroID));
+        ((GameScreenCtrl)currentScreenCtrl).setUpGame(result.first);
         currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();

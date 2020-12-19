@@ -45,9 +45,9 @@ public class Kakuro {
         return this.difficulty;
     }
 
-    public User getCreatedBy() { return this.createdBy; } // FIXME: remove
-
-    public User getUser() { return this.createdBy; }
+    public User getCreatedBy() {
+        return this.createdBy;
+    }
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
