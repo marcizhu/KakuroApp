@@ -86,7 +86,7 @@ public class Board {
      * @param b Board to copy
      */
     public Board(Board b) {
-        this.id = b.getId();
+        this.id = UUID.randomUUID();
         width = b.getWidth();
         height = b.getHeight();
         cells = new Cell[height][width];

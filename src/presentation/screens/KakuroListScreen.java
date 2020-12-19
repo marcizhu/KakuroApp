@@ -1,6 +1,5 @@
 package src.presentation.screens;
 
-import src.domain.entities.Difficulty;
 import src.presentation.controllers.KakuroListScreenCtrl;
 import src.presentation.views.KakuroInfoCardView;
 
@@ -21,13 +20,7 @@ public class KakuroListScreen extends AbstractScreen {
     }
 
     public void setSelectedTab(String difficulty) {
-        int tabIdx = 0;
-        if (difficulty.equals("EASY")) tabIdx = 0;
-        else if (difficulty.equals("MEDIUM")) tabIdx = 1;
-        else if (difficulty.equals("HARD")) tabIdx = 2;
-        else if (difficulty.equals("EXTREME")) tabIdx = 3;
-        else if (difficulty.equals("USER_MADE")) tabIdx = 4;
-        tabbedPane.setSelectedIndex(tabIdx);
+        tabbedPane.setSelectedIndex(difficultyToInt(difficulty));
     }
 
     @Override
@@ -42,13 +35,13 @@ public class KakuroListScreen extends AbstractScreen {
         contents.add(title);
 
         tabbedPane = new JTabbedPane();
-        kakuroListPane = new JScrollPane[Difficulty.values().length];
-        kakuroListLayout = new JPanel[Difficulty.values().length];
+        kakuroListPane = new JScrollPane[5];
+        kakuroListLayout = new JPanel[5];
 
-        for(Difficulty diff : Difficulty.values()) {
+        for(int diff = 0; diff < 5; diff++) {
             ArrayList<Map<String, Object>> info = ((KakuroListScreenCtrl) ctrl).getInfoToDisplay(diff);
-            if (info.size() == 0) return;
-            kakuroListLayout[diff.ordinal()] = new JPanel(new GridLayout(info.size() / 3 + ((info.size() % 3 != 0) ? 1 : 0), 3));
+            //if (info.size() == 0) return;
+            kakuroListLayout[diff] = new JPanel(new GridLayout(info.size() / 3 + ((info.size() % 3 != 0) ? 1 : 0), 3));
 
             for (Map<String, Object> kakuroData : info) {
                 String state = (String) kakuroData.get("state");
@@ -87,13 +80,13 @@ public class KakuroListScreen extends AbstractScreen {
                     }
                 });
                 kak.setSize(width / 4, height * 2 / 3);
-                kakuroListLayout[diff.ordinal()].add(kak);
+                kakuroListLayout[diff].add(kak);
             }
-            kakuroListPane[diff.ordinal()] = new JScrollPane(kakuroListLayout[diff.ordinal()]);
-            kakuroListPane[diff.ordinal()].setVisible(true);
-            kakuroListPane[diff.ordinal()].getVerticalScrollBar().setUnitIncrement(20);
+            kakuroListPane[diff] = new JScrollPane(kakuroListLayout[diff]);
+            kakuroListPane[diff].setVisible(true);
+            kakuroListPane[diff].getVerticalScrollBar().setUnitIncrement(20);
 
-            tabbedPane.addTab(diff.name().equals("USER_MADE") ? "BY USERS" : diff.name(), kakuroListPane[diff.ordinal()]);
+            tabbedPane.addTab(difficultyToString(diff).equals("USER_MADE") ? "BY USERS" : difficultyToString(diff), kakuroListPane[diff]);
         }
 
         contents.add(tabbedPane);
@@ -101,10 +94,31 @@ public class KakuroListScreen extends AbstractScreen {
         onResize(width, height);
     }
 
+    private String difficultyToString(int diff) {
+        switch (diff) {
+            case 0: return "EASY";
+            case 1: return "MEDIUM";
+            case 2: return "HARD";
+            case 3: return "EXTREME";
+            case 4: return "USER_MADE";
+        }
+        return "";
+    }
+
+    private int difficultyToInt(String difficulty) {
+        int diff = 0;
+        if (difficulty.equals("EASY")) diff = 0;
+        else if (difficulty.equals("MEDIUM")) diff = 1;
+        else if (difficulty.equals("HARD")) diff = 2;
+        else if (difficulty.equals("EXTREME")) diff = 3;
+        else if (difficulty.equals("USER_MADE")) diff = 4;
+        return diff;
+    }
+
     @Override
     public void onResize(int width, int height) {
         contents.setSize(width, height);
-        for(int i = 0; i < Difficulty.values().length; i++) {
+        for(int i = 0; i < 5; i++) {
             int remainingHeight = height - title.getHeight();
             kakuroListPane[i].setSize(width, remainingHeight);
             kakuroListLayout[i].setSize(width - 50, remainingHeight);

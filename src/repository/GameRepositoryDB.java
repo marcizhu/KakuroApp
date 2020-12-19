@@ -44,8 +44,8 @@ public class GameRepositoryDB implements GameRepository {
 
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(gameId)) {
-                gamesList.remove(i);
                 Game g = gamesList.get(i);
+                gamesList.remove(i);
                 if (g instanceof GameInProgress) {
                     boardRepository.deleteBoard(((GameInProgress) g).getBoard());
                 }
@@ -62,6 +62,11 @@ public class GameRepositoryDB implements GameRepository {
         for (int i = 0; i<gamesList.size(); i++) {
             if (gamesList.get(i).getId().equals(game.getId())) {
                 gamesList.set(i, game);
+                if (game instanceof GameInProgress) {
+                    // Save board
+                    BoardRepository boardRepo = new BoardRepositoryDB(driver);
+                    boardRepo.saveBoard(((GameInProgress)game).getBoard());
+                }
                 driver.writeToFile(gamesList, "Game", serializer, subclasses);
                 return;
             }

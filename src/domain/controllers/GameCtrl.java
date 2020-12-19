@@ -18,7 +18,7 @@ public class GameCtrl {
     public GameInProgress getGameInProgress(String username, String kakuroname) throws Exception {
         ArrayList<Game> userGames = gameRepository.getAllGamesByUser(username);
         for (Game game : userGames) {
-            if (game.getKakuroName() == kakuroname && game instanceof GameInProgress) {
+            if (game.getKakuroName().equals(kakuroname) && game instanceof GameInProgress) {
                 return (GameInProgress) game;
             }
         }

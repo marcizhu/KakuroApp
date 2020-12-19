@@ -1,7 +1,6 @@
 package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
-import src.domain.entities.Difficulty;
 import src.presentation.screens.KakuroListScreen;
 import src.utils.Pair;
 
@@ -25,8 +24,8 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
     // Called at setScreen right after a call to onDestroy of the previous screen.
     public void build(int width, int height) {
         screen = new KakuroListScreen(this);
-        for(Difficulty diff : Difficulty.values()) {
-            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(diff.name());
+        for(int diff = 0; diff < 5; diff++) {
+            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff));
             if (result.second != null) {
                 // TODO: handle error
                 return;
@@ -39,8 +38,9 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
 
     @Override
     public void onFocusRegained(int width, int height) {
-        for(Difficulty diff : Difficulty.values()) {
-            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(diff.name());
+        infoToDisplay.clear();
+        for(int diff = 0; diff < 5; diff++) {
+            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff));
             if (result.second != null) {
                 // TODO: handle error
                 return;
@@ -51,8 +51,8 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
         screen.build(width, height);
     }
 
-    public ArrayList<Map<String, Object>> getInfoToDisplay(Difficulty diff) {
-        return infoToDisplay.get(diff.ordinal());
+    public ArrayList<Map<String, Object>> getInfoToDisplay(int diff) {
+        return infoToDisplay.get(diff);
     }
 
     public void onExportKakuroClicked(String id) {
@@ -61,5 +61,16 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
 
     public void onPlayKakuroClicked(String id) {
         presentationCtrl.startNewGame(id);
+    }
+
+    private String difficultyToString(int diff) {
+        switch (diff) {
+            case 0: return "EASY";
+            case 1: return "MEDIUM";
+            case 2: return "HARD";
+            case 3: return "EXTREME";
+            case 4: return "USER_MADE";
+        }
+        return "";
     }
 }

@@ -253,6 +253,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
 
         Dialogs.showInfoDialog("Time spent: " + secondsToStringTime(timeUsed) + "\nTotal score: 0.0", "You surrendered...");
         Dialogs.showInfoDialog("Num solutions: " + numSolutions + "\nTime solving: " + timeSolving +" ms", "Should show KakuroDisplayScreen");
+
+        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
     }
 
     private String secondsToStringTime(float time) {
