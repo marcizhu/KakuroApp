@@ -15,11 +15,11 @@ public class GameCtrl {
         this.userRepository = userRepository;
     }
 
-    public Game getGameInProgress(String username, String kakuroname) throws Exception {
+    public GameInProgress getGameInProgress(String username, String kakuroname) throws Exception {
         ArrayList<Game> userGames = gameRepository.getAllGamesByUser(username);
         for (Game game : userGames) {
             if (game.getKakuroName() == kakuroname && game instanceof GameInProgress) {
-                return game;
+                return (GameInProgress) game;
             }
         }
         return null;

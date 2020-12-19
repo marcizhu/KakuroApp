@@ -17,7 +17,7 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
         infoToDisplay = new ArrayList<>();
     }
 
-    public void setSelectedTab(Difficulty difficulty) {
+    public void setSelectedTab(String difficulty) {
         ((KakuroListScreen)screen).setSelectedTab(difficulty);
     }
 

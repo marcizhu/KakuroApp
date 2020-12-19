@@ -19,12 +19,12 @@ import java.util.Collections;
 import java.util.Random;
 
 public class GameplayCtrl {
-    GameScreenCtrl viewCtrl;
+    private GameScreenCtrl viewCtrl;
     private final GameCtrl gameCtrl;
 
-    User user;
-    Kakuro kakuro;
-    GameInProgress currentGame;
+    private final User user;
+    private final Kakuro kakuro;
+    private final GameInProgress currentGame;
     private int movementCount;
     private int currentMovement;
 
@@ -53,38 +53,39 @@ public class GameplayCtrl {
     private Pair<Pair<Integer, Integer>, Integer> lastHint;
     private int totalNumOfHints;
 
-    private boolean isCurrentGameInDB;
+    private final boolean isCurrentGameInDB;
     private long initialTime;
 
     public GameplayCtrl(User user, Kakuro kakuro, GameCtrl gameCtrl) {
         this.user = user;
         this.kakuro = kakuro;
         this.gameCtrl = gameCtrl;
+        this.currentGame = new GameInProgress(user, kakuro);
+        isCurrentGameInDB = false;
         movementCount = 0;
         currentMovement = 0;
+        totalNumOfHints = 0;
+        initializeCommon();
+    }
+
+    public GameplayCtrl(GameInProgress gameInProgress, GameCtrl gameCtrl) {
+        this.currentGame = gameInProgress;
+        this.user = currentGame.getPlayer();
+        this.kakuro = currentGame.getKakuro();
+        this.gameCtrl = gameCtrl;
+        isCurrentGameInDB = true;
+        movementCount = currentGame.getMovements().size();
+        currentMovement = movementCount;
+        totalNumOfHints = 0; // FIXME: change when they can be stored to DB
+        initializeCommon();
+    }
+
+    private void initializeCommon() {
         hintAtMove = -1;
         lastHint = new Pair<>(new Pair<>(-1, -1), -1);
-        // First we check if there's a game in progress for this kakuro and this userName, if not we create a new game.
-        isCurrentGameInDB = false;
-        ArrayList<GameInProgress> allGamesInProgress = new ArrayList<>();// = GameCtrl.getAllGamesInProgress(user.getName());
-        for (GameInProgress g : allGamesInProgress) {
-            if (g.getKakuro().getName().equals(kakuro.getName())) {
-                currentGame = g;
-                movementCount = currentGame.getMovements().size();
-                currentMovement = movementCount;
-                isCurrentGameInDB = true;
-                break;
-            }
-        }
-
-        if (!isCurrentGameInDB) {
-            currentGame = new GameInProgress(user, kakuro);
-        }
-
         usedValuesHelpIsActive = false;
         combinationsHelpIsActive = false;
         autoEraseHelpIsActive = false;
-        totalNumOfHints = 0;
     }
 
     public String gameSetUp(GameScreenCtrl view) {
@@ -738,13 +739,6 @@ public class GameplayCtrl {
         // save game in progress to db
         try {
             gameCtrl.saveGame(currentGame);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        GameRepository gr = new GameRepositoryDB(new DB());
-        try {
-            gr.saveGame(currentGame);
         } catch (Exception e) {
             e.printStackTrace();
         }

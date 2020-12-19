@@ -1,9 +1,6 @@
 package src.domain.controllers;
 
-import src.domain.entities.Difficulty;
-import src.domain.entities.Game;
-import src.domain.entities.Kakuro;
-import src.domain.entities.User;
+import src.domain.entities.*;
 import src.repository.*;
 import src.utils.Pair;
 
@@ -94,19 +91,49 @@ public class DomainCtrl {
 
     public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {
         try {
+            GameInProgress game = gameCtrl.getGameInProgress(username, kakuroname);
+            if (game != null) return new Pair<>(new GameplayCtrl(game, gameCtrl), null);
             User user = userCtrl.getUser(username);
-            Game game = gameCtrl.getGameInProgress(username, kakuroname);
-            Kakuro kakuro;
-            if (game != null) kakuro = game.getKakuro();
-            else kakuro = kakuroCtrl.getKakuro(kakuroname);
+            Kakuro kakuro = kakuroCtrl.getKakuro(kakuroname);
             return new Pair<>(new GameplayCtrl(user, kakuro, gameCtrl), null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }
     }
 
-    public KakuroCreationCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
-        User user = new User(sessionID);
+    public Pair<GameplayCtrl, String> newImportedGameInstance(String username, String filePath) {
+        // TODO: validate kakuro (and the format), if valid register it in data base as USER_MADE and return new game instance
+        return new Pair<>(null, "Functionality currently not implemented");
+    }
+
+    public KakuroCreationCtrl newCreatorInstance(String username, int numRows, int numCols) {
+        User user = new User(username);
         return new KakuroCreationCtrl(user, numRows, numCols, kakuroCtrl);
+    }
+
+    public Pair<KakuroCreationCtrl, String> newImportedCreatorInstance(String username, String filePath) {
+        // TODO: validate kakuro format, extract the number of rows and columns and return a creation ctrl
+        //  using constructor
+        // new KakuroCreationCtrl(user, initialBoard, kakuroCtrl);
+        return new Pair<>(null, "Functionality currently not implemented");
+    }
+
+    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique) {
+        // TODO: this shouldn't be void, it should generate the kakuro, save it to the database and return
+        //  the board.toSting(), the time that the generator spent generating the kakuro (like in the example), etc.
+
+        // long initTime = System.currentTimeMillis();
+        // generator.generate();
+        // timeToReturn = System.currentTimeMillis() - initTime;
+    }
+
+    public void generateKakuroFromSeed(String seed) {
+        // TODO: this shouldn't be void, it should decode the seed to extract rows, columns, difficulty, forceUnique and long seed
+        //  generate the kakuro, save it to the database and return
+        //  the board.toSting(), the time that the generator spent generating the kakuro (like in the example), etc.
+
+        // long initTime = System.currentTimeMillis();
+        // generator.generate();
+        // timeToReturn = System.currentTimeMillis() - initTime;
     }
 }

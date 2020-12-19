@@ -20,8 +20,14 @@ public class KakuroListScreen extends AbstractScreen {
         super(ctrl);
     }
 
-    public void setSelectedTab(Difficulty difficulty) {
-        tabbedPane.setSelectedIndex(difficulty.ordinal());
+    public void setSelectedTab(String difficulty) {
+        int tabIdx = 0;
+        if (difficulty.equals("EASY")) tabIdx = 0;
+        else if (difficulty.equals("MEDIUM")) tabIdx = 1;
+        else if (difficulty.equals("HARD")) tabIdx = 2;
+        else if (difficulty.equals("EXTREME")) tabIdx = 3;
+        else if (difficulty.equals("USER_MADE")) tabIdx = 4;
+        tabbedPane.setSelectedIndex(tabIdx);
     }
 
     @Override

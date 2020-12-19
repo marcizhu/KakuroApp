@@ -5,6 +5,8 @@ import src.presentation.controllers.DashboardScreenCtrl;
 import src.presentation.utils.Palette;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -228,7 +230,15 @@ public class DashboardScreen extends AbstractScreen {
         rowsLbl.setHorizontalAlignment(SwingConstants.LEFT);
         rowsLbl.setVerticalAlignment(SwingConstants.CENTER);
 
-        genRows = new JSpinner(new SpinnerNumberModel(9, 2, 20, 1));
+        genRows = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
+        ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
+        genRows.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Integer)genRows.getValue() > 25) ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
+                else ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
+            }
+        });
 
         JLabel colsLbl = new JLabel("Columns");
         colsLbl.setFont(bodyFnt);
@@ -237,7 +247,15 @@ public class DashboardScreen extends AbstractScreen {
         colsLbl.setHorizontalAlignment(SwingConstants.LEFT);
         colsLbl.setVerticalAlignment(SwingConstants.CENTER);
 
-        genCols = new JSpinner(new SpinnerNumberModel(9, 2, 20, 1));
+        genCols = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
+        ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
+        genCols.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Integer)genCols.getValue() > 25) ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
+                else ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
+            }
+        });
 
         JLabel diffLbl = new JLabel("Difficulty");
         diffLbl.setFont(bodyFnt);
@@ -436,7 +454,15 @@ public class DashboardScreen extends AbstractScreen {
         rowsLbl.setHorizontalAlignment(SwingConstants.LEFT);
         rowsLbl.setVerticalAlignment(SwingConstants.CENTER);
 
-        handRows = new JSpinner(new SpinnerNumberModel(9, 2, 20, 1));
+        handRows = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
+        ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
+        handRows.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Integer)handRows.getValue() > 25) ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
+                else ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
+            }
+        });
 
         JLabel colsLbl = new JLabel("Columns");
         colsLbl.setFont(bodyFnt);
@@ -445,7 +471,15 @@ public class DashboardScreen extends AbstractScreen {
         colsLbl.setHorizontalAlignment(SwingConstants.LEFT);
         colsLbl.setVerticalAlignment(SwingConstants.CENTER);
 
-        handCols = new JSpinner(new SpinnerNumberModel(9, 2, 20, 1));
+        handCols = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
+        ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
+        handCols.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if ((Integer)handCols.getValue() > 25) ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
+                else ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
+            }
+        });
 
         JButton confirmHand = new JButton("✅");
         confirmHand.setForeground(Palette.StrongGreen);

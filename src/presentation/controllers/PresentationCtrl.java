@@ -2,6 +2,8 @@ package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
 import src.domain.controllers.GameplayCtrl;
+import src.domain.controllers.KakuroCreationCtrl;
+import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
 import src.utils.Pair;
 
@@ -102,8 +104,6 @@ public class PresentationCtrl {
         app.setLocation(xLocation, yLocation);
 
         // Contents
-        // TODO: When initializing we should set the screen to LogInScreenCtrl, which hasn't got any menu bar
-        //  the menu bar is left here in purpose to showcase it at the demo.
         currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
 
@@ -289,6 +289,25 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    public void importNewGame(String filePath) {
+        Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong");
+            return;
+        }
+
+        currentScreenCtrl.onDestroy();
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
+        currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
+        ((GameScreenCtrl)currentScreenCtrl).setUpGame(result.first);
+        currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
+        app.setContentPane(currentScreenCtrl.getContents());
+        app.revalidate();
+    }
+
     public void startNewCreation(int numRows, int numCols) {
         currentScreenCtrl.onDestroy();
 
@@ -300,5 +319,32 @@ public class PresentationCtrl {
         currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();
+    }
+
+    public void importNewCreation(String filePath) {
+        Pair<KakuroCreationCtrl, String> result = domainCtrl.newImportedCreatorInstance(userSessionId, filePath);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong");
+            return;
+        }
+
+        currentScreenCtrl.onDestroy();
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+
+        currentScreenCtrl = new CreatorScreenCtrl(this, domainCtrl);
+        ((CreatorScreenCtrl)currentScreenCtrl).setUpCreator(result.first);
+        currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
+        app.setContentPane(currentScreenCtrl.getContents());
+        app.revalidate();
+    }
+
+    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique) {
+        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique);
+    }
+
+    public void generateKakuroFromSeed(String seed) {
+        domainCtrl.generateKakuroFromSeed(seed);
     }
 }
