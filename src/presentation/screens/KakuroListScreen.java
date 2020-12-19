@@ -87,7 +87,7 @@ public class KakuroListScreen extends AbstractScreen {
             kakuroListPane[diff.ordinal()].setVisible(true);
             kakuroListPane[diff.ordinal()].getVerticalScrollBar().setUnitIncrement(20);
 
-            tabbedPane.addTab(diff.name().equals("USER_MADE") ? "CUSTOM" : diff.name(), kakuroListPane[diff.ordinal()]);
+            tabbedPane.addTab(diff.name().equals("USER_MADE") ? "BY USERS" : diff.name(), kakuroListPane[diff.ordinal()]);
         }
 
         contents.add(tabbedPane);
