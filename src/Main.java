@@ -2,10 +2,14 @@ package src;
 
 import src.domain.algorithms.Generator;
 import src.domain.algorithms.Solver;
+import src.domain.controllers.Reader;
 import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
 import src.presentation.controllers.PresentationCtrl;
 import src.presentation.views.KakuroView;
+import src.repository.BoardRepository;
+import src.repository.BoardRepositoryDB;
+import src.repository.DB;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -22,6 +26,18 @@ public class Main {
 					}
 				}
 		);//*/
+		/*BoardRepository br = new BoardRepositoryDB(new DB());
+		Board b1 = Reader.fromFile("data/kakuros/generated/20_20_extreme_unique.kak");
+		Board b2 = Reader.fromFile("data/kakuros/generated/30_30_hard_unique_clear.txt");
+		Board b3 = Reader.fromFile("data/kakuros/generated/40_40_hard_unique.kak");
+		Board b4 = Reader.fromFile("data/kakuros/generated/60_60_easy_unique_clear.txt");
+		Board b5 = Reader.fromFile("data/kakuros/generated/150_150_easy_unique.kak");
+
+		br.saveBoard(b1);
+		br.saveBoard(b2);
+		br.saveBoard(b3);
+		br.saveBoard(b4);
+		br.saveBoard(b5);*/
 		// From here on are testing and debugging purposes
 
 		// Program to visualize a board
@@ -47,8 +63,9 @@ public class Main {
 		// 12x12 2541328425778467360
 
 		// to investigate: extreme 15*15 -5432280936471879465 , has a starting value in a 1 length col
+
 /*
-		Generator gen = new Generator(20, 20, Difficulty.HARD,  true);
+		Generator gen = new Generator(10, 10, Difficulty.HARD,  true);
 		gen.generate();
 
 		Solver solver = new Solver(gen.getGeneratedBoard());
@@ -62,7 +79,7 @@ public class Main {
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-*/
+
 		// Program to generate a board and send it to solver to check the solutions
 		// Zero solutions generated with param: 100, 100, HARD, -1003457041328273474, true... pendant to investigate
 		// Prepared executions for DEMO: Unique solutions:

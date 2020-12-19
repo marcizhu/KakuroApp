@@ -510,11 +510,15 @@ public class GameplayCtrl {
             // hint next move
             lastHint = trivialFinder();
             if (lastHint.second == -1) lastHint = simulateHintFinder();
-        } else {
+        } else if (currentMovement != 0) {
             // hint number of movement where it went wrong, set lastHint.second to -1
             int badMove = binarySearchBadMove(new Board(kakuro.getBoard()),1, currentMovement);
             lastHint.first.first = -1;
             lastHint.first.second = badMove;
+            lastHint.second = -1;
+        } else {
+            lastHint.first.first = -1;
+            lastHint.first.second = -1;
             lastHint.second = -1;
         }
         return new Pair<>(lastHint.first,-1);

@@ -26,6 +26,7 @@ public class KakuroCreationCtrl {
     private static final String WHITE_CELL_SELECTION = "These values above me are the possible values for the selected white cell. If you assign one of them to it, this cell will have an initial value on the finished kakuro you are creating.";
     private static final String CLEAR_BLACK_CELL_FAILURE = "This cell cannot be cleared as its value was inferred from other assignations. It is its only possible value in the current state of the board.";
     private static final String BOARD_FILLED = "This is what the generator has come up with, I have checked it for you and it has ";
+    private static final String BOARD_FILL_FAILED = "After ten attempts the generator didn't find a way to fill this board, you might want to change the balck cell structure.";
     private static final String BOARD_CLEARED = "I have erased all the values from the board, but keeping the black/white cell structure you created.";
     private static final String NAME_REQUESTED = "Please enter a name for your creation.";
     private static final String NAME_INVALID = "Oh no! Someone is already using this name... Please come up with a different one and try again, you're very close to publishing your creation!";
@@ -842,7 +843,8 @@ public class KakuroCreationCtrl {
         return true;
     }
 
-    public void fillKakuro() {
+    public void fillKakuro() { fillKakuro(1); }
+    public void fillKakuro(int numTry) {
         if (invalidSizes) {
             sendMessageToPresentation(LINE_SIZES_MESSAGE);
             return;
@@ -867,7 +869,8 @@ public class KakuroCreationCtrl {
         int numSolutions = solver.solve();
 
         if (numSolutions == 0) {
-            fillKakuro();
+            if (numTry < 10) fillKakuro();
+            else sendMessageToPresentation(BOARD_FILL_FAILED);
             return;
         }
 

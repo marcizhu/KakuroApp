@@ -29,10 +29,10 @@ public class PresentationCtrl {
     // App content
     private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
     private final LoginScreenCtrl loginScreenCtrl;         ///< "Login" Screen controller
+    private final DashboardScreenCtrl dashboardScreenCtrl; ///< "Dashboard" Screen controller
     private final MyKakurosScreenCtrl myKakurosScreenCtrl; ///< "My Kakuros" Screen controller
 
     // FIXME: temporary
-    private final DemoScreenCtrl dashboardScreenCtrl;
     private final DemoScreenCtrl kakuroListScreenCtrl;
     private final DemoScreenCtrl statisticsScreenCtrl;
     private final DemoScreenCtrl rankingsScreenCtrl;
@@ -55,11 +55,12 @@ public class PresentationCtrl {
         domainCtrl = new DomainCtrl();
 
         // Initialize screen controllers
-        myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
         loginScreenCtrl = new LoginScreenCtrl(this, domainCtrl);
+        dashboardScreenCtrl = new DashboardScreenCtrl(this, domainCtrl);
+        myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
 
         // FIXME: temporary
-        dashboardScreenCtrl = kakuroListScreenCtrl = statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
+        kakuroListScreenCtrl = statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -150,7 +151,7 @@ public class PresentationCtrl {
             menu.getComponent(i).setForeground(Color.BLACK);
 
         menu.getComponent(0).setForeground(Color.BLUE);
-        //setScreen(dashboardScreenCtrl);
+        setScreen(dashboardScreenCtrl);
     }
 
     private void onKakuroListMenuItemClicked() {
@@ -182,7 +183,6 @@ public class PresentationCtrl {
 
         menu.getComponent(3).setForeground(Color.BLUE);
         //setScreen(statisticsScreenCtrl);
-        startNewCreation(10,10);
     }
 
     private void onRankingsMenuItemClicked() {
@@ -250,9 +250,7 @@ public class PresentationCtrl {
             userSessionId = name;
             buildMenuBar();
             app.setJMenuBar(menu);
-            // TODO: when dashboard is implemented switch to dashboard screen
-            //  for now we leave this:
-            setScreen(myKakurosScreenCtrl);
+            setScreen(dashboardScreenCtrl);
             return true;
         }
 
