@@ -12,6 +12,10 @@ public class UserCtrl {
         this.userRepository = userRepository;
     }
 
+    public User getUser(String username) throws Exception {
+        return userRepository.getUser(username);
+    }
+
     public ArrayList<String> getUserList() throws Exception {
         ArrayList<User> userList = userRepository.getAllUsers();
         ArrayList<String> usernameList = new ArrayList<>();

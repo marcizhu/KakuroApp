@@ -19,11 +19,12 @@ import java.util.Collections;
 import java.util.Random;
 
 public class GameplayCtrl {
+    GameScreenCtrl viewCtrl;
+    private final GameCtrl gameCtrl;
 
     User user;
     Kakuro kakuro;
     GameInProgress currentGame;
-    GameScreenCtrl viewCtrl;
     private int movementCount;
     private int currentMovement;
 
@@ -55,9 +56,10 @@ public class GameplayCtrl {
     private boolean isCurrentGameInDB;
     private long initialTime;
 
-    public GameplayCtrl(User user, Kakuro kakuro) {
+    public GameplayCtrl(User user, Kakuro kakuro, GameCtrl gameCtrl) {
         this.user = user;
         this.kakuro = kakuro;
+        this.gameCtrl = gameCtrl;
         movementCount = 0;
         currentMovement = 0;
         hintAtMove = -1;
@@ -729,8 +731,12 @@ public class GameplayCtrl {
         currentGame.setLastPlayedToNow();
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
 
-
-        // FIXME : alex, estem esperant el GameCtrl
+        // save game in progress to db
+        try {
+            gameCtrl.saveGame(currentGame);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         GameRepository gr = new GameRepositoryDB(new DB());
         try {
@@ -747,14 +753,12 @@ public class GameplayCtrl {
         GameFinished finished = new GameFinished(currentGame);
         // TODO: set surrendered.
 
-        // FIXME: alex...
-        System.out.println("Creating repo and database");
-        GameRepository gr = new GameRepositoryDB(new DB());
+        // delete in progress game and save the finished one in db
         try {
-            System.out.println("Deleting game in progress");
-            if (isCurrentGameInDB) gr.deleteGame(currentGame);
-            System.out.println("Saving finished game");
-            gr.saveGame(finished);
+            if (isCurrentGameInDB) {
+                gameCtrl.deleteGame(currentGame);
+            }
+            gameCtrl.saveGame(finished);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -805,14 +809,12 @@ public class GameplayCtrl {
         GameFinished finished = new GameFinished(currentGame);
         finished.computeScore(totalNumOfHints);
 
-        // FIXME: alex...
-        System.out.println("Creating repo and database");
-        GameRepository gr = new GameRepositoryDB(new DB());
+        // delete in progress game and save the finished one in db
         try {
-            System.out.println("Deleting game in progress");
-            if (isCurrentGameInDB) gr.deleteGame(currentGame);
-            System.out.println("Saving finished game");
-            gr.saveGame(finished);
+            if (isCurrentGameInDB) {
+                gameCtrl.deleteGame(currentGame);
+            }
+            gameCtrl.saveGame(finished);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package src.domain.controllers;
 
 import src.domain.entities.Difficulty;
+import src.domain.entities.Game;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
 import src.repository.*;
@@ -12,15 +13,22 @@ import java.util.Map;
 public class DomainCtrl {
     UserRepository userRepository;
     KakuroRepository kakuroRepository;
+    GameRepository gameRepository;
+
     UserCtrl userCtrl;
     KakuroCtrl kakuroCtrl;
+    GameCtrl gameCtrl;
 
     public DomainCtrl() {
         DB driver = new DB();
+
         userRepository = new UserRepositoryDB(driver);
         kakuroRepository = new KakuroRepositoryDB(driver);
+        gameRepository = new GameRepositoryDB(driver);
+
         userCtrl = new UserCtrl(userRepository);
         kakuroCtrl = new KakuroCtrl(kakuroRepository, userRepository);
+        gameCtrl = new GameCtrl(gameRepository, userRepository);
     }
 
     public Pair<ArrayList<String>, String> getUserList() {
@@ -73,19 +81,17 @@ public class DomainCtrl {
         return new Pair<>(result, null);
     }
 
-    // TODO: testing purposes, delete when it is properly implemented
-    public GameplayCtrl newGameInstance(String sessionID, String kakuroID) {
-        User user = new User(sessionID);
-        Kakuro kakuro;
+    public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {
         try {
-            kakuro = new Kakuro("Fix this!!", Difficulty.HARD, Reader.fromFile("data/kakuros/unsolved/cpu_burner.kak"));
-            kakuroRepository.saveKakuro(kakuro);
+            User user = userCtrl.getUser(username);
+            Game game = gameCtrl.getGameInProgress(username, kakuroname);
+            Kakuro kakuro;
+            if (game != null) kakuro = game.getKakuro();
+            else kakuro = kakuroCtrl.getKakuro(kakuroname);
+            return new Pair<>(new GameplayCtrl(user, kakuro, gameCtrl), null);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
+            return new Pair<>(null, e.getMessage());
         }
-
-        return new GameplayCtrl(user, kakuro);
     }
 
     public KakuroCreationCtrl newCreatorInstance(String sessionID, int numRows, int numCols) {
