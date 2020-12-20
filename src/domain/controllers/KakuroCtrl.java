@@ -119,11 +119,12 @@ public class KakuroCtrl {
             float bestTime = -1;
             String state = "neutral";
             for (Game game : kakuroGames) {
-                if (game instanceof GameFinished && (game.getTimeSpent() < bestTime || bestTime == -1)) bestTime = game.getTimeSpent(); // TODO: check if it was solved or surrendered!!!
+                if (game instanceof GameFinished && ((GameFinished) game).isSurrendered() &&
+                        (game.getTimeSpent() < bestTime || bestTime == -1)) bestTime = game.getTimeSpent();
                 if (game.getPlayerName().equals(user.getName())) {
                     if (game instanceof GameInProgress) state = "unfinished";
                     else if (state.equals("neutral") && game instanceof GameFinished) {
-                        state = "solved"; // TODO: check if it was solved or surrendered!!!
+                        state = ((GameFinished) game).isSurrendered() ? "surrendered" : "solved";
                     }
                 }
             }
