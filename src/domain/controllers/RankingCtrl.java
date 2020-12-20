@@ -28,6 +28,7 @@ public class RankingCtrl {
             ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
             for (Game game : kakuros) {
                 if (game instanceof GameInProgress) continue;
+                if (((GameFinished)game).isSurrendered()) continue;
 
                 /**/ if (game.getKakuro().getDifficulty() == Difficulty.EASY)    easy    += ((GameFinished)game).getScore();
                 else if (game.getKakuro().getDifficulty() == Difficulty.MEDIUM)  medium  += ((GameFinished)game).getScore();
@@ -94,6 +95,7 @@ public class RankingCtrl {
             ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
             for (Game game : kakuros) {
                 if (game instanceof GameInProgress) continue;
+                if (((GameFinished)game).isSurrendered()) continue;
                 if (!game.getKakuro().getDifficulty().toString().equals(difficulty)) continue;
 
                 totalTime += game.getTimeSpent();
