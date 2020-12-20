@@ -46,7 +46,7 @@ public class RankingCtrl {
             result.add(map);
         }
 
-        result.sort((o1, o2) -> Float.compare((float) o1.get("totalPts"), (float) o2.get("totalPts")));
+        result.sort((o1, o2) -> Float.compare((float)o2.get("totalPts"), (float)o1.get("totalPts")));
         return result;
     }
 
@@ -57,7 +57,7 @@ public class RankingCtrl {
         for (User user : users) {
             Map<String, Object> map = new HashMap<>();
 
-            float easy = 0, medium = 0, hard = 0, extreme = 0;
+            int easy = 0, medium = 0, hard = 0, extreme = 0;
             ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
             for (Game game : kakuros) {
                 if (game instanceof GameInProgress) continue;
@@ -78,7 +78,7 @@ public class RankingCtrl {
             result.add(map);
         }
 
-        result.sort((o1, o2) -> Float.compare((float) o1.get("totalGames"), (float) o2.get("totalGames")));
+        result.sort((o1, o2) -> Float.compare((float)o2.get("totalGames"), (float)o1.get("totalGames")));
         return result;
     }
 
@@ -108,7 +108,7 @@ public class RankingCtrl {
             result.add(map);
         }
 
-        result.sort((o1, o2) -> Float.compare((float) o1.get("avgTime"), (float) o2.get("avgTime")));
+        result.sort((o1, o2) -> Float.compare((float)o2.get("avgTime"), (float)o1.get("avgTime")));
         return result;
     }
 }
