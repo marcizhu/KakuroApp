@@ -45,7 +45,7 @@ public class DisplayKakuroScreen extends AbstractScreen {
         title.setVerticalAlignment(SwingConstants.CENTER);
 
         kakuroView = new KakuroView(((DisplayKakuroScreenCtrl)ctrl).getBoard(), true);
-        kakuroView.setSize(width, height/2);
+        kakuroView.setSize(height/2, height/2);
 
         body = new JLabel("<html><body>" + ((DisplayKakuroScreenCtrl)ctrl).getBody() + "</body></html>");
         body.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
@@ -100,6 +100,6 @@ public class DisplayKakuroScreen extends AbstractScreen {
     public void onResize(int width, int height) {
         contents.setSize(width, height);
         int remainingHeight = height - title.getHeight() - body.getHeight() - okBtn.getHeight();
-        kakuroView.setSize(width, remainingHeight*2/3);
+        kakuroView.setSize(remainingHeight*2/3, remainingHeight*2/3);
     }
 }

@@ -181,8 +181,6 @@ public class PresentationCtrl {
     private void onLogOutMenuItemClicked() {
         System.out.println("LOG OUT");
         currentScreenCtrl.onLogOutMenuItemClicked();
-        // This one behaves differently because the login screen doesn't have the menu bar and we have to
-        // warn domain that the user is logging out, etc.
         int dialogResult = JOptionPane.showConfirmDialog(
                 null,
                 "Do you want to log out?",
@@ -258,6 +256,11 @@ public class PresentationCtrl {
         userSessionId = "";
         app.setJMenuBar(null);
         setScreen(loginScreenCtrl);
+        dashboardScreenCtrl.invalidate();
+        myKakurosScreenCtrl.invalidate();
+        kakuroListScreenCtrl.invalidate();
+        statisticsScreenCtrl.invalidate();
+        rankingsScreenCtrl.invalidate();
     }
 
     public String getUserSessionId() {

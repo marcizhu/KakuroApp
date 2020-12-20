@@ -20,6 +20,7 @@ public abstract class AbstractScreenCtrl {
     }
 
     public boolean hasBeenBuilt() { return beenBuilt; }
+    public void invalidate() { beenBuilt = false; }
 
     // Called at setScreen right after a call to onDestroy of the previous screen.
     public void build(int width, int height) {
