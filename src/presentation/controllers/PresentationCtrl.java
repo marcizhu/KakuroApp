@@ -149,52 +149,30 @@ public class PresentationCtrl {
     private void onDashboardMenuItemClicked() {
         System.out.println("DASHBOARD");
         currentScreenCtrl.onDashboardMenuItemClicked();
-        for (int i = 0; i < 5; i++)
-            menu.getComponent(i).setForeground(Color.BLACK);
-
-        menu.getComponent(0).setForeground(Color.BLUE);
         setScreen(dashboardScreenCtrl);
     }
 
     private void onKakuroListMenuItemClicked() {
         System.out.println("KAKURO LIST");
         currentScreenCtrl.onKakuroListMenuItemClicked();
-        for (int i = 0; i < 5; i++)
-            menu.getComponent(i).setForeground(Color.BLACK);
-
-        menu.getComponent(1).setForeground(Color.BLUE);
         setScreen(kakuroListScreenCtrl);
     }
 
     private void onMyKakurosMenuItemClicked() {
         System.out.println("MY KAKUROS");
         currentScreenCtrl.onMyKakurosMenuItemClicked();
-        for (int i = 0; i < 5; i++)
-            menu.getComponent(i).setForeground(Color.BLACK);
-
-        menu.getComponent(2).setForeground(Color.BLUE);
         setScreen(myKakurosScreenCtrl);
     }
 
     private void onStatisticsMenuItemClicked() {
         System.out.println("STATISTICS");
         currentScreenCtrl.onStatisticsMenuItemClicked();
-
-        for (int i = 0; i < 5; i++)
-            menu.getComponent(i).setForeground(Color.BLACK);
-
-        menu.getComponent(3).setForeground(Color.BLUE);
         //setScreen(statisticsScreenCtrl);
     }
 
     private void onRankingsMenuItemClicked() {
         System.out.println("RANKINGS");
         currentScreenCtrl.onRankingsMenuItemClicked();
-
-        for (int i = 0; i < 5; i++)
-            menu.getComponent(i).setForeground(Color.BLACK);
-
-        menu.getComponent(4).setForeground(Color.BLUE);
         //setScreen(rankingsScreenCtrl);
     }
 
@@ -218,6 +196,7 @@ public class PresentationCtrl {
     public void setScreen(AbstractScreenCtrl nextScreen) {
         currentScreenCtrl.onDestroy();
         currentScreenCtrl = nextScreen;
+        updateMenuSelection();
         if (!currentScreenCtrl.hasBeenBuilt()) currentScreenCtrl.build(app.getWidth(), app.getHeight()-2*windowBarHeight);
         else currentScreenCtrl.onFocusRegained(app.getWidth(), app.getHeight()-2*windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
@@ -239,6 +218,19 @@ public class PresentationCtrl {
         }
         // Should never happen
         return loginScreenCtrl;
+    }
+
+    private void updateMenuSelection() {
+        int tabIdx = 0;
+        if (currentScreenCtrl instanceof DashboardScreenCtrl) tabIdx = 0;
+        else if (currentScreenCtrl instanceof KakuroListScreenCtrl) tabIdx = 1;
+        else if (currentScreenCtrl instanceof MyKakurosScreenCtrl) tabIdx = 2;
+        else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 3;
+        else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 4;
+
+        for (int i = 0; i < 5; i++)
+            menu.getComponent(i).setForeground(Color.BLACK);
+        menu.getComponent(tabIdx).setForeground(Color.BLUE);
     }
 
     // Domain communication
