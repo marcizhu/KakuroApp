@@ -49,7 +49,7 @@ public class KakuroCtrl {
         if (solver.getSolutions().size() <= 0) throw new Exception("The provided Kakuro has no solution");
 
         Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
-        kakuroRepository.saveKakuro(kakuro);
+        saveKakuro(kakuro);
 
         return kakuro;
     }
