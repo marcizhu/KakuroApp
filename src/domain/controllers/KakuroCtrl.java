@@ -37,25 +37,35 @@ public class KakuroCtrl {
         return computeResultFromKakuroList(kakuroList, user);
     }
 
+    public void validateKakuroName(String kakuroname) throws Exception {
+        if (kakuroname.equals("")) throw new Exception("The name of the Kakuro cannot be null");
+        Kakuro existentKakuro = kakuroRepository.getKakuro(kakuroname);
+        if (existentKakuro != null) throw new Exception("The provided name is already used by a Kakuro in the database");
+    }
+
     public void saveKakuro(Kakuro kakuro) throws Exception {
-        Kakuro kak = kakuroRepository.getKakuro(kakuro.getName());
-        if (kak != null) throw new Exception("The provided name is already used by a Kakuro in the database");
+        validateKakuroName(kakuro.getName());
+
         kakuroRepository.saveKakuro(kakuro);
     }
 
     public Kakuro saveKakuroFromFile(User user, String filePath, String kakuroname) throws Exception {
+        validateKakuroName(kakuroname);
+
         Board board = Reader.fromFile(filePath);
         Solver solver = new Solver(board);
         solver.solve();
         if (solver.getSolutions().size() <= 0) throw new Exception("The provided Kakuro has no solution");
 
         Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user, "");
-        saveKakuro(kakuro);
+        kakuroRepository.saveKakuro(kakuro);
 
         return kakuro;
     }
 
     public Map<String, Object> saveKakuroFromGeneratorParameters(User user, int rows, int columns, Difficulty difficulty, boolean forceUnique, String kakuroname) throws Exception {
+        validateKakuroName(kakuroname);
+
         Generator generator = new Generator(rows, columns, difficulty, forceUnique);
         long initTime = System.currentTimeMillis();
         generator.generate();
@@ -63,7 +73,7 @@ public class KakuroCtrl {
         Board board = generator.getGeneratedBoard();
 
         Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
-        saveKakuro(kakuro);
+        kakuroRepository.saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
@@ -74,6 +84,8 @@ public class KakuroCtrl {
     }
 
     public Map<String, Object> saveKakuroFromGeneratorSeed(User user, String seed, String kakuroname) throws Exception {
+        validateKakuroName(kakuroname);
+
         String[] parameters = seed.split("_");
         int rows = Integer.parseInt(parameters[0]);
         int columns = Integer.parseInt(parameters[1]);
@@ -100,7 +112,7 @@ public class KakuroCtrl {
         Board board = generator.getGeneratedBoard();
 
         Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
-        saveKakuro(kakuro);
+        kakuroRepository.saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
