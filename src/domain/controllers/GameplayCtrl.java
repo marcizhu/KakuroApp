@@ -64,7 +64,6 @@ public class GameplayCtrl {
         isCurrentGameInDB = false;
         movementCount = 0;
         currentMovement = 0;
-        totalNumOfHints = 0;
         initializeCommon();
     }
 
@@ -76,7 +75,6 @@ public class GameplayCtrl {
         isCurrentGameInDB = true;
         movementCount = currentGame.getMovements().size();
         currentMovement = movementCount;
-        totalNumOfHints = 0; // FIXME: change when they can be stored to DB
         initializeCommon();
     }
 
@@ -86,6 +84,7 @@ public class GameplayCtrl {
         usedValuesHelpIsActive = false;
         combinationsHelpIsActive = false;
         autoEraseHelpIsActive = false;
+        totalNumOfHints = 0;
     }
 
     public String gameSetUp(GameScreenCtrl view) {
@@ -735,6 +734,7 @@ public class GameplayCtrl {
     public void persistProgress() {
         currentGame.setLastPlayedToNow();
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+        currentGame.setNumberOfHints(currentGame.getNumberOfHints() + totalNumOfHints);
 
         // save game in progress to db
         try {
@@ -749,7 +749,6 @@ public class GameplayCtrl {
 
         // Correct solution
         GameFinished finished = new GameFinished(currentGame, true);
-        // TODO: set surrendered.
 
         // delete in progress game and save the finished one in db
         try {
@@ -805,7 +804,6 @@ public class GameplayCtrl {
         // Correct solution
         System.out.println("Creating game finished");
         GameFinished finished = new GameFinished(currentGame, false);
-        finished.computeScore(totalNumOfHints);
 
         // delete in progress game and save the finished one in db
         try {

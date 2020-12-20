@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 public class GameFinished extends Game{
-    private float score;
+    private final float score;
     private final Timestamp timeFinished;
     private final boolean surrendered;
 
@@ -13,7 +13,9 @@ public class GameFinished extends Game{
         this.surrendered = surrendered;
         this.timeFinished = new Timestamp(System.currentTimeMillis());
         this.setTimeSpent(gip.getTimeSpent());
-        this.score = 0; // FIXME: maybe compute it here in the constructor? this.score = computeScore()
+        float tmpScore = computeScore(gip.getNumberOfHints());
+        if (tmpScore < 0) tmpScore = 0;
+        this.score = tmpScore;
     }
 
     // For deserializing
@@ -24,10 +26,9 @@ public class GameFinished extends Game{
         this.score = score;
     }
 
-    public void computeScore(int numOfHints) {
-        if (getKakuro().getDifficulty() == Difficulty.USER_MADE) {
-            this.score = 0;
-            return;
+    private float computeScore(int numOfHints) {
+        if (getKakuro().getDifficulty() == Difficulty.USER_MADE || surrendered) {
+            return 0;
         }
         int diff = 0;
         switch(getKakuro().getDifficulty()) {
@@ -55,9 +56,8 @@ public class GameFinished extends Game{
         }
         float k = numOfWhiteCells > 0 ? numOfBlackCells / numOfWhiteCells : 0;
 
-        if (getTimeSpent() != 0) score = d/getTimeSpent() - numOfHints*k;
-
-        if (score < 0) score = 0;
+        if (getTimeSpent() != 0) return d/getTimeSpent() - numOfHints*k;
+        else return 0;
     }
 
     public float getScore() {
