@@ -199,11 +199,12 @@ public class RankingsScreen extends AbstractScreen {
             JPanel infoLine = new JPanel();
             infoLine.setLayout(new GridBagLayout());
             ctrs.gridy = 0;
+            ctrs.gridwidth = 1;
 
             for (int j = 0; j < keys.length; j++) {
                 ctrs.gridx = j;
                 Object toAdd = userInfo.get(keys[j]);
-                String toAddStr = "";
+                String toAddStr;
                 if (toAdd instanceof Float) {
                     if (keys[j].contains("time") || keys[j].contains("Time")) toAddStr = secondsToStringTime((float) toAdd);
                     else toAddStr = ""+(float)toAdd;
