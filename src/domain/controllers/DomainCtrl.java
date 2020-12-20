@@ -17,6 +17,7 @@ public class DomainCtrl {
     UserCtrl userCtrl;
     KakuroCtrl kakuroCtrl;
     GameCtrl gameCtrl;
+    RankingCtrl rankingCtrl;
 
     public DomainCtrl() {
         DB driver = new DB();
@@ -28,6 +29,7 @@ public class DomainCtrl {
         userCtrl = new UserCtrl(userRepository);
         kakuroCtrl = new KakuroCtrl(kakuroRepository, userRepository, gameRepository);
         gameCtrl = new GameCtrl(gameRepository, userRepository);
+        rankingCtrl = new RankingCtrl(gameRepository, userRepository);
     }
 
     public Pair<ArrayList<String>, String> getUserList() {
@@ -99,36 +101,9 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByPoints() {
+        ArrayList<Map<String, Object>> result;
         try {
-            ArrayList<String> users = userCtrl.getUserList();
-            ArrayList<Map<String, Object>> result = new ArrayList<>();
-
-            for (String user : users) {
-                Map<String, Object> map = new HashMap<>();
-
-                float easy = 0, medium = 0, hard = 0, extreme = 0;
-                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
-                for (Map<String, Object> kakuro : kakuros) {
-                    if (kakuro.get("state").equals("unfinished")) continue;
-
-                    /**/ if (kakuro.get("difficulty").equals("EASY"))    easy    += (float)kakuro.get("score");
-                    else if (kakuro.get("difficulty").equals("MEDIUM"))  medium  += (float)kakuro.get("score");
-                    else if (kakuro.get("difficulty").equals("HARD"))    hard    += (float)kakuro.get("score");
-                    else if (kakuro.get("difficulty").equals("EXTREME")) extreme += (float)kakuro.get("score");
-                }
-
-                map.put("name", user);
-                map.put("easyPts", easy);
-                map.put("mediumPts", medium);
-                map.put("hardPts", hard);
-                map.put("extremePts", extreme);
-                map.put("totalPts", easy + medium + hard + extreme);
-
-                result.add(map);
-            }
-
-            result.sort((o1, o2) -> Float.compare((float) o1.get("totalPts"), (float) o2.get("totalPts")));
-
+            result = rankingCtrl.getRankingByPoints();
             return new Pair<>(result, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
@@ -136,36 +111,9 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByGamesPlayed() {
+        ArrayList<Map<String, Object>> result;
         try {
-            ArrayList<String> users = userCtrl.getUserList();
-            ArrayList<Map<String, Object>> result = new ArrayList<>();
-
-            for (String user : users) {
-                Map<String, Object> map = new HashMap<>();
-
-                float easy = 0, medium = 0, hard = 0, extreme = 0;
-                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
-                for (Map<String, Object> kakuro : kakuros) {
-                    if (kakuro.get("state").equals("unfinished")) continue;
-
-                    /**/ if (kakuro.get("difficulty").equals("EASY"))    easy++;
-                    else if (kakuro.get("difficulty").equals("MEDIUM"))  medium++;
-                    else if (kakuro.get("difficulty").equals("HARD"))    hard++;
-                    else if (kakuro.get("difficulty").equals("EXTREME")) extreme++;
-                }
-
-                map.put("name", user);
-                map.put("easyGames", easy);
-                map.put("mediumGames", medium);
-                map.put("hardGames", hard);
-                map.put("extremeGames", extreme);
-                map.put("totalGames", easy + medium + hard + extreme);
-
-                result.add(map);
-            }
-
-            result.sort((o1, o2) -> Float.compare((float) o1.get("totalGames"), (float) o2.get("totalGames")));
-
+            result = rankingCtrl.getRankingByGamesPlayed();
             return new Pair<>(result, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
@@ -173,33 +121,9 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByTimeInDifficulty(String difficulty) {
+        ArrayList<Map<String, Object>> result;
         try {
-            ArrayList<String> users = userCtrl.getUserList();
-            ArrayList<Map<String, Object>> result = new ArrayList<>();
-
-            for (String user : users) {
-                Map<String, Object> map = new HashMap<>();
-
-                float totalTime = 0.0f;
-                int totalGames = 0;
-
-                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
-                for (Map<String, Object> kakuro : kakuros) {
-                    if (kakuro.get("state").equals("unfinished")) continue;
-                    if (!kakuro.get("difficulty").equals(difficulty)) continue;
-
-                    totalTime += (float)kakuro.get("timeSpent");
-                    totalGames++;
-                }
-
-                map.put("name", user);
-                map.put("avgTime", totalTime / (float)totalGames);
-
-                result.add(map);
-            }
-
-            result.sort((o1, o2) -> Float.compare((float) o1.get("avgTime"), (float) o2.get("avgTime")));
-
+            result = rankingCtrl.getRankingByTimeInDifficulty(difficulty);
             return new Pair<>(result, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
