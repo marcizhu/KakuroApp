@@ -50,7 +50,7 @@ public class GameCtrl {
             gameData.put("width", kakuro.getBoard().getWidth());
             gameData.put("height", kakuro.getBoard().getHeight());
             gameData.put("difficulty", kakuro.getDifficulty().toString());
-            gameData.put("timeSpent", game.getTimeSpent());
+            gameData.put("timeSpent", (int)game.getTimeSpent());
             gameData.put("lastPlayed", (game instanceof GameFinished) ? ((GameFinished)game).getTimeFinished() : ((GameInProgress)game).getLastPlayed());
             if (game instanceof GameInProgress) {
                 gameData.put("state", "unfinished");

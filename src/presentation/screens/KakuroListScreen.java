@@ -47,6 +47,9 @@ public class KakuroListScreen extends AbstractScreen {
                 int stateCode = 0;
 
                 switch (state) {
+                    case "neutral":
+                        stateCode = KakuroInfoCardView.STATE_NEUTRAL;
+                        break;
                     case "unfinished":
                         stateCode = KakuroInfoCardView.STATE_UNFINISHED;
                         break;

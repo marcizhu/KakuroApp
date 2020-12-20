@@ -62,17 +62,20 @@ public class KakuroInfoCardView extends JPanel {
         constraints.gridy = 2;
         kakuroInfoAndButtons.add(sizeLbl, constraints);
 
-        int hours = recordTime/3600;
-        int minutes = recordTime/60 - hours*60;
-        int seconds = recordTime - minutes*60 - hours*3600;
         String recordTimeStr = "";
-        if (hours > 0) {
-            recordTimeStr += hours+":";
-            if (minutes < 10) recordTimeStr += "0";
+        if (recordTime == -1) recordTimeStr = "none";
+        else {
+            int hours = recordTime/3600;
+            int minutes = recordTime/60 - hours*60;
+            int seconds = recordTime - minutes*60 - hours*3600;
+            if (hours > 0) {
+                recordTimeStr += hours+":";
+                if (minutes < 10) recordTimeStr += "0";
+            }
+            recordTimeStr += minutes+":";
+            if (seconds < 10) recordTimeStr += "0";
+            recordTimeStr += seconds;
         }
-        recordTimeStr += minutes+":";
-        if (seconds < 10) recordTimeStr += "0";
-        recordTimeStr += seconds;
 
         JLabel recordLbl = new JLabel("BEST TIME: "+recordTimeStr);
         recordLbl.setHorizontalTextPosition(SwingConstants.LEFT);

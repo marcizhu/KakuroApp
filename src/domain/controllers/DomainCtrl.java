@@ -24,7 +24,7 @@ public class DomainCtrl {
         gameRepository = new GameRepositoryDB(driver);
 
         userCtrl = new UserCtrl(userRepository);
-        kakuroCtrl = new KakuroCtrl(kakuroRepository, userRepository);
+        kakuroCtrl = new KakuroCtrl(kakuroRepository, userRepository, gameRepository);
         gameCtrl = new GameCtrl(gameRepository, userRepository);
     }
 

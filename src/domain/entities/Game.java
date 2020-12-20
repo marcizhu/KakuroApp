@@ -33,7 +33,9 @@ public abstract class Game {
         this.timeSpent = timeSpent;
     }
 
-    public void setTimeSpent(float timeSpent) { this.timeSpent = timeSpent; }
+    public void setTimeSpent(float timeSpent) {
+        this.timeSpent = timeSpent;
+    }
 
     public Kakuro getKakuro() {
         return this.kakuro;
@@ -43,7 +45,9 @@ public abstract class Game {
         return this.kakuro == null ? null : this.kakuro.getName();
     }
 
-    public UUID getId () { return this.id; }
+    public UUID getId () {
+        return this.id;
+    }
 
     public float getTimeSpent() {
         return this.timeSpent;
