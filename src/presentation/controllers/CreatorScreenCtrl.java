@@ -9,6 +9,7 @@ import src.utils.IntPair;
 import src.utils.Pair;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -283,14 +284,26 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
             mouseIsPressed = true;
             brushPath.clear();
             brushPath.add(new IntPair(r, c));
+
+            if (blackBrushActive) {
+                ((CreatorScreen)screen).selectWhiteCellColor(r, c, Color.BLACK);
+            } else {
+                ((CreatorScreen)screen).selectBlackCellColor(r, c, Color.WHITE);
+            }
         }
     }
     public void onMouseEntered(int r, int c) {
         if (mouseIsPressed && (blackBrushActive || whiteBrushActive)) {
             brushPath.add(new IntPair(r, c));
+
+            if (blackBrushActive) {
+                ((CreatorScreen)screen).selectWhiteCellColor(r, c, Color.BLACK);
+            } else {
+                ((CreatorScreen)screen).selectBlackCellColor(r, c, Color.WHITE);
+            }
         }
     }
-    public void onMouseReleased(int r, int c) {
+    public void onMouseReleased() {
         mouseIsPressed = false;
         if (blackBrushActive) creator.setCellsToBlack(brushPath);
         else if (whiteBrushActive) creator.setCellsToWhite(brushPath);

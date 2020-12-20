@@ -493,6 +493,13 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBlackCellValue(r, c, s, value);
         onResize(contents.getWidth(), contents.getHeight());
     }
+    public void selectBlackCellColor(int r, int c, Color col) {
+        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_TOP, col);
+        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_BOTTOM, col);
+        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_LEFT, col);
+        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_RIGHT, col);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
     public void selectModified(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.HintGreen);
@@ -589,7 +596,7 @@ public class CreatorScreen extends AbstractScreen {
 
             @Override
             public void onCellInBoardReleased(int row, int col) {
-                ((CreatorScreenCtrl)ctrl).onMouseReleased(row, col);
+                ((CreatorScreenCtrl)ctrl).onMouseReleased();
             }
 
             @Override
