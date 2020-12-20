@@ -35,7 +35,7 @@ public class RankingCtrl {
                 else if (game.getKakuro().getDifficulty() == Difficulty.EXTREME) extreme += ((GameFinished)game).getScore();
             }
 
-            map.put("name", user);
+            map.put("name", user.getName());
             map.put("easyPts", easy);
             map.put("mediumPts", medium);
             map.put("hardPts", hard);
@@ -67,7 +67,7 @@ public class RankingCtrl {
                 else if (game.getKakuro().getDifficulty() == Difficulty.EXTREME) extreme++;
             }
 
-            map.put("name", user);
+            map.put("name", user.getName());
             map.put("easyGames", easy);
             map.put("mediumGames", medium);
             map.put("hardGames", hard);
@@ -100,7 +100,7 @@ public class RankingCtrl {
                 totalGames++;
             }
 
-            map.put("name", user);
+            map.put("name", user.getName());
             map.put("avgTime", totalTime / (float)totalGames);
 
             result.add(map);
