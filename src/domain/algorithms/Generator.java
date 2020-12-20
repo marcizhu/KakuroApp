@@ -124,8 +124,20 @@ public class Generator {
      * Get the seed used for the generation.
      * @return the seed of the Random object used for generating the board.
      */
-    public long getUsedSeed() {
-        return this.seed;
+    public String getEncodedSeed() {
+        String encodedSeed = "";
+        encodedSeed += ""+rows+"_";
+        encodedSeed += ""+columns+"_";
+        switch (difficulty) {
+            case EASY: encodedSeed+="E_"; break;
+            case MEDIUM: encodedSeed+="M_"; break;
+            case HARD: encodedSeed+="H_"; break;
+            case EXTREME: encodedSeed+="X_"; break;
+        }
+        if (forceUniqueSolution) encodedSeed+="F_";
+        else encodedSeed+="N_";
+        encodedSeed += seed;
+        return encodedSeed;
     }
 
     private boolean isValidPosition(Board b, int row, int col) {
