@@ -66,9 +66,10 @@ public class GameDeserializer implements JsonDeserializer<Game> {
 
     private Game deserializeGameFinished (JsonObject obj, UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
         float score = obj.get("score").getAsFloat();
+        boolean surrendered = obj.get("surrendered").getAsBoolean();
         Timestamp timeFinished = Timestamp.valueOf(obj.get("timeFinished").getAsString());
 
-        return new GameFinished(id, startTime, timeSpent, player, kakuro, score, timeFinished);
+        return new GameFinished(id, startTime, timeSpent, player, kakuro, score, timeFinished, surrendered);
     }
 
 }

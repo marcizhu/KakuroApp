@@ -35,6 +35,7 @@ public class GameSerializer implements JsonSerializer<Game> {
         obj.addProperty("inProgress", false);
         obj.addProperty("score", g.getScore());
         obj.addProperty("timeFinished", g.getTimeFinished().toString());
+        obj.addProperty("surrendered", g.isSurrendered());
 
         return obj;
     }
