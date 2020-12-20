@@ -1,11 +1,14 @@
 package src.repository.serializers;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import src.domain.entities.Game;
 import src.domain.entities.GameFinished;
 import src.domain.entities.GameInProgress;
+import src.domain.entities.Movement;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 public class GameSerializer implements JsonSerializer<Game> {
 
@@ -25,9 +28,13 @@ public class GameSerializer implements JsonSerializer<Game> {
     private JsonObject serializeGameInProgress (GameInProgress g, JsonObject obj) {
         obj.addProperty("inProgress", true);
         obj.addProperty("boardId", g.getBoardId().toString());
-        obj.addProperty("movements", g.getMovements().toString()); // FIXME: this dont work lmao
         obj.addProperty("lastPlayed", g.getLastPlayed().toString());
         obj.addProperty("hints", g.getNumberOfHints());
+
+        Type listOfTestObject = new TypeToken<List<Movement>>(){}.getType();
+        Gson gson = new Gson();
+        //String s = gson.toJson(g.getMovements(), listOfTestObject);
+        obj.addProperty("movements", gson.toJson(g.getMovements(), listOfTestObject));
 
         return obj;
     }

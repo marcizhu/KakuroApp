@@ -1,6 +1,7 @@
 package src.repository.serializers;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import src.domain.entities.*;
 import src.repository.*;
 
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class GameDeserializer implements JsonDeserializer<Game> {
@@ -60,7 +62,10 @@ public class GameDeserializer implements JsonDeserializer<Game> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ArrayList<Movement> movements = new ArrayList();//obj.get("movements").; // TODO: IMPLEMENT!!
+
+        Type listOfTestObject = new TypeToken<List<Movement>>(){}.getType();
+        Gson gson = new Gson();
+        ArrayList<Movement> movements = gson.fromJson(obj.get("movements").getAsString(),  listOfTestObject);
 
         return new GameInProgress(id, startTime, timeSpent, player, kakuro, board, movements, lastPlayed, numberOfHints);
     }
