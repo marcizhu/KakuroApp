@@ -49,7 +49,7 @@ public class KakuroCtrl {
         solver.solve();
         if (solver.getSolutions().size() <= 0) throw new Exception("The provided Kakuro has no solution");
 
-        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user, "");
         saveKakuro(kakuro);
 
         return kakuro;
@@ -62,7 +62,7 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user);
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
         saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
@@ -84,7 +84,7 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user);
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
         saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();

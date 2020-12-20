@@ -25,6 +25,7 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
         Timestamp createdAt = Timestamp.valueOf(obj.get("createdAt").getAsString());
         Difficulty d = Difficulty.valueOf(obj.get("difficulty").getAsString());
         String name = obj.get("name").getAsString();
+        String seed = obj.get("seed").getAsString();
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
 
 
@@ -51,6 +52,6 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
             }
         }
 
-        return new Kakuro(name, createdAt, d, b, u);
+        return new Kakuro(name, createdAt, d, b, u, seed);
     }
 }

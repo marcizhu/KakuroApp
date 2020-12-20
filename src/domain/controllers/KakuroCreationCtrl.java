@@ -972,7 +972,7 @@ public class KakuroCreationCtrl {
         }
 
         try {
-            kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user));
+            kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user, ""));
             viewCtrl.onKakuroPublished();
         } catch (Exception e) {
             sendMessageToPresentation(e.getMessage());
