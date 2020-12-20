@@ -206,8 +206,15 @@ public class RankingsScreen extends AbstractScreen {
                 Object toAdd = userInfo.get(keys[j]);
                 String toAddStr;
                 if (toAdd instanceof Float) {
-                    if (keys[j].contains("time") || keys[j].contains("Time")) toAddStr = secondsToStringTime((float) toAdd);
-                    else toAddStr = ""+(float)toAdd;
+                    if (keys[j].contains("time") || keys[j].contains("Time"))
+                        toAddStr = secondsToStringTime((float) toAdd);
+                    else if(Math.floor((float)toAdd) == Math.ceil((float)toAdd)) {
+                        // Number is integer. Remove decimals or display "---" if zero
+                        int val = Math.round((float)toAdd);
+                        toAddStr = (val == 0 ? "---" : "" + val);
+                    } else
+                        // round to 2 decimal places
+                        toAddStr = "" + Math.round((float) toAdd * 100.0f) / 100.0f;
                 } else if (!(toAdd instanceof String)) {
                     toAddStr = toAdd.toString();
                 } else {
@@ -260,6 +267,8 @@ public class RankingsScreen extends AbstractScreen {
     }
 
     private String secondsToStringTime(float time) {
+        if(Float.isNaN(time)) return "---";
+
         int hours = (int)time/3600;
         int minutes = (int)time/60 - hours*60;
         int seconds = (int)time - minutes*60 - hours*3600;

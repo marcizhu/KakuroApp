@@ -57,7 +57,7 @@ public class RankingCtrl {
         for (User user : users) {
             Map<String, Object> map = new HashMap<>();
 
-            int easy = 0, medium = 0, hard = 0, extreme = 0;
+            float easy = 0, medium = 0, hard = 0, extreme = 0;
             ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
             for (Game game : kakuros) {
                 if (game instanceof GameInProgress) continue;
@@ -108,7 +108,7 @@ public class RankingCtrl {
             result.add(map);
         }
 
-        result.sort((o1, o2) -> Float.compare((float)o2.get("avgTime"), (float)o1.get("avgTime")));
+        result.sort((o1, o2) -> Float.compare((float)o1.get("avgTime"), (float)o2.get("avgTime")));
         return result;
     }
 }
