@@ -99,14 +99,6 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByPoints() {
-        // TODO: Marc, returns decreasingly ordered array of:
-        //  name -> user.name
-        //  easyPts -> avg points in easy games of user .. 0 if no games
-        //  mediumPts -> avg points in medium games of user .. 0 if no games
-        //  hardPts -> avg points in hard games of user .. 0 if no games
-        //  extremePts -> avg points in extreme games of user .. 0 if no games
-        //  totalPts -> sum of all points (also user.getScore() if I'm not mistaken)
-
         try {
             ArrayList<String> users = userCtrl.getUserList();
             ArrayList<Map<String, Object>> result = new ArrayList<>();
@@ -144,22 +136,74 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByGamesPlayed() {
-        // TODO: Marc, returns decreasingly ordered array of:
-        //  name -> user.name
-        //  easyGames -> number of easy games of user
-        //  mediumGames -> number of medium games of user
-        //  hardGames -> number of hard games of user
-        //  extremeGames -> number of extreme games of user
-        //  totalGames -> sum of all games
-        return new Pair(new ArrayList<>(), "Functionality not implemented");
+        try {
+            ArrayList<String> users = userCtrl.getUserList();
+            ArrayList<Map<String, Object>> result = new ArrayList<>();
+
+            for (String user : users) {
+                Map<String, Object> map = new HashMap<>();
+
+                float easy = 0, medium = 0, hard = 0, extreme = 0;
+                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
+                for (Map<String, Object> kakuro : kakuros) {
+                    if (kakuro.get("state").equals("unfinished")) continue;
+
+                    /**/ if (kakuro.get("difficulty").equals("EASY"))    easy++;
+                    else if (kakuro.get("difficulty").equals("MEDIUM"))  medium++;
+                    else if (kakuro.get("difficulty").equals("HARD"))    hard++;
+                    else if (kakuro.get("difficulty").equals("EXTREME")) extreme++;
+                }
+
+                map.put("name", user);
+                map.put("easyGames", easy);
+                map.put("mediumGames", medium);
+                map.put("hardGames", hard);
+                map.put("extremeGames", extreme);
+                map.put("totalGames", easy + medium + hard + extreme);
+
+                result.add(map);
+            }
+
+            result.sort((o1, o2) -> Float.compare((float) o1.get("totalGames"), (float) o2.get("totalGames")));
+
+            return new Pair<>(result, null);
+        } catch(Exception e) {
+            return new Pair<>(new ArrayList<>(), e.getMessage());
+        }
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByTimeInDifficulty(String difficulty) {
-        Difficulty diff = Difficulty.valueOf(difficulty);
-        // TODO: Marc, returns decreasingly ordered array of:
-        //  name -> user.name
-        //  avgTime -> average time spent in finished gamed of difficulty diff of user
-        return new Pair(new ArrayList<>(), "Functionality not implemented");
+        try {
+            ArrayList<String> users = userCtrl.getUserList();
+            ArrayList<Map<String, Object>> result = new ArrayList<>();
+
+            for (String user : users) {
+                Map<String, Object> map = new HashMap<>();
+
+                float totalTime = 0.0f;
+                int totalGames = 0;
+
+                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
+                for (Map<String, Object> kakuro : kakuros) {
+                    if (kakuro.get("state").equals("unfinished")) continue;
+                    if (!kakuro.get("difficulty").equals(difficulty)) continue;
+
+                    totalTime += (float)kakuro.get("timeSpent");
+                    totalGames++;
+                }
+
+                map.put("name", user);
+                map.put("avgTime", totalTime / (float)totalGames);
+
+                result.add(map);
+            }
+
+            result.sort((o1, o2) -> Float.compare((float) o1.get("avgTime"), (float) o2.get("avgTime")));
+
+            return new Pair<>(result, null);
+        } catch(Exception e) {
+            return new Pair<>(new ArrayList<>(), e.getMessage());
+        }
     }
 
     public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {
