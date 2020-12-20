@@ -10,6 +10,7 @@ import src.utils.Pair;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Map;
 
 public class PresentationCtrl {
     // Misc settings
@@ -342,12 +343,12 @@ public class PresentationCtrl {
 
     public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique, name);
+        Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromParameters(userSessionId, rows, columns, difficulty, forceUnique, name);
     }
 
     public void generateKakuroFromSeed(String name, String seed) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromSeed(seed, name);
+        Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromSeed(userSessionId, seed, name);
     }
 
     public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {

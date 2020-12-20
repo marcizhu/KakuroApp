@@ -1,5 +1,6 @@
 package src.domain.controllers;
 
+import src.domain.algorithms.Generator;
 import src.domain.algorithms.Solver;
 import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
@@ -52,6 +53,45 @@ public class KakuroCtrl {
         saveKakuro(kakuro);
 
         return kakuro;
+    }
+
+    public Map<String, Object> saveKakuroFromGeneratorParameters(User user, int rows, int columns, Difficulty difficulty, boolean forceUnique, String kakuroname) throws Exception {
+        Generator generator = new Generator(rows, columns, difficulty, forceUnique);
+        long initTime = System.currentTimeMillis();
+        generator.generate();
+        long generatorTime = System.currentTimeMillis() - initTime;
+        Board board = generator.getGeneratedBoard();
+
+        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        saveKakuro(kakuro);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("board", board.toString());
+        result.put("generatorTime", generatorTime);
+
+        return result;
+    }
+
+    public Map<String, Object> saveKakuroFromGeneratorSeed(User user, String encodedSeed, String kakuroname) throws Exception {
+        int rows = 10; // TODO: compute this from encodedSeed
+        int columns = 10; // TODO: compute this from encodedSeed
+        Difficulty difficulty = Difficulty.MEDIUM; // TODO: compute this from encodedSeed
+        long seed = 1234567890; // TODO: compute this from encodedSeed
+
+        Generator generator = new Generator(rows, columns, difficulty, seed);
+        long initTime = System.currentTimeMillis();
+        generator.generate();
+        long generatorTime = System.currentTimeMillis() - initTime;
+        Board board = generator.getGeneratedBoard();
+
+        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        saveKakuro(kakuro);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("board", board.toString());
+        result.put("generatorTime", generatorTime);
+
+        return result;
     }
 
     private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList) {
