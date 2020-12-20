@@ -646,7 +646,7 @@ public class DashboardScreen extends AbstractScreen {
             int width = (Integer) gameData.get("width");
             int height = (Integer) gameData.get("height");
             String difficulty = (String) gameData.get("difficulty");
-            float timeSpent = (float) gameData.get("timeSpent");
+            int timeSpent = (int) gameData.get("timeSpent");
             String lastPlayed = ((Timestamp) gameData.get("lastPlayed")).toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("EEEE d MMMM uuuu"));
             float score = 0;
             if (!state.equals("unfinished")) score = (float) gameData.get("score");
@@ -764,10 +764,10 @@ public class DashboardScreen extends AbstractScreen {
         return tile;
     }
 
-    private String secondsToStringTime(float time) {
-        int hours = (int)time/3600;
-        int minutes = (int)time/60 - hours*60;
-        int seconds = (int)time - minutes*60 - hours*3600;
+    private String secondsToStringTime(int time) {
+        int hours = time/3600;
+        int minutes = time/60 - hours*60;
+        int seconds = time - minutes*60 - hours*3600;
         String timeStr = "";
         if (hours > 0) {
             timeStr += hours+":";

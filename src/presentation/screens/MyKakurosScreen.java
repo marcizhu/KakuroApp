@@ -38,6 +38,7 @@ public class MyKakurosScreen extends AbstractScreen {
             int stateCode = 0;
 
             switch (state) {
+                case "neutral":     stateCode = KakuroInfoCardView.STATE_NEUTRAL; break;
                 case "unfinished":  stateCode = KakuroInfoCardView.STATE_UNFINISHED; break;
                 case "solved":      stateCode = KakuroInfoCardView.STATE_SOLVED; break;
                 case "surrendered": stateCode = KakuroInfoCardView.STATE_SURRENDERED; break;

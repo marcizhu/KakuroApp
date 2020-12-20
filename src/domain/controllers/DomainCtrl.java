@@ -69,10 +69,11 @@ public class DomainCtrl {
         return new Pair<>(result, null);
     }
 
-    public Pair<ArrayList<Map<String, Object>>, String> getKakuroListByDifficulty(String difficulty) {
+    public Pair<ArrayList<Map<String, Object>>, String> getKakuroListByDifficulty(String difficulty, String username) {
         ArrayList<Map<String, Object>> result;
         try {
-            result = kakuroCtrl.getKakuroListByDifficulty(Difficulty.valueOf(difficulty));
+            User user = userCtrl.getUser(username);
+            result = kakuroCtrl.getKakuroListByDifficulty(Difficulty.valueOf(difficulty), user);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }

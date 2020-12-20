@@ -273,7 +273,7 @@ public class PresentationCtrl {
 
         Pair<GameplayCtrl, String> result = domainCtrl.newGameInstance(userSessionId, kakuroID);
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, result.second);
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return;
         }
 
@@ -287,7 +287,7 @@ public class PresentationCtrl {
     public void importNewGame(String name, String filePath) {
         Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath, name);
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, result.second);
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return;
         }
 
@@ -311,7 +311,7 @@ public class PresentationCtrl {
 
         Pair<KakuroCreationCtrl, String> result = domainCtrl.newCreatorInstance(userSessionId, numRows, numCols);
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, result.second);
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return;
         }
 
@@ -325,7 +325,7 @@ public class PresentationCtrl {
     public void importNewCreation(String filePath) {
         Pair<KakuroCreationCtrl, String> result = domainCtrl.newImportedCreatorInstance(userSessionId, filePath);
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, result.second);
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return;
         }
 
@@ -342,13 +342,55 @@ public class PresentationCtrl {
     }
 
     public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
-        // TODO, might throw an error if name is already in use
         Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromParameters(userSessionId, rows, columns, difficulty, forceUnique, name);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return;
+        }
+
+        String board = (String) result.first.get("board");
+        float time = (float) (long) result.first.get("generatorTime");
+
+        DisplayKakuroScreenCtrl nextScreen = new DisplayKakuroScreenCtrl(this, domainCtrl);
+        nextScreen.prepareContents(
+                "GENERATION COMPLETE",
+                board,
+                Palette.SelectionBlue,
+                "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
+                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
+                    @Override
+                    public void onFinished() {
+                        setScreen(myKakurosScreenCtrl);
+                    }
+                }
+        );
+        setScreen(nextScreen);
     }
 
     public void generateKakuroFromSeed(String name, String seed) {
-        // TODO, might throw an error if name is already in use
         Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromSeed(userSessionId, seed, name);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return;
+        }
+
+        String board = (String) result.first.get("board");
+        float time = (float) (long) result.first.get("generatorTime");
+
+        DisplayKakuroScreenCtrl nextScreen = new DisplayKakuroScreenCtrl(this, domainCtrl);
+        nextScreen.prepareContents(
+                "GENERATION COMPLETE",
+                board,
+                Palette.SelectionBlue,
+                "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
+                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
+                    @Override
+                    public void onFinished() {
+                        setScreen(myKakurosScreenCtrl);
+                    }
+                }
+        );
+        setScreen(nextScreen);
     }
 
     public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {

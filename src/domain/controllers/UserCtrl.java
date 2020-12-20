@@ -36,6 +36,7 @@ public class UserCtrl {
     }
 
     public boolean registerUser(String username) throws Exception {
+        if (username.equals("System")) throw new Exception("What are you trying to do? You don't have access to System rights!");
         User user = userRepository.getUser(username);
         if (user != null) return false; // user already in the database
         userRepository.saveUser(new User(username));

@@ -27,14 +27,14 @@ public class KakuroCtrl {
         return kakuroRepository.getKakuro(name);
     }
 
-    public ArrayList<Map<String, Object>> getKakuroListByDifficulty(Difficulty difficulty) throws Exception {
+    public ArrayList<Map<String, Object>> getKakuroListByDifficulty(Difficulty difficulty, User user) throws Exception {
         ArrayList<Kakuro> kakuroList = kakuroRepository.getAllKakurosByDifficulty(difficulty);
-        return computeResultFromKakuroList(kakuroList);
+        return computeResultFromKakuroList(kakuroList, user);
     }
 
     public ArrayList<Map<String, Object>> getKakuroListByUser(User user) throws Exception {
         ArrayList<Kakuro> kakuroList = kakuroRepository.getAllKakurosByUser(user);
-        return computeResultFromKakuroList(kakuroList);
+        return computeResultFromKakuroList(kakuroList, user);
     }
 
     public void saveKakuro(Kakuro kakuro) throws Exception {
@@ -62,7 +62,7 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user);
         saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
@@ -84,7 +84,7 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user);
         saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
@@ -94,7 +94,7 @@ public class KakuroCtrl {
         return result;
     }
 
-    private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList) throws IOException {
+    private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList, User user) throws IOException {
         ArrayList<Map<String, Object>> result = new ArrayList<>();
 
         for (Kakuro kakuro : kakuroList) {
@@ -104,7 +104,7 @@ public class KakuroCtrl {
             String state = "neutral";
             for (Game game : kakuroGames) {
                 if (game.getTimeSpent() < bestTime || bestTime == -1) bestTime = game.getTimeSpent();
-                if (game.getPlayerName() == "LOL") { // TODO: unhardcode NAME
+                if (game.getPlayerName().equals(user.getName())) {
                     if (game instanceof GameInProgress) state = "unfinished";
                     else if (state.equals("neutral") && game instanceof GameFinished) {
                         state = "solved"; // TODO: check if it was solved or surrendered!!!

@@ -25,7 +25,7 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
     public void build(int width, int height) {
         screen = new KakuroListScreen(this);
         for(int diff = 0; diff < 5; diff++) {
-            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff));
+            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff), presentationCtrl.getUserSessionId());
             if (result.second != null) {
                 // TODO: handle error
                 return;
@@ -40,7 +40,7 @@ public class KakuroListScreenCtrl extends AbstractScreenCtrl {
     public void onFocusRegained(int width, int height) {
         infoToDisplay.clear();
         for(int diff = 0; diff < 5; diff++) {
-            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff));
+            Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByDifficulty(difficultyToString(diff), presentationCtrl.getUserSessionId());
             if (result.second != null) {
                 // TODO: handle error
                 return;

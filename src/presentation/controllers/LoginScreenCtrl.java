@@ -32,8 +32,8 @@ public class LoginScreenCtrl extends AbstractScreenCtrl {
     public void register(String user) {
         Pair<Boolean, String> ret = domainCtrl.registerUser(user);
 
-        if(!ret.first)
-            Dialogs.showErrorDialog("Unable to register new user: " + ret.second, "Error");
+        if(ret.second != null)
+            Dialogs.showErrorDialog(ret.second, "Error");
         else
             loginUser(user);
     }

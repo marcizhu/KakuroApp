@@ -61,7 +61,7 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
                 return;
         }
         String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that is about to be generated.");
-        presentationCtrl.generateKakuroFromParameters(name, rows, columns, difficulty, unique);
+        presentationCtrl.generateKakuroFromParameters(name, rows, columns, difficulty.toUpperCase(), unique);
     }
 
     public void onGenerateBySeed(String seed) {
