@@ -10,10 +10,12 @@ public class GameInProgress extends Game{
     private Board board;
     private ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
     private Timestamp lastPlayed;
+    private int numberOfHints;
 
     public GameInProgress(User player, Kakuro kakuro) {
         super(player, kakuro);
         this.board = new Board(kakuro.getBoard());
+        this.numberOfHints = 0;
         movements = new ArrayList<>();
         setLastPlayedToNow();
     }
@@ -21,15 +23,17 @@ public class GameInProgress extends Game{
     public GameInProgress(User player, Kakuro kakuro, Board board) {
         super(player, kakuro);
         this.board = board;
+        this.numberOfHints = 0;
         movements = new ArrayList<>();
         setLastPlayedToNow();
     }
 
-    public GameInProgress(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, Board board, ArrayList<Movement> movements, Timestamp lastPlayed) {
+    public GameInProgress(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, Board board, ArrayList<Movement> movements, Timestamp lastPlayed, int numberOfHints) {
         super(id, startTime, timeSpent, player, kakuro);
         this.board = board;
         this.movements = movements;
         this.lastPlayed = lastPlayed;
+        this.numberOfHints = numberOfHints;
     }
 
     public UUID getBoardId() {
@@ -78,6 +82,10 @@ public class GameInProgress extends Game{
     public void setLastPlayedToNow () {
         this.lastPlayed = new Timestamp(System.currentTimeMillis());
     }
+
+    public void setNumberOfHints (int numberOfHints) { this.numberOfHints = numberOfHints; }
+
+    public int getNumberOfHints() { return this.numberOfHints; }
 
     public String toString() {
         return "Game in Progress\n" + super.toString() + "\nBoard: " + board.toString() + "\nlast played: " + lastPlayed;
