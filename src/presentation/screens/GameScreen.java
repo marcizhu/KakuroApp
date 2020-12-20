@@ -17,9 +17,11 @@ public class GameScreen extends AbstractScreen {
 
     JPanel leftContent;
 
+    JPanel helpOptionsPanel;
     JCheckBox redBtnPanChk;
     JCheckBox showCombChk;
     JCheckBox autoEraseChk;
+    Component hHelpOptionsFiller;
 
     JPanel rightContent;
 
@@ -75,7 +77,7 @@ public class GameScreen extends AbstractScreen {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 10, 5);
 
-        JPanel helpOptionsPanel = buildHelpOptionsPanel();
+        buildHelpOptionsPanel(width);
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weighty = 1;
@@ -90,8 +92,8 @@ public class GameScreen extends AbstractScreen {
         leftContent.setVisible(true);
     }
 
-    public JPanel buildHelpOptionsPanel() {
-        JPanel helpOptionsPanel = new JPanel();
+    public JPanel buildHelpOptionsPanel(int width) {
+        helpOptionsPanel = new JPanel();
         helpOptionsPanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 5, 10, 5);
@@ -162,6 +164,12 @@ public class GameScreen extends AbstractScreen {
         autoEraseChk.addItemListener(e -> ((GameScreenCtrl)ctrl).setHelpAutoEraseNotations(e.getStateChange() == ItemEvent.SELECTED));
         constraints.gridy = 4;
         helpOptionsPanel.add(autoEraseChk, constraints);
+
+        hHelpOptionsFiller = Box.createRigidArea(new Dimension(width/7, 5));
+        constraints.gridx = 0;
+        constraints.gridy = 5;
+        constraints.gridwidth = 3;
+        helpOptionsPanel.add(hHelpOptionsFiller, constraints);
 
         return helpOptionsPanel;
     }
@@ -482,6 +490,9 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void onResize(int width, int height) {
         contents.setSize(width, height);
+        hHelpOptionsFiller = Box.createRigidArea(new Dimension(width/7, 5));
+        Component[] helpComp = helpOptionsPanel.getComponents();
+        helpComp[helpComp.length-1] = hHelpOptionsFiller;
         leftContent.setSize(width/4, height);
         rightContent.setSize(width/4, height);
         int remainingWidth = width - leftContent.getWidth() - rightContent.getWidth();

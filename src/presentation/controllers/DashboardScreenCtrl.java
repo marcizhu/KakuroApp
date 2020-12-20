@@ -6,6 +6,8 @@ import src.presentation.utils.Dialogs;
 import src.utils.Pair;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class DashboardScreenCtrl extends AbstractScreenCtrl{
 
@@ -84,8 +86,22 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         }
     }
 
+    public ArrayList<Map<String, Object>> getHistory() {
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getGameHistory(presentationCtrl.getUserSessionId());
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return new ArrayList<>();
+        }
+        System.out.println("History contains: " + result.first.size() + " elements");
+        return result.first;
+    }
+
+    public void onResumeFromHistory(String kakuroID) {
+        presentationCtrl.startNewGame(kakuroID);
+    }
+
     @Override
     public void onFocusRegained(int width, int height) {
-
+        ((DashboardScreen)screen).updateHistoryPanel();
     }
 }

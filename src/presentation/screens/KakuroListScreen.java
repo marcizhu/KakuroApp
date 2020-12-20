@@ -40,7 +40,6 @@ public class KakuroListScreen extends AbstractScreen {
 
         for(int diff = 0; diff < 5; diff++) {
             ArrayList<Map<String, Object>> info = ((KakuroListScreenCtrl) ctrl).getInfoToDisplay(diff);
-            //if (info.size() == 0) return;
             kakuroListLayout[diff] = new JPanel(new GridLayout(info.size() / 3 + ((info.size() % 3 != 0) ? 1 : 0), 3));
 
             for (Map<String, Object> kakuroData : info) {

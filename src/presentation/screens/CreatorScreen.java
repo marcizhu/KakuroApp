@@ -30,6 +30,8 @@ public class CreatorScreen extends AbstractScreen {
     JTextField kakuroName;
     JButton kakuroStateBtn;
 
+    Component horizontalLeftFiller;
+
     JPanel lowerRightContent;
     KakuroView creatorBoard;
 
@@ -40,7 +42,7 @@ public class CreatorScreen extends AbstractScreen {
         super.build(width, height);
         contents = new JPanel();
 
-        leftContent = buildLeftContent();
+        buildLeftContent(width);
         lowerRightContent = buildRightContent();
 
         String initialBoard = ((CreatorScreenCtrl)ctrl).getBoardToDisplay();
@@ -72,9 +74,9 @@ public class CreatorScreen extends AbstractScreen {
         onResize(width, height);
     }
 
-    private JPanel buildLeftContent() {
-        JPanel left = new JPanel();
-        left.setLayout(new GridBagLayout());
+    private void buildLeftContent(int width) {
+        leftContent = new JPanel();
+        leftContent.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
         blackWhiteSelectors = new JTabbedPane();
@@ -120,6 +122,8 @@ public class CreatorScreen extends AbstractScreen {
             }
         });
 
+        horizontalLeftFiller = Box.createRigidArea(new Dimension(width/3, 5));
+
         constraints.insets = new Insets(5, 20, 5, 20);
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -142,23 +146,23 @@ public class CreatorScreen extends AbstractScreen {
         lowerLeft.add(kakuroStateBtn, constraints);
 
         constraints.insets = new Insets(10, 5, 10, 5);
-        //left.setLayout(new GridLayout(3,1,5,10));
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weighty = 4;
         constraints.fill = GridBagConstraints.BOTH;
-        left.add(blackWhiteSelectors, constraints);
+        leftContent.add(blackWhiteSelectors, constraints);
 
         constraints.gridy = 1;
         constraints.weighty = 2;
         constraints.fill = GridBagConstraints.BOTH;
-        left.add(tipBox, constraints);
+        leftContent.add(tipBox, constraints);
 
         constraints.gridy = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        left.add(lowerLeft, constraints);
+        leftContent.add(lowerLeft, constraints);
 
-        return left;
+        constraints.gridy = 3;
+        leftContent.add(horizontalLeftFiller, constraints);
     }
 
     private void buildSelectorBlack() {
@@ -537,6 +541,9 @@ public class CreatorScreen extends AbstractScreen {
     @Override
     public void onResize(int width, int height) {
         contents.setSize(width, height);
+        horizontalLeftFiller = Box.createRigidArea(new Dimension(width/3, 5));
+        Component[] leftComp = leftContent.getComponents();
+        leftComp[leftComp.length -1] = horizontalLeftFiller;
         leftContent.setSize(width/2, height);
         lowerRightContent.setSize(width/2, lowerRightContent.getHeight());
         int remainingWidth = width - leftContent.getWidth();

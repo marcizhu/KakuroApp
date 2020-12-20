@@ -1,8 +1,17 @@
 package src.presentation.screens;
 
+import src.domain.entities.GameFinished;
+import src.domain.entities.GameInProgress;
+import src.domain.entities.Kakuro;
 import src.presentation.controllers.AbstractScreenCtrl;
 import src.presentation.controllers.DashboardScreenCtrl;
+import src.presentation.controllers.GameScreenCtrl;
+import src.presentation.controllers.MyKakurosScreenCtrl;
+import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
+import src.presentation.views.KakuroInfoCardView;
+import src.presentation.views.KakuroView;
+import src.utils.Pair;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -12,10 +21,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DashboardScreen extends AbstractScreen {
 
     JPanel historyPanel;
+    JScrollPane historyScroll;
+    Component hHistoryFiller;
 
     JPanel quickStatsPanel;
 
@@ -42,28 +60,42 @@ public class DashboardScreen extends AbstractScreen {
     @Override
     public void build(int width, int height) {
         contents = new JPanel();
-        contents.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        contents.setLayout(new BorderLayout());
+
+        JPanel contentWrapper = new JPanel();
+        contentWrapper.setLayout(new BoxLayout(contentWrapper, BoxLayout.X_AXIS));
 
         titleFnt = new Font(Font.SANS_SERIF, Font.BOLD, 20);
         subtitleFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
         bodyFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
         smallFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 9);
 
+        JPanel interactivePanel = new JPanel();
+        interactivePanel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
         buildNewGamePanel();
         buildCreatePanel();
-
-
 
         constraints.insets = new Insets(10,10,10,10);
         constraints.fill = GridBagConstraints.BOTH;
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        contents.add(gamePanel, constraints);
-
+        interactivePanel.add(gamePanel, constraints);
         constraints.gridy = 1;
-        contents.add(createPanel, constraints);
+        interactivePanel.add(createPanel, constraints);
+
+        JPanel history = buildHistoryPanel(width);
+
+        contentWrapper.add(interactivePanel);
+        contentWrapper.add(history);
+
+        contents.add(contentWrapper, BorderLayout.CENTER);
+        contents.add(Box.createRigidArea(new Dimension(width, 40)), BorderLayout.NORTH);
+        contents.add(Box.createRigidArea(new Dimension(width, 40)), BorderLayout.SOUTH);
+        contents.add(Box.createRigidArea(new Dimension(40, height-80)), BorderLayout.EAST);
+        contents.add(Box.createRigidArea(new Dimension(40, height-80)), BorderLayout.WEST);
     }
 
     private void buildNewGamePanel() {
@@ -285,7 +317,7 @@ public class DashboardScreen extends AbstractScreen {
         forceUniqueLbl2.setHorizontalAlignment(SwingConstants.LEFT);
         forceUniqueLbl2.setVerticalAlignment(SwingConstants.TOP);
 
-        JButton confirmGen = new JButton("✅");
+        JButton confirmGen = new JButton("Ok"); //✅
         confirmGen.setForeground(Palette.StrongGreen);
         confirmGen.setBackground(Palette.HintGreen);
         confirmGen.addActionListener(new ActionListener() {
@@ -373,13 +405,15 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JButton confirmSeed = new JButton("✅");
+        JButton confirmSeed = new JButton("Ok");
         confirmSeed.setForeground(Palette.StrongGreen);
         confirmSeed.setBackground(Palette.HintGreen);
         confirmSeed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onGenerateBySeed(seed.getText());
+                if (seed.getText().equals("Please enter a valid seed...") || seed.getText().equals(""))
+                    Dialogs.showErrorDialog("A seed must be provided to use this functionality", "Invalid seed");
+                else ((DashboardScreenCtrl)ctrl).onGenerateBySeed(seed.getText());
             }
         });
 
@@ -481,7 +515,7 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JButton confirmHand = new JButton("✅");
+        JButton confirmHand = new JButton("Ok");
         confirmHand.setForeground(Palette.StrongGreen);
         confirmHand.setBackground(Palette.HintGreen);
         confirmHand.addActionListener(new ActionListener() {
@@ -559,18 +593,207 @@ public class DashboardScreen extends AbstractScreen {
         return handMadePanel;
     }
 
-    @Override
-    public void onShow() {
 
+    private JPanel buildHistoryPanel(int width) {
+        JPanel history = new JPanel();
+        history.setLayout(new BoxLayout(history, BoxLayout.Y_AXIS));
+
+        JLabel title = new JLabel("HISTORY");
+        title.setFont(titleFnt);
+        title.setForeground(Color.BLACK);
+        title.setOpaque(false);
+        title.setHorizontalAlignment(SwingConstants.LEFT);
+        title.setVerticalAlignment(SwingConstants.CENTER);
+
+        buildGameHistoryPanel(width);
+        historyScroll = new JScrollPane(historyPanel);
+        historyScroll.getVerticalScrollBar().setUnitIncrement(20);
+        historyScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        history.add(title);
+        history.add(historyScroll);
+
+        //history.add(hHistoryFiller);
+
+        return history;
+    }
+
+    public void updateHistoryPanel() {
+        buildGameHistoryPanel(contents.getWidth());
+        historyScroll.setViewportView(historyPanel);
+    }
+    private void buildGameHistoryPanel(int windowWidth) {
+        ArrayList<Map<String, Object>> allGames = ((DashboardScreenCtrl) ctrl).getHistory();
+        historyPanel = new JPanel();
+        historyPanel.setLayout(new GridLayout(allGames.size()+1, 1));
+        historyPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+
+        if (allGames.size() == 0) {
+            JLabel noGamesYetLbl = new JLabel("<html><body>Welcome! You haven't played any games yet, click on one of the buttons in the NEW GAME section to get started.</body></html>");
+            noGamesYetLbl.setFont(bodyFnt);
+            noGamesYetLbl.setForeground(Color.BLACK);
+            noGamesYetLbl.setOpaque(false);
+            noGamesYetLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            noGamesYetLbl.setVerticalAlignment(SwingConstants.CENTER);
+            //historyPanel.add(noGamesYetLbl);
+        }
+
+        for (Map<String, Object> gameData : allGames) {
+            String state = (String) gameData.get("state");
+
+            String board = (String) gameData.get("board");
+            String name = (String) gameData.get("name");
+            int width = (Integer) gameData.get("width");
+            int height = (Integer) gameData.get("height");
+            String difficulty = (String) gameData.get("difficulty");
+            float timeSpent = (float) gameData.get("timeSpent");
+            String lastPlayed = ((Timestamp) gameData.get("lastPlayed")).toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("EEEE d MMMM uuuu"));
+            float score = 0;
+            if (!state.equals("unfinished")) score = (float) gameData.get("score");
+
+            JPanel tile = buildHistoryGameTile(board, name, width, height, difficulty, secondsToStringTime(timeSpent), lastPlayed, score, state);
+
+            historyPanel.add(tile);
+        }
+
+        hHistoryFiller = Box.createRigidArea(new Dimension(windowWidth/2-90, 1));
+        historyPanel.add(hHistoryFiller);
+    }
+
+    private JPanel buildHistoryGameTile(String board, String name, int width, int height, String difficulty, String timeSpent, String lastPlayed, float score, String state) {
+        JPanel tile = new JPanel();
+        tile.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        KakuroView kakuroView = new KakuroView(board, false);
+        kakuroView.setSize(200, 200);
+
+        JLabel headerLbl = new JLabel(state.equals("unfinished")? "Unfinished" : "Score: " + score);
+        headerLbl.setFont(subtitleFnt);
+        headerLbl.setForeground(Color.BLACK);
+        headerLbl.setOpaque(false);
+        headerLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        headerLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        JButton resumeBtn = new JButton("Resume game");
+        resumeBtn.setFont(bodyFnt);
+        resumeBtn.setForeground(Color.BLACK);
+        resumeBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+        resumeBtn.setVerticalAlignment(SwingConstants.CENTER);
+        resumeBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((DashboardScreenCtrl)ctrl).onResumeFromHistory(name);
+            }
+        });
+
+        JLabel nameLbl = new JLabel(name);
+        nameLbl.setFont(bodyFnt);
+        nameLbl.setForeground(Color.BLACK);
+        nameLbl.setOpaque(false);
+        nameLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        nameLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        JLabel timeSpentLbl = new JLabel("Time: " + timeSpent);
+        timeSpentLbl.setFont(bodyFnt);
+        timeSpentLbl.setForeground(Color.BLACK);
+        timeSpentLbl.setOpaque(false);
+        timeSpentLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        timeSpentLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        JLabel sizeLbl = new JLabel("Size: " + height + " x " + width);
+        sizeLbl.setFont(bodyFnt);
+        sizeLbl.setForeground(Color.BLACK);
+        sizeLbl.setOpaque(false);
+        sizeLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        sizeLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        JLabel difficultyLbl = new JLabel("Difficulty: " + difficulty);
+        difficultyLbl.setFont(bodyFnt);
+        difficultyLbl.setForeground(Color.BLACK);
+        difficultyLbl.setOpaque(false);
+        difficultyLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        difficultyLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        JLabel lastPlayedLbl = new JLabel("Last played on: " + lastPlayed);
+        lastPlayedLbl.setFont(bodyFnt);
+        lastPlayedLbl.setForeground(Color.BLACK);
+        lastPlayedLbl.setOpaque(false);
+        lastPlayedLbl.setHorizontalAlignment(SwingConstants.LEFT);
+        lastPlayedLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 6;
+        constraints.fill = GridBagConstraints.VERTICAL;
+        constraints.insets = new Insets(0, 5, 0, 5);
+        tile.add(kakuroView, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridheight = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets.top = 20;
+        tile.add(headerLbl, constraints);
+        constraints.insets.bottom = 5;
+
+        if (state.equals("unfinished")) {
+            constraints.gridx = 2;
+            constraints.insets.right = 30;
+            tile.add(resumeBtn, constraints);
+            constraints.insets.right = 5;
+        }
+
+        constraints.insets.top = 5;
+
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        tile.add(nameLbl, constraints);
+        constraints.gridy = 2;
+        tile.add(timeSpentLbl, constraints);
+        constraints.gridy = 3;
+        tile.add(sizeLbl, constraints);
+        constraints.gridy = 4;
+        tile.add(difficultyLbl, constraints);
+        constraints.gridy = 5;
+        constraints.gridwidth = 2;
+        //constraints.insets.right = 30;
+        tile.add(lastPlayedLbl, constraints);
+
+        return tile;
+    }
+
+    private String secondsToStringTime(float time) {
+        int hours = (int)time/3600;
+        int minutes = (int)time/60 - hours*60;
+        int seconds = (int)time - minutes*60 - hours*3600;
+        String timeStr = "";
+        if (hours > 0) {
+            timeStr += hours+":";
+            if (minutes < 10) timeStr += "0";
+        }
+        timeStr += minutes+":";
+        if (seconds < 10) timeStr += "0";
+        timeStr += seconds;
+
+        return timeStr;
     }
 
     @Override
-    public void onHide() {
-
-    }
+    public void onShow() {}
 
     @Override
-    public void onDestroy() {
+    public void onHide() {}
 
+    @Override
+    public void onDestroy() {}
+
+    @Override
+    public void onResize(int width, int height) {
+        hHistoryFiller = Box.createRigidArea(new Dimension(width/2 -90, 1));
+        Component[] histComp = historyPanel.getComponents();
+        histComp[histComp.length-1] = hHistoryFiller;
+        super.onResize(width, height);
     }
 }

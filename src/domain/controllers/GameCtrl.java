@@ -36,9 +36,9 @@ public class GameCtrl {
                 if (aFinished && !bFinished) return 1;
                 else if (!aFinished && bFinished) return -1;
                 else if (aFinished && bFinished) {
-                    return ((GameFinished) a).getTimeFinished().compareTo(((GameFinished) b).getTimeFinished());
+                    return ((GameFinished) b).getTimeFinished().compareTo(((GameFinished) a).getTimeFinished());
                 } else { // !aFinished && !bFinished
-                    return ((GameInProgress) a).getLastPlayed().compareTo(((GameInProgress) b).getLastPlayed());
+                    return ((GameInProgress) b).getLastPlayed().compareTo(((GameInProgress) a).getLastPlayed());
                 }
             }
         });
@@ -51,12 +51,14 @@ public class GameCtrl {
             gameData.put("height", kakuro.getBoard().getHeight());
             gameData.put("difficulty", kakuro.getDifficulty().toString());
             gameData.put("timeSpent", game.getTimeSpent());
+            gameData.put("lastPlayed", (game instanceof GameFinished) ? ((GameFinished)game).getTimeFinished() : ((GameInProgress)game).getLastPlayed());
             if (game instanceof GameInProgress) {
                 gameData.put("state", "unfinished");
             } else { // game instanceof GameFinished
                 gameData.put("score", ((GameFinished)game).getScore());
                 gameData.put("state", "finished");
             }
+            result.add(gameData);
         }
         return result;
 

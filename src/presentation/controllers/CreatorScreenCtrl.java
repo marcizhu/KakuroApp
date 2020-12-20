@@ -270,7 +270,8 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         creator.fillKakuro();
     }
     public void onClearBoardButtonClicked() {
-        creator.clearWholeBoard();
+        if (Dialogs.showYesNoOptionDialog("This action will remove all values from the cells. It will preserve the black cell layout but in \"initial state\".", "Are you sure?"))
+            creator.clearWholeBoard();
     }
 
     public void setTipMessage(String message) {
