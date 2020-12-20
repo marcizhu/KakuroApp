@@ -906,7 +906,7 @@ public class KakuroCreationCtrl {
             }
         }
         try {
-            FileWriter myWriter = new FileWriter(file+".wip");
+            FileWriter myWriter = new FileWriter(file+".txt");
             myWriter.write(toExport.toString() + "\n");
             myWriter.close();
             return new Pair<>(true, null);

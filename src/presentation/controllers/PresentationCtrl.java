@@ -344,6 +344,25 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    public void exportKakuro(String kakuroID) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export kakuro");
+
+        int userSelection = fileChooser.showSaveDialog(currentScreenCtrl.getContents());
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String file = fileChooser.getSelectedFile().getAbsolutePath();
+            Pair<Boolean, String> result = domainCtrl.exportKakuro(kakuroID, file);
+
+            if(!result.first) {
+                Dialogs.showErrorDialog(result.second, "Error while exporting kakuro:");
+                return;
+            }
+
+            Dialogs.showInfoDialog("Kakuro was exported successfully.", "Exported!");
+        }
+    }
+
     public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
         Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromParameters(userSessionId, rows, columns, difficulty, forceUnique, name);
         if (result.second != null) {

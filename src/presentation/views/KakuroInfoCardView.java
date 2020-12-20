@@ -175,10 +175,11 @@ public class KakuroInfoCardView extends JPanel {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         kakuroInfoAndButtons.add(separator, constraints);
 
-        kakuroInfoAndButtons.setBackground(Color.GRAY);
+        //kakuroInfoAndButtons.setBackground(Color.GRAY);
         add(kakuroInfoAndButtons);
 
-        setBackground(Color.LIGHT_GRAY);
+        //setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        //setBackground(Color.LIGHT_GRAY);
     }
 
     @Override

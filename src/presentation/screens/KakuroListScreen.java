@@ -30,6 +30,7 @@ public class KakuroListScreen extends AbstractScreen {
         contents.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
 
         title = new JLabel("Kakuro List");
+        title.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         title.setForeground(Color.BLACK);
         title.setVisible(true);
         contents.add(title);
@@ -40,7 +41,7 @@ public class KakuroListScreen extends AbstractScreen {
 
         for(int diff = 0; diff < 5; diff++) {
             ArrayList<Map<String, Object>> info = ((KakuroListScreenCtrl) ctrl).getInfoToDisplay(diff);
-            kakuroListLayout[diff] = new JPanel(new GridLayout(info.size() / 3 + ((info.size() % 3 != 0) ? 1 : 0), 3));
+            kakuroListLayout[diff] = new JPanel(new GridLayout(info.size() / 3 + ((info.size() % 3 != 0) ? 1 : 0), 3, 10, 10));
 
             for (Map<String, Object> kakuroData : info) {
                 String state = (String) kakuroData.get("state");
@@ -83,10 +84,13 @@ public class KakuroListScreen extends AbstractScreen {
                 });
                 kak.setSize(width / 4, height * 2 / 3);
                 kakuroListLayout[diff].add(kak);
+                kakuroListLayout[diff].setBackground(Color.LIGHT_GRAY);
             }
             kakuroListPane[diff] = new JScrollPane(kakuroListLayout[diff]);
             kakuroListPane[diff].setVisible(true);
             kakuroListPane[diff].getVerticalScrollBar().setUnitIncrement(20);
+            kakuroListPane[diff].setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            kakuroListPane[diff].setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
             tabbedPane.addTab(difficultyToString(diff).equals("USER_MADE") ? "BY USERS" : difficultyToString(diff), kakuroListPane[diff]);
         }
@@ -131,10 +135,12 @@ public class KakuroListScreen extends AbstractScreen {
                     rowSize = 1;
                 else if (width < 3 * ((KakuroInfoCardView) kakuroListLayout[i].getComponents()[0]).getRealMinimumSize().width)
                     rowSize = 2;
-                kakuroListLayout[i].setLayout(new GridLayout(numComp / rowSize + ((numComp % rowSize != 0) ? 1 : 0), rowSize));
+                kakuroListLayout[i].setLayout(new GridLayout(numComp / rowSize + ((numComp % rowSize != 0) ? 1 : 0), rowSize, 10, 10));
+            } else {
+                kakuroListLayout[i].setLayout(new GridLayout(1, numComp, 10, 10));
             }
             for (Component c : kakuroListLayout[i].getComponents()) {
-                c.setSize(contents.getWidth() / 4, height * 2 / 3);
+                c.setSize(width / 4, width/4);
                 c.revalidate();
             }
             kakuroListLayout[i].revalidate();

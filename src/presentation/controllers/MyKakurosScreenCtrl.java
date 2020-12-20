@@ -2,8 +2,10 @@ package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
 import src.presentation.screens.MyKakurosScreen;
+import src.presentation.utils.Dialogs;
 import src.utils.Pair;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,7 +23,7 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
         screen = new MyKakurosScreen(this);
         Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByUser(presentationCtrl.getUserSessionId());
         if (result.second != null) {
-            // TODO: handle error
+            Dialogs.showErrorDialog(result.second, "Something went wrong...");
             return;
         }
         infoToDisplay = result.first;
@@ -32,7 +34,7 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
     public void onFocusRegained(int width, int height) {
         Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getKakuroListByUser(presentationCtrl.getUserSessionId());
         if (result.second != null) {
-            // TODO: handle error
+            Dialogs.showErrorDialog(result.second, "Something went wrong...");
             return;
         }
 
@@ -45,7 +47,7 @@ public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void onExportKakuroClicked(String id) {
-        System.out.println("Export: " + id);
+        presentationCtrl.exportKakuro(id);
     }
 
     public void onPlayKakuroClicked(String id) {

@@ -4,6 +4,7 @@ import src.domain.entities.*;
 import src.repository.*;
 import src.utils.Pair;
 
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -182,6 +183,18 @@ public class DomainCtrl {
             User user = userCtrl.getUser(username);
             Map<String, Object> result = kakuroCtrl.saveKakuroFromGeneratorSeed(user, seed, kakuroName);
             return new Pair<>(result, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
+    }
+
+    public Pair<Boolean, String> exportKakuro(String kakuroName, String filePath) {
+        try {
+            Kakuro kakuro = kakuroCtrl.getKakuro(kakuroName);
+            FileWriter myWriter = new FileWriter(filePath+".txt");
+            myWriter.write(kakuro.getBoard().toString() + "\n");
+            myWriter.close();
+            return new Pair<>(true, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }

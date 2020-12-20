@@ -25,13 +25,14 @@ public class MyKakurosScreen extends AbstractScreen {
         contents.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
 
         title = new JLabel("My Kakuros");
+        title.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         title.setForeground(Color.BLACK);
         title.setVisible(true);
         contents.add(title);
 
         ArrayList<Map<String, Object>> info = ((MyKakurosScreenCtrl) ctrl).getInfoToDisplay();
         if (info.size() == 0) return;
-        kakuroListLayout = new JPanel(new GridLayout(info.size()/3 + ((info.size()%3 != 0) ? 1 : 0), 3));
+        kakuroListLayout = new JPanel(new GridLayout(info.size()/3 + ((info.size()%3 != 0) ? 1 : 0), 3, 10, 10));
 
         for (Map<String, Object> kakuroData : info) {
             String state = (String) kakuroData.get("state");
@@ -67,9 +68,12 @@ public class MyKakurosScreen extends AbstractScreen {
             kak.setSize(width/4, height*2/3);
             kakuroListLayout.add(kak);
         }
+        kakuroListLayout.setBackground(Color.LIGHT_GRAY);
         kakuroListPane = new JScrollPane(kakuroListLayout);
         kakuroListPane.setVisible(true);
         kakuroListPane.getVerticalScrollBar().setUnitIncrement(20);
+        kakuroListPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        kakuroListPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         contents.add(kakuroListPane);
         contents.setVisible(true);
         onResize(width, height);
@@ -83,10 +87,12 @@ public class MyKakurosScreen extends AbstractScreen {
         kakuroListLayout.setSize(width-50, remainingHeight);
         int rowSize = 3;
         int numComp = kakuroListLayout.getComponents().length;
-        if (numComp > 0) {
+        if (numComp > 3) {
             if (width < 2*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 1;
             else if (width < 3*((KakuroInfoCardView)kakuroListLayout.getComponents()[0]).getRealMinimumSize().width) rowSize = 2;
-            kakuroListLayout.setLayout(new GridLayout(numComp / rowSize  + ((numComp % rowSize != 0) ? 1 : 0), rowSize));
+            kakuroListLayout.setLayout(new GridLayout(numComp / rowSize  + ((numComp % rowSize != 0) ? 1 : 0), rowSize, 10, 10));
+        } else {
+            kakuroListLayout.setLayout(new GridLayout(1, numComp, 10, 10));
         }
         for (Component c : kakuroListLayout.getComponents()) {
             c.setSize(contents.getWidth()/4, height*2/3);
