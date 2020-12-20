@@ -52,7 +52,9 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             String file = fileChooser.getSelectedFile().getAbsolutePath();
             String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that you are importing.");
-            presentationCtrl.importNewGame(name, file);
+            if (name == null) return;
+            if (name.equals("")) Dialogs.showErrorDialog("A kakuro can not be nameless", "Invalid name");
+            else presentationCtrl.importNewGame(name, file);
         }
     }
 
@@ -62,12 +64,16 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
                 return;
         }
         String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that is about to be generated.");
-        presentationCtrl.generateKakuroFromParameters(name, rows, columns, difficulty.toUpperCase(), unique);
+        if (name == null) return;
+        if (name.equals("")) Dialogs.showErrorDialog("A kakuro can not be nameless", "Invalid name");
+        else presentationCtrl.generateKakuroFromParameters(name, rows, columns, difficulty.toUpperCase(), unique);
     }
 
     public void onGenerateBySeed(String seed) {
         String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that is about to be generated.");
-        presentationCtrl.generateKakuroFromSeed(name, seed);
+        if (name == null) return;
+        if (name.equals("")) Dialogs.showErrorDialog("A kakuro can not be nameless", "Invalid name");
+        else presentationCtrl.generateKakuroFromSeed(name, seed);
     }
 
     public void onHandMadeClicked(int rows, int columns) {
