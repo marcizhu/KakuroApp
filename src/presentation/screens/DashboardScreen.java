@@ -70,8 +70,8 @@ public class DashboardScreen extends AbstractScreen {
         bodyFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
         smallFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 9);
 
-        JPanel interactivePanel = new JPanel();
-        interactivePanel.setLayout(new GridBagLayout());
+        interactiveActionsPanel = new JPanel();
+        interactiveActionsPanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
         buildNewGamePanel();
@@ -82,13 +82,13 @@ public class DashboardScreen extends AbstractScreen {
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        interactivePanel.add(gamePanel, constraints);
+        interactiveActionsPanel.add(gamePanel, constraints);
         constraints.gridy = 1;
-        interactivePanel.add(createPanel, constraints);
+        interactiveActionsPanel.add(createPanel, constraints);
 
         JPanel history = buildHistoryPanel(width);
 
-        contentWrapper.add(interactivePanel);
+        contentWrapper.add(interactiveActionsPanel);
         contentWrapper.add(history);
 
         contents.add(contentWrapper, BorderLayout.CENTER);
@@ -593,6 +593,26 @@ public class DashboardScreen extends AbstractScreen {
         return handMadePanel;
     }
 
+    public void updateQuickStats() {
+        quickStatsPanel = buildQuickStatsPanel();
+        quickStatsPanel.revalidate();
+    }
+
+    private JPanel buildQuickStatsPanel() {
+        JPanel statsPanel = new JPanel();
+        statsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        JLabel title = buildLabel("QUICK STATS", titleFnt, SwingConstants.CENTER);
+
+        JLabel rnkLbl = buildLabel("Ranking", subtitleFnt, SwingConstants.LEFT);
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(Color.BLACK);
+
+
+        return statsPanel;
+    }
 
     private JPanel buildHistoryPanel(int width) {
         JPanel history = new JPanel();
@@ -778,6 +798,16 @@ public class DashboardScreen extends AbstractScreen {
         timeStr += seconds;
 
         return timeStr;
+    }
+
+    private JLabel buildLabel(String text, Font font, int horizontalAlign) {
+        JLabel label = new JLabel(text);
+        label.setFont(font);
+        label.setForeground(Color.BLACK);
+        label.setOpaque(false);
+        label.setHorizontalAlignment(horizontalAlign);
+        label.setVerticalAlignment(SwingConstants.CENTER);
+        return label;
     }
 
     @Override

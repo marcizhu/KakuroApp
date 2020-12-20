@@ -80,6 +80,11 @@ public class DomainCtrl {
         return new Pair<>(result, null);
     }
 
+    public Pair<Map<String, Integer>, String> getNumberOfGamesPlayed(String username) {
+        // TODO: alex, all difficulties
+        return null;
+    }
+
     public Pair<ArrayList<Map<String, Object>>, String> getGameHistory(String username) {
         ArrayList<Map<String, Object>> result;
         try {
@@ -91,7 +96,7 @@ public class DomainCtrl {
         return new Pair<>(result, null);
     }
 
-    public ArrayList<Map<String, Object>> getRankingByPoints() {
+    public Pair<ArrayList<Map<String, Object>>, String> getRankingByPoints() {
         // TODO: Marc, returns decreasingly ordered array of:
         //  name -> user.name
         //  easyPts -> avg points in easy games of user .. 0 if no games
@@ -99,10 +104,10 @@ public class DomainCtrl {
         //  hardPts -> avg points in hard games of user .. 0 if no games
         //  extremePts -> avg points in extreme games of user .. 0 if no games
         //  totalPts -> sum of all points (also user.getScore() if I'm not mistaken)
-        return new ArrayList<>();
+        return new Pair(new ArrayList<>(), "Functionality not implemented");
     }
 
-    public ArrayList<Map<String, Object>> getRankingByGamesPlayed() {
+    public Pair<ArrayList<Map<String, Object>>, String> getRankingByGamesPlayed() {
         // TODO: Marc, returns decreasingly ordered array of:
         //  name -> user.name
         //  easyGames -> number of easy games of user
@@ -110,15 +115,15 @@ public class DomainCtrl {
         //  hardGames -> number of hard games of user
         //  extremeGames -> number of extreme games of user
         //  totalGames -> sum of all games
-        return new ArrayList<>();
+        return new Pair(new ArrayList<>(), "Functionality not implemented");
     }
 
-    public ArrayList<Map<String, Object>> getRankingByTimeInDifficulty(String difficulty) {
+    public Pair<ArrayList<Map<String, Object>>, String> getRankingByTimeInDifficulty(String difficulty) {
         Difficulty diff = Difficulty.valueOf(difficulty);
         // TODO: Marc, returns decreasingly ordered array of:
         //  name -> user.name
         //  avgTime -> average time spent in finished gamed of difficulty diff of user
-        return new ArrayList<>();
+        return new Pair(new ArrayList<>(), "Functionality not implemented");
     }
 
     public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {

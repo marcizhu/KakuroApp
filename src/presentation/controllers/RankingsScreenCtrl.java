@@ -2,6 +2,7 @@ package src.presentation.controllers;
 
 import src.domain.controllers.DomainCtrl;
 import src.presentation.screens.RankingsScreen;
+import src.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -17,27 +18,33 @@ public class RankingsScreenCtrl extends AbstractScreenCtrl {
     }
 
     public ArrayList<Map<String, Object>>  getRankingByPoints() {
-        return domainCtrl.getRankingByPoints();
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByPoints();
+        return result.first;
     }
 
     public ArrayList<Map<String, Object>>  getRankingByGames() {
-        return domainCtrl.getRankingByGamesPlayed();
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByGamesPlayed();
+        return result.first;
     }
 
     public ArrayList<Map<String, Object>>  getRankingByTimeEasy() {
-        return domainCtrl.getRankingByTimeInDifficulty("EASY");
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByTimeInDifficulty("EASY");
+        return result.first;
     }
 
     public ArrayList<Map<String, Object>>  getRankingByTimeMedium() {
-        return domainCtrl.getRankingByTimeInDifficulty("MEDIUM");
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByTimeInDifficulty("MEDIUM");
+        return result.first;
     }
 
     public ArrayList<Map<String, Object>>  getRankingByTimeHard() {
-        return domainCtrl.getRankingByTimeInDifficulty("HARD");
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByTimeInDifficulty("HARD");
+        return result.first;
     }
 
     public ArrayList<Map<String, Object>>  getRankingByTimeExtreme() {
-        return domainCtrl.getRankingByTimeInDifficulty("EXTREME");
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByTimeInDifficulty("EXTREME");
+        return result.first;
     }
 
 

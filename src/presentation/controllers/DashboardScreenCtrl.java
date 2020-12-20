@@ -7,6 +7,7 @@ import src.utils.Pair;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DashboardScreenCtrl extends AbstractScreenCtrl{
@@ -89,13 +90,26 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         }
     }
 
+    public Pair<Map<String, Object>, String> getTopRanking() {
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByPoints(); //TODO: finish
+        return null;
+    }
+
+    public Map<String, Integer> getGamesPlayed() {
+        Pair<Map<String, Integer>, String> result = domainCtrl.getNumberOfGamesPlayed(presentationCtrl.getUserSessionId());
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return new HashMap<>();
+        }
+        return result.first;
+    }
+
     public ArrayList<Map<String, Object>> getHistory() {
         Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getGameHistory(presentationCtrl.getUserSessionId());
         if (result.second != null) {
             Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return new ArrayList<>();
         }
-        System.out.println("History contains: " + result.first.size() + " elements");
         return result.first;
     }
 
