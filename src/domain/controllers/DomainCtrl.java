@@ -161,22 +161,23 @@ public class DomainCtrl {
         }
     }
 
-    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique, String kakuroName) {
-        // TODO: this shouldn't be void, it should generate the kakuro, save it to the database and return
-        //  the board.toSting(), the time that the generator spent generating the kakuro (like in the example), etc.
-
-        // long initTime = System.currentTimeMillis();
-        // generator.generate();
-        // timeToReturn = System.currentTimeMillis() - initTime;
+    public Pair<Map<String, Object>, String> generateKakuroFromParameters(String username, int rows, int columns, String difficulty, boolean forceUnique, String kakuroName) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Object> result = kakuroCtrl.saveKakuroFromGeneratorParameters(user, rows, columns, Difficulty.valueOf(difficulty), forceUnique, kakuroName);
+            return new Pair<>(result, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
     }
 
-    public void generateKakuroFromSeed(String seed, String kakuroName) {
-        // TODO: this shouldn't be void, it should decode the seed to extract rows, columns, difficulty, forceUnique and long seed
-        //  generate the kakuro, save it to the database and return
-        //  the board.toSting(), the time that the generator spent generating the kakuro (like in the example), etc.
-
-        // long initTime = System.currentTimeMillis();
-        // generator.generate();
-        // timeToReturn = System.currentTimeMillis() - initTime;
+    public Pair<Map<String, Object>, String> generateKakuroFromSeed(String username, String seed, String kakuroName) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Object> result = kakuroCtrl.saveKakuroFromGeneratorSeed(user, seed, kakuroName);
+            return new Pair<>(result, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
     }
 }
