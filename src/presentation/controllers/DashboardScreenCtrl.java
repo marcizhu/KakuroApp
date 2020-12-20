@@ -50,7 +50,8 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             String file = fileChooser.getSelectedFile().getAbsolutePath();
-            presentationCtrl.importNewGame(file);
+            String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that you are importing.");
+            presentationCtrl.importNewGame(name, file);
         }
     }
 
@@ -59,11 +60,13 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
             if (!Dialogs.showYesNoOptionDialog("Warning: Kakuros of large dimensions might not be rendered properly on screen.", "Continue?"))
                 return;
         }
-        presentationCtrl.generateKakuroFromParameters(rows, columns, difficulty, unique);
+        String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that is about to be generated.");
+        presentationCtrl.generateKakuroFromParameters(name, rows, columns, difficulty, unique);
     }
 
     public void onGenerateBySeed(String seed) {
-        presentationCtrl.generateKakuroFromSeed(seed);
+        String name = Dialogs.showStringInputDialog("Please enter a name for the kakuro that is about to be generated.");
+        presentationCtrl.generateKakuroFromSeed(name, seed);
     }
 
     public void onHandMadeClicked(int rows, int columns) {

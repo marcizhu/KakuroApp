@@ -241,20 +241,50 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         game.surrender();
     }
 
-    public void onKakuroSolutionValidated(float score, float timeUsed) {
+    public void onKakuroSolutionValidated(float score, float timeUsed, String board) {
         ignoreDestroy = true;
 
-        Dialogs.showInfoDialog("Time spent: " + secondsToStringTime(timeUsed) + "\nTotal score: " + score, "Completed successfully!");
-        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
+        DisplayKakuroScreenCtrl nextScreen = presentationCtrl.getNewDisplayKakuroScreenCtrlInstance();
+
+        nextScreen.prepareContents(
+                "KAKURO SOLVED!",
+                board,
+                Palette.HintGreen,
+                "You spent " + secondsToStringTime(timeUsed) + " during this game and obtained a total of " + score + " points!",
+                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
+                    @Override
+                    public void onFinished() {
+                        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
+                    }
+                }
+        );
+
+        presentationCtrl.setScreen(nextScreen);
     }
 
     public void onSurrender(float timeUsed, String board, int numSolutions, float timeSolving) {
         ignoreDestroy = true;
 
-        Dialogs.showInfoDialog("Time spent: " + secondsToStringTime(timeUsed) + "\nTotal score: 0.0", "You surrendered...");
-        Dialogs.showInfoDialog("Num solutions: " + numSolutions + "\nTime solving: " + timeSolving +" ms", "Should show KakuroDisplayScreen");
+        DisplayKakuroScreenCtrl nextScreen = presentationCtrl.getNewDisplayKakuroScreenCtrlInstance();
 
-        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
+        String solutions = "no solutions.";
+        if (numSolutions == 1) solutions = "only one solution, which is now displayed on screen.";
+        else if (numSolutions == 2) solutions = "multiple solutions, one of which is now displayed on screen.";
+
+        nextScreen.prepareContents(
+                "YOU SURRENDERED",
+                board,
+                Palette.WarningLightRed,
+                "You spent " + secondsToStringTime(timeUsed) + " during this game. As you surrendered you get 0 points. The solver has determined that his board has " + solutions + " The solver took exactly " + timeSolving + " ms to achieve these results.",
+                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
+                    @Override
+                    public void onFinished() {
+                        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
+                    }
+                }
+        );
+
+        presentationCtrl.setScreen(nextScreen);
     }
 
     private String secondsToStringTime(float time) {

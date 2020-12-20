@@ -767,7 +767,7 @@ public class GameplayCtrl {
         int numSolutions = solver.solve();
         float timeSolving = (float)(System.currentTimeMillis() - init);
 
-        String board = "";
+        String board = kakuro.getBoard().toString();
         if (numSolutions > 0) board = solver.getSolutions().get(0).toString();
 
         viewCtrl.onSurrender(finished.getTimeSpent(), board, numSolutions, timeSolving);
@@ -818,6 +818,6 @@ public class GameplayCtrl {
         }
 
         System.out.println("Back to presentation");
-        viewCtrl.onKakuroSolutionValidated(finished.getScore(), finished.getTimeSpent());
+        viewCtrl.onKakuroSolutionValidated(finished.getScore(), finished.getTimeSpent(), currentGame.getBoard().toString());
     }
 }

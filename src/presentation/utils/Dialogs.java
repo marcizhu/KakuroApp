@@ -14,4 +14,8 @@ public class Dialogs {
     public static boolean showYesNoOptionDialog(String msg, String title) {
         return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, JOptionPane.YES_OPTION);
     }
+
+    public static String showStringInputDialog(String msg) {
+        return JOptionPane.showInputDialog(msg);
+    }
 }

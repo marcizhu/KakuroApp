@@ -37,8 +37,8 @@ public class PresentationCtrl {
     private final KakuroListScreenCtrl kakuroListScreenCtrl; ///< "Kakuro List" Screen controller
 
     // FIXME: temporary
-    private final DemoScreenCtrl statisticsScreenCtrl;
-    private final DemoScreenCtrl rankingsScreenCtrl;
+    private final DisplayKakuroScreenCtrl statisticsScreenCtrl;
+    private final DisplayKakuroScreenCtrl rankingsScreenCtrl;
 
     // List of all screen controllers to handle screen switching
     //private DemoScreenCtrl demoScreenCtrl;
@@ -64,7 +64,7 @@ public class PresentationCtrl {
         kakuroListScreenCtrl = new KakuroListScreenCtrl(this, domainCtrl);
 
         // FIXME: temporary
-        statisticsScreenCtrl = rankingsScreenCtrl = new DemoScreenCtrl(this, domainCtrl);
+        statisticsScreenCtrl = rankingsScreenCtrl = new DisplayKakuroScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -289,7 +289,7 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void importNewGame(String filePath) {
+    public void importNewGame(String name, String filePath) {
         Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath);
         if (result.second != null) {
             Dialogs.showErrorDialog(result.second, "Something went wrong");
@@ -340,11 +340,17 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique) {
+    public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
+        // TODO, might throw an error if name is already in use
         domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique);
     }
 
-    public void generateKakuroFromSeed(String seed) {
+    public void generateKakuroFromSeed(String name, String seed) {
+        // TODO, might throw an error if name is already in use
         domainCtrl.generateKakuroFromSeed(seed);
+    }
+
+    public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {
+        return new DisplayKakuroScreenCtrl(this, domainCtrl);
     }
 }
