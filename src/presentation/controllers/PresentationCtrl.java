@@ -290,8 +290,8 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void importNewGame(String filePath) {
-        Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath, "FIXME");
+    public void importNewGame(String name, String filePath) {
+        Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath, name);
         if (result.second != null) {
             Dialogs.showErrorDialog(result.second, result.second);
             return;
@@ -347,14 +347,14 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique) {
+    public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique, "FIXME");
+        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique, name);
     }
 
-    public void generateKakuroFromSeed(String seed) {
+    public void generateKakuroFromSeed(String name, String seed) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromSeed(seed, "FIXME");
+        domainCtrl.generateKakuroFromSeed(seed, name);
     }
 
     public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {
