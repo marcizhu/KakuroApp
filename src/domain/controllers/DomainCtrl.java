@@ -98,7 +98,7 @@ public class DomainCtrl {
         //  hardPts -> avg points in hard games of user .. 0 if no games
         //  extremePts -> avg points in extreme games of user .. 0 if no games
         //  totalPts -> sum of all points (also user.getScore() if I'm not mistaken)
-        return null;
+        return new ArrayList<>();
     }
 
     public ArrayList<Map<String, Object>> getRankingByGamesPlayed() {
@@ -109,7 +109,7 @@ public class DomainCtrl {
         //  hardGames -> number of hard games of user
         //  extremeGames -> number of extreme games of user
         //  totalGames -> sum of all games
-        return null;
+        return new ArrayList<>();
     }
 
     public ArrayList<Map<String, Object>> getRankingByTimeInDifficulty(String difficulty) {
@@ -117,7 +117,7 @@ public class DomainCtrl {
         // TODO: Marc, returns decreasingly ordered array of:
         //  name -> user.name
         //  avgTime -> average time spent in finished gamed of difficulty diff of user
-        return null;
+        return new ArrayList<>();
     }
 
     public Pair<GameplayCtrl, String> newGameInstance(String username, String kakuroname) {

@@ -35,10 +35,10 @@ public class PresentationCtrl {
     private final DashboardScreenCtrl dashboardScreenCtrl;   ///< "Dashboard" Screen controller
     private final MyKakurosScreenCtrl myKakurosScreenCtrl;   ///< "My Kakuros" Screen controller
     private final KakuroListScreenCtrl kakuroListScreenCtrl; ///< "Kakuro List" Screen controller
+    private final RankingsScreenCtrl rankingsScreenCtrl; ///< "Rankings" Screen controller
 
     // FIXME: temporary
     private final DisplayKakuroScreenCtrl statisticsScreenCtrl;
-    private final DisplayKakuroScreenCtrl rankingsScreenCtrl;
 
     // List of all screen controllers to handle screen switching
     //private DemoScreenCtrl demoScreenCtrl;
@@ -62,9 +62,10 @@ public class PresentationCtrl {
         dashboardScreenCtrl = new DashboardScreenCtrl(this, domainCtrl);
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
         kakuroListScreenCtrl = new KakuroListScreenCtrl(this, domainCtrl);
+        rankingsScreenCtrl = new RankingsScreenCtrl(this, domainCtrl);
 
         // FIXME: temporary
-        statisticsScreenCtrl = rankingsScreenCtrl = new DisplayKakuroScreenCtrl(this, domainCtrl);
+        statisticsScreenCtrl = new DisplayKakuroScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -173,7 +174,7 @@ public class PresentationCtrl {
     private void onRankingsMenuItemClicked() {
         System.out.println("RANKINGS");
         currentScreenCtrl.onRankingsMenuItemClicked();
-        //setScreen(rankingsScreenCtrl);
+        setScreen(rankingsScreenCtrl);
     }
 
     private void onLogOutMenuItemClicked() {
