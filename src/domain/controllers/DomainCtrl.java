@@ -7,6 +7,7 @@ import src.utils.Pair;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.*;
 
 public class DomainCtrl {
     UserRepository userRepository;
@@ -105,7 +106,41 @@ public class DomainCtrl {
         //  hardPts -> avg points in hard games of user .. 0 if no games
         //  extremePts -> avg points in extreme games of user .. 0 if no games
         //  totalPts -> sum of all points (also user.getScore() if I'm not mistaken)
-        return new Pair(new ArrayList<>(), "Functionality not implemented");
+
+        try {
+            ArrayList<String> users = userCtrl.getUserList();
+            ArrayList<Map<String, Object>> result = new ArrayList<>();
+
+            for (String user : users) {
+                Map<String, Object> map = new HashMap<>();
+
+                float easy = 0, medium = 0, hard = 0, extreme = 0;
+                ArrayList<Map<String, Object>> kakuros = gameCtrl.getGameHistory(user);
+                for (Map<String, Object> kakuro : kakuros) {
+                    if (kakuro.get("state").equals("unfinished")) continue;
+
+                    /**/ if (kakuro.get("difficulty").equals("EASY"))    easy    += (float)kakuro.get("score");
+                    else if (kakuro.get("difficulty").equals("MEDIUM"))  medium  += (float)kakuro.get("score");
+                    else if (kakuro.get("difficulty").equals("HARD"))    hard    += (float)kakuro.get("score");
+                    else if (kakuro.get("difficulty").equals("EXTREME")) extreme += (float)kakuro.get("score");
+                }
+
+                map.put("name", user);
+                map.put("easyPts", easy);
+                map.put("mediumPts", medium);
+                map.put("hardPts", hard);
+                map.put("extremePts", extreme);
+                map.put("totalPts", easy + medium + hard + extreme);
+
+                result.add(map);
+            }
+
+            result.sort((o1, o2) -> Float.compare((float) o1.get("totalPts"), (float) o2.get("totalPts")));
+
+            return new Pair<>(result, null);
+        } catch(Exception e) {
+            return new Pair<>(new ArrayList<>(), e.getMessage());
+        }
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByGamesPlayed() {
