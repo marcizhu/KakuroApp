@@ -1,11 +1,14 @@
 package src.domain.controllers;
 
+import src.domain.algorithms.Solver;
+import src.domain.entities.Board;
 import src.domain.entities.Difficulty;
 import src.domain.entities.Kakuro;
 import src.domain.entities.User;
 import src.repository.KakuroRepository;
 import src.repository.UserRepository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,28 +31,27 @@ public class KakuroCtrl {
         return computeResultFromKakuroList(kakuroList);
     }
 
-    public ArrayList<Map<String, Object>> getKakuroListByUser(String username) throws Exception {
-        User user = userRepository.getUser(username);
-        if (user == null) {
-            throw new Exception("User not found"); // TODO: maybe create custom exception obejcts for each case and use them?
-        }
-
+    public ArrayList<Map<String, Object>> getKakuroListByUser(User user) throws Exception {
         ArrayList<Kakuro> kakuroList = kakuroRepository.getAllKakurosByUser(user);
         return computeResultFromKakuroList(kakuroList);
     }
 
-    // returns whether kakuro instance could be saved to database.
-    public boolean saveKakuro(Kakuro kakuro) throws Exception {
-        User user = userRepository.getUser(kakuro.getCreatedBy().getName());
-        if (user == null) {
-            throw new Exception("User not found"); // TODO: maybe create custom exception obejcts for each case and use them?
-        }
-
+    public void saveKakuro(Kakuro kakuro) throws Exception {
         Kakuro kak = kakuroRepository.getKakuro(kakuro.getName());
-        if (kak != null) return false;
-
+        if (kak != null) throw new Exception("The provided name is already used by a Kakuro in the database");
         kakuroRepository.saveKakuro(kakuro);
-        return true;
+    }
+
+    public Kakuro saveKakuroFromFile(User user, String filePath, String kakuroname) throws Exception {
+        Board board = Reader.fromFile(filePath);
+        Solver solver = new Solver(board);
+        solver.solve();
+        if (solver.getSolutions().size() <= 0) throw new Exception("The provided Kakuro has no solution");
+
+        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user);
+        kakuroRepository.saveKakuro(kakuro);
+
+        return kakuro;
     }
 
     private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList) {

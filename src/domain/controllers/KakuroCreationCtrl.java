@@ -972,13 +972,10 @@ public class KakuroCreationCtrl {
         }
 
         try {
-            if(kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user))) {
-                viewCtrl.onKakuroPublished();
-                return;
-            }
-            sendMessageToPresentation(NAME_INVALID);
+            kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user));
+            viewCtrl.onKakuroPublished();
         } catch (Exception e) {
-            e.printStackTrace();
+            sendMessageToPresentation(e.getMessage());
         }
     }
 

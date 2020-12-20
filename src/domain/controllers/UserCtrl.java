@@ -13,7 +13,12 @@ public class UserCtrl {
     }
 
     public User getUser(String username) throws Exception {
-        return userRepository.getUser(username);
+        User user = userRepository.getUser(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+
+        return user;
     }
 
     public ArrayList<String> getUserList() throws Exception {
