@@ -245,7 +245,7 @@ public class PresentationCtrl {
     public boolean logIn(String name) {
         Pair<Boolean, String> result = domainCtrl.loginUser(name);
         if (result.second != null) {
-            // TODO: handle error
+            Dialogs.showErrorDialog(result.second, result.second);
             return false;
         }
         if (result.first) { // user exists
@@ -279,7 +279,8 @@ public class PresentationCtrl {
 
         Pair<GameplayCtrl, String> result = domainCtrl.newGameInstance(userSessionId, kakuroID);
         if (result.second != null) {
-            // TODO: handle error
+            Dialogs.showErrorDialog(result.second, result.second);
+            return;
         }
 
         currentScreenCtrl = new GameScreenCtrl(this, domainCtrl);
@@ -289,10 +290,10 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void importNewGame(String name, String filePath) {
-        Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath);
+    public void importNewGame(String filePath) {
+        Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath, "FIXME");
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, "Something went wrong");
+            Dialogs.showErrorDialog(result.second, result.second);
             return;
         }
 
@@ -314,8 +315,14 @@ public class PresentationCtrl {
         for (int i = 0; i < 5; i++)
             menu.getComponent(i).setForeground(Color.BLACK);
 
+        Pair<KakuroCreationCtrl, String> result = domainCtrl.newCreatorInstance(userSessionId, numRows, numCols);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, result.second);
+            return;
+        }
+
         currentScreenCtrl = new CreatorScreenCtrl(this, domainCtrl);
-        ((CreatorScreenCtrl)currentScreenCtrl).setUpCreator(domainCtrl.newCreatorInstance(userSessionId, numRows, numCols));
+        ((CreatorScreenCtrl)currentScreenCtrl).setUpCreator(result.first);
         currentScreenCtrl.build(app.getWidth(), app.getHeight() - 2 * windowBarHeight);
         app.setContentPane(currentScreenCtrl.getContents());
         app.revalidate();
@@ -324,7 +331,7 @@ public class PresentationCtrl {
     public void importNewCreation(String filePath) {
         Pair<KakuroCreationCtrl, String> result = domainCtrl.newImportedCreatorInstance(userSessionId, filePath);
         if (result.second != null) {
-            Dialogs.showErrorDialog(result.second, "Something went wrong");
+            Dialogs.showErrorDialog(result.second, result.second);
             return;
         }
 
@@ -340,14 +347,14 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
-    public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
+    public void generateKakuroFromParameters(int rows, int columns, String difficulty, boolean forceUnique) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique);
+        domainCtrl.generateKakuroFromParameters(rows, columns, difficulty, forceUnique, "FIXME");
     }
 
-    public void generateKakuroFromSeed(String name, String seed) {
+    public void generateKakuroFromSeed(String seed) {
         // TODO, might throw an error if name is already in use
-        domainCtrl.generateKakuroFromSeed(seed);
+        domainCtrl.generateKakuroFromSeed(seed, "FIXME");
     }
 
     public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {
