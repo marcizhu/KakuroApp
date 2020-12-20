@@ -228,7 +228,7 @@ public class PresentationCtrl {
         else if (currentScreenCtrl instanceof KakuroListScreenCtrl) tabIdx = 1;
         else if (currentScreenCtrl instanceof MyKakurosScreenCtrl) tabIdx = 2;
         else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 3;
-        else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 4;
+        else if (currentScreenCtrl instanceof RankingsScreenCtrl) tabIdx = 4;
 
         for (int i = 0; i < 5; i++)
             menu.getComponent(i).setForeground(Color.BLACK);
