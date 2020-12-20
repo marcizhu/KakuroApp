@@ -52,6 +52,7 @@ public class GameDeserializer implements JsonDeserializer<Game> {
     private Game deserializeGameInProgress (JsonObject obj, UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
         Timestamp lastPlayed = Timestamp.valueOf(obj.get("lastPlayed").getAsString());
+        int numberOfHints = obj.get("hints").getAsInt();
 
         Board board = null;
         try {
@@ -59,16 +60,17 @@ public class GameDeserializer implements JsonDeserializer<Game> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ArrayList<Movement> movements = new ArrayList();//obj.get("movements").; // TODO: implement !!// FIXME: bug potential ??
+        ArrayList<Movement> movements = new ArrayList();//obj.get("movements").; // TODO: IMPLEMENT!!
 
-        return new GameInProgress(id, startTime, timeSpent, player, kakuro, board, movements, lastPlayed);
+        return new GameInProgress(id, startTime, timeSpent, player, kakuro, board, movements, lastPlayed, numberOfHints);
     }
 
     private Game deserializeGameFinished (JsonObject obj, UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro) {
         float score = obj.get("score").getAsFloat();
+        boolean surrendered = obj.get("surrendered").getAsBoolean();
         Timestamp timeFinished = Timestamp.valueOf(obj.get("timeFinished").getAsString());
 
-        return new GameFinished(id, startTime, timeSpent, player, kakuro, score, timeFinished);
+        return new GameFinished(id, startTime, timeSpent, player, kakuro, score, timeFinished, surrendered);
     }
 
 }

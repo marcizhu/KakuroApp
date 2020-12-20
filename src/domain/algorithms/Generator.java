@@ -137,6 +137,7 @@ public class Generator {
         if (forceUniqueSolution) encodedSeed+="F_";
         else encodedSeed+="N_";
         encodedSeed += seed;
+        System.out.println(encodedSeed);
         return encodedSeed;
     }
 

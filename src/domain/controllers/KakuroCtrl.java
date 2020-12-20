@@ -67,18 +67,33 @@ public class KakuroCtrl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
+        result.put("seed", kakuro.getSeed());
         result.put("generatorTime", generatorTime);
 
         return result;
     }
 
-    public Map<String, Object> saveKakuroFromGeneratorSeed(User user, String encodedSeed, String kakuroname) throws Exception {
-        int rows = 10; // TODO: compute this from encodedSeed
-        int columns = 10; // TODO: compute this from encodedSeed
-        Difficulty difficulty = Difficulty.MEDIUM; // TODO: compute this from encodedSeed
-        long seed = 1234567890; // TODO: compute this from encodedSeed
+    public Map<String, Object> saveKakuroFromGeneratorSeed(User user, String seed, String kakuroname) throws Exception {
+        String[] parameters = seed.split("_");
+        int rows = Integer.parseInt(parameters[0]);
+        int columns = Integer.parseInt(parameters[1]);
+        Difficulty difficulty;
+        switch (parameters[2]) {
+            case "E": difficulty = Difficulty.EASY;    break;
+            case "M": difficulty = Difficulty.MEDIUM;  break;
+            case "H": difficulty = Difficulty.HARD;    break;
+            case "X": difficulty = Difficulty.EXTREME; break;
+            default: throw new Exception("Invalid seed, difficulty could not be decoded");
+        }
+        boolean forceUnique;
+        switch (parameters[3]) {
+            case "F": forceUnique = true;  break;
+            case "N": forceUnique = false; break;
+            default: throw new Exception("Invalid seed, force unique could not be decoded");
+        }
+        long seedValue = Long.parseLong(parameters[4]);
 
-        Generator generator = new Generator(rows, columns, difficulty, seed);
+        Generator generator = new Generator(rows, columns, difficulty, seedValue, forceUnique);
         long initTime = System.currentTimeMillis();
         generator.generate();
         long generatorTime = System.currentTimeMillis() - initTime;
@@ -89,6 +104,7 @@ public class KakuroCtrl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
+        result.put("seed", kakuro.getSeed());
         result.put("generatorTime", generatorTime);
 
         return result;

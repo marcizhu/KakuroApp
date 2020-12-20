@@ -748,7 +748,7 @@ public class GameplayCtrl {
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
 
         // Correct solution
-        GameFinished finished = new GameFinished(currentGame);
+        GameFinished finished = new GameFinished(currentGame, true);
         // TODO: set surrendered.
 
         // delete in progress game and save the finished one in db
@@ -804,7 +804,7 @@ public class GameplayCtrl {
 
         // Correct solution
         System.out.println("Creating game finished");
-        GameFinished finished = new GameFinished(currentGame);
+        GameFinished finished = new GameFinished(currentGame, false);
         finished.computeScore(totalNumOfHints);
 
         // delete in progress game and save the finished one in db

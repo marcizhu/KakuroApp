@@ -25,8 +25,9 @@ public class GameSerializer implements JsonSerializer<Game> {
     private JsonObject serializeGameInProgress (GameInProgress g, JsonObject obj) {
         obj.addProperty("inProgress", true);
         obj.addProperty("boardId", g.getBoardId().toString());
-        obj.addProperty("movements", g.getMovements().toString()); // FIXME: do this even work fr?
+        obj.addProperty("movements", g.getMovements().toString()); // FIXME: this dont work lmao
         obj.addProperty("lastPlayed", g.getLastPlayed().toString());
+        obj.addProperty("hints", g.getNumberOfHints());
 
         return obj;
     }
@@ -35,6 +36,7 @@ public class GameSerializer implements JsonSerializer<Game> {
         obj.addProperty("inProgress", false);
         obj.addProperty("score", g.getScore());
         obj.addProperty("timeFinished", g.getTimeFinished().toString());
+        obj.addProperty("surrendered", g.isSurrendered());
 
         return obj;
     }

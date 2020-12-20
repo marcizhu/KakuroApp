@@ -6,23 +6,20 @@ import java.util.UUID;
 public class GameFinished extends Game{
     private float score;
     private final Timestamp timeFinished;
+    private final boolean surrendered;
 
-    public GameFinished(GameInProgress gip) {
+    public GameFinished(GameInProgress gip, boolean surrendered) {
         super(gip.getPlayer(), gip.getKakuro(), gip.getStartTime());
+        this.surrendered = surrendered;
         this.timeFinished = new Timestamp(System.currentTimeMillis());
         this.setTimeSpent(gip.getTimeSpent());
-        this.score = 0;
-    }
-
-    public GameFinished(User player, Kakuro kakuro) {
-        super(player, kakuro);
-        this.timeFinished = new Timestamp(System.currentTimeMillis());
-        this.score = 0;
+        this.score = 0; // FIXME: maybe compute it here in the constructor? this.score = computeScore()
     }
 
     // For deserializing
-    public GameFinished(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, float score, Timestamp timeFinished) {
+    public GameFinished(UUID id, Timestamp startTime, float timeSpent, User player, Kakuro kakuro, float score, Timestamp timeFinished, boolean surrendered) {
         super(id, startTime, timeSpent, player, kakuro);
+        this.surrendered = surrendered;
         this.timeFinished = timeFinished;
         this.score = score;
     }
@@ -74,4 +71,6 @@ public class GameFinished extends Game{
     public String toString() {
         return "Game Finished\n" + super.toString() + "\ntime finished: " + timeFinished + ", score: " + score;
     }
+
+    public boolean isSurrendered() { return this.surrendered; }
 }
