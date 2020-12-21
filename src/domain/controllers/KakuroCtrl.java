@@ -131,7 +131,7 @@ public class KakuroCtrl {
             float bestTime = -1;
             String state = "neutral";
             for (Game game : kakuroGames) {
-                if (game instanceof GameFinished && ((GameFinished) game).isSurrendered() &&
+                if (game instanceof GameFinished && !((GameFinished) game).isSurrendered() &&
                         (game.getTimeSpent() < bestTime || bestTime == -1)) bestTime = game.getTimeSpent();
                 if (game.getPlayerName().equals(user.getName())) {
                     if (game instanceof GameInProgress) state = "unfinished";

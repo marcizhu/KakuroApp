@@ -25,8 +25,8 @@ public class RankingCtrl {
             Map<String, Object> map = new HashMap<>();
 
             float easy = 0, medium = 0, hard = 0, extreme = 0;
-            ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
-            for (Game game : kakuros) {
+            ArrayList<Game> games = gameRepository.getAllGamesByUser(user.getName());
+            for (Game game : games) {
                 if (game instanceof GameInProgress) continue;
                 if (((GameFinished)game).isSurrendered()) continue;
 
@@ -58,8 +58,8 @@ public class RankingCtrl {
             Map<String, Object> map = new HashMap<>();
 
             float easy = 0, medium = 0, hard = 0, extreme = 0;
-            ArrayList<Game> kakuros = gameRepository.getAllGamesByUser(user.getName());
-            for (Game game : kakuros) {
+            ArrayList<Game> games = gameRepository.getAllGamesByUser(user.getName());
+            for (Game game : games) {
                 if (game instanceof GameInProgress) continue;
 
                 /**/ if (game.getKakuro().getDifficulty() == Difficulty.EASY)    easy++;
