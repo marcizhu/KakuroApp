@@ -7,7 +7,6 @@ import src.utils.Pair;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.*;
 
 public class DomainCtrl {
     UserRepository userRepository;
@@ -53,8 +52,8 @@ public class DomainCtrl {
 
     public Pair<Boolean, String> registerUser(String username) {
         try {
-            boolean result = userCtrl.registerUser(username);
-            if (!result) return new Pair<>(false, "User already exists");
+            boolean userRegistered = userCtrl.registerUser(username);
+            if (!userRegistered) return new Pair<>(false, "User already exists");
             return new Pair<>(true, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
@@ -62,69 +61,68 @@ public class DomainCtrl {
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getKakuroListByUser(String username) {
-        ArrayList<Map<String, Object>> result;
         try {
             User user = userCtrl.getUser(username);
-            result = kakuroCtrl.getKakuroListByUser(user);
+            ArrayList<Map<String, Object>> data = kakuroCtrl.getKakuroListByUser(user);
+            return new Pair<>(data, null);
         } catch (Exception e) {
             e.printStackTrace();
             return new Pair<>(null, e.getMessage());
         }
-        return new Pair<>(result, null);
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getKakuroListByDifficulty(String difficulty, String username) {
-        ArrayList<Map<String, Object>> result;
         try {
             User user = userCtrl.getUser(username);
-            result = kakuroCtrl.getKakuroListByDifficulty(Difficulty.valueOf(difficulty), user);
+            ArrayList<Map<String, Object>> data = kakuroCtrl.getKakuroListByDifficulty(Difficulty.valueOf(difficulty), user);
+            return new Pair<>(data, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }
-        return new Pair<>(result, null);
     }
 
     public Pair<Map<String, Integer>, String> getNumberOfGamesPlayed(String username) {
-        // TODO: alex, all difficulties
-        return new Pair<>(null, "Functionality not available");
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Integer> data = gameCtrl.countGamesPlayedByDifficulty(user);
+            return new Pair<>(data, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getGameHistory(String username) {
-        ArrayList<Map<String, Object>> result;
         try {
-            result = gameCtrl.getGameHistory(username);
+            ArrayList<Map<String, Object>> data = gameCtrl.getGameHistory(username);
+            return new Pair<>(data, null);
         } catch (Exception e) {
             e.printStackTrace();
             return new Pair<>(null, e.getMessage());
         }
-        return new Pair<>(result, null);
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByPoints() {
-        ArrayList<Map<String, Object>> result;
         try {
-            result = rankingCtrl.getRankingByPoints();
-            return new Pair<>(result, null);
+            ArrayList<Map<String, Object>> data = rankingCtrl.getRankingByPoints();
+            return new Pair<>(data, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
         }
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByGamesPlayed() {
-        ArrayList<Map<String, Object>> result;
         try {
-            result = rankingCtrl.getRankingByGamesPlayed();
-            return new Pair<>(result, null);
+            ArrayList<Map<String, Object>> data = rankingCtrl.getRankingByGamesPlayed();
+            return new Pair<>(data, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
         }
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByTimeInDifficulty(String difficulty) {
-        ArrayList<Map<String, Object>> result;
         try {
-            result = rankingCtrl.getRankingByTimeInDifficulty(difficulty);
-            return new Pair<>(result, null);
+            ArrayList<Map<String, Object>> data = rankingCtrl.getRankingByTimeInDifficulty(difficulty);
+            return new Pair<>(data, null);
         } catch(Exception e) {
             return new Pair<>(new ArrayList<>(), e.getMessage());
         }
@@ -174,8 +172,8 @@ public class DomainCtrl {
     public Pair<Map<String, Object>, String> generateKakuroFromParameters(String username, int rows, int columns, String difficulty, boolean forceUnique, String kakuroName) {
         try {
             User user = userCtrl.getUser(username);
-            Map<String, Object> result = kakuroCtrl.saveKakuroFromGeneratorParameters(user, rows, columns, Difficulty.valueOf(difficulty), forceUnique, kakuroName);
-            return new Pair<>(result, null);
+            Map<String, Object> data = kakuroCtrl.saveKakuroFromGeneratorParameters(user, rows, columns, Difficulty.valueOf(difficulty), forceUnique, kakuroName);
+            return new Pair<>(data, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }
@@ -184,8 +182,8 @@ public class DomainCtrl {
     public Pair<Map<String, Object>, String> generateKakuroFromSeed(String username, String seed, String kakuroName) {
         try {
             User user = userCtrl.getUser(username);
-            Map<String, Object> result = kakuroCtrl.saveKakuroFromGeneratorSeed(user, seed, kakuroName);
-            return new Pair<>(result, null);
+            Map<String, Object> data = kakuroCtrl.saveKakuroFromGeneratorSeed(user, seed, kakuroName);
+            return new Pair<>(data, null);
         } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }

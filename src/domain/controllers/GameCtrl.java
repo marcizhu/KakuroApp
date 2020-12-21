@@ -4,6 +4,7 @@ import src.domain.entities.*;
 import src.repository.GameRepository;
 import src.repository.UserRepository;
 
+import java.io.IOException;
 import java.util.*;
 
 public class GameCtrl {
@@ -61,7 +62,30 @@ public class GameCtrl {
             result.add(gameData);
         }
         return result;
+    }
 
+    public Map<String, Integer> countGamesPlayedByDifficulty(User user) throws IOException {
+        ArrayList<Game> games = gameRepository.getAllGamesByUser(user);
+        int easy = 0, medium = 0, hard = 0, extreme = 0, userMade = 0;
+        for (Game game : games) {
+            switch (game.getKakuro().getDifficulty()) {
+                case EASY:      easy++;     break;
+                case MEDIUM:    medium++;   break;
+                case HARD:      hard++;     break;
+                case EXTREME:   extreme++;  break;
+                case USER_MADE: userMade++; break;
+                default: break; // this should not happen
+            }
+        }
+
+        HashMap<String, Integer> result = new HashMap<>();
+        result.put("easy", easy);
+        result.put("medium", medium);
+        result.put("hard", hard);
+        result.put("extreme", extreme);
+        result.put("userMade", userMade);
+
+        return result;
     }
 
     public void saveGame(Game game) throws Exception {
