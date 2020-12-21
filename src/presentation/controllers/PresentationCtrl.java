@@ -30,19 +30,15 @@ public class PresentationCtrl {
     private JMenuBar menu;
 
     // App content
-    private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
+    private AbstractScreenCtrl currentScreenCtrl;            ///< The current screen controller to handle events
 
     // List of all screen controllers to handle screen switching
     private final LoginScreenCtrl loginScreenCtrl;           ///< "Login" Screen controller
     private final DashboardScreenCtrl dashboardScreenCtrl;   ///< "Dashboard" Screen controller
     private final MyKakurosScreenCtrl myKakurosScreenCtrl;   ///< "My Kakuros" Screen controller
     private final KakuroListScreenCtrl kakuroListScreenCtrl; ///< "Kakuro List" Screen controller
-    private final RankingsScreenCtrl rankingsScreenCtrl; ///< "Rankings" Screen controller
-
-    // FIXME: temporary
-    private final DisplayKakuroScreenCtrl statisticsScreenCtrl;
-
-    //private DemoScreenCtrl demoScreenCtrl;
+    private final StatisticsScreenCtrl statisticsScreenCtrl; ///< "Statistics" Screen controller
+    private final RankingsScreenCtrl rankingsScreenCtrl;     ///< "Rankings" Screen controller
 
     // ScreenCtrl ids
     public static final int DASHBOARD = 1;
@@ -63,10 +59,8 @@ public class PresentationCtrl {
         dashboardScreenCtrl = new DashboardScreenCtrl(this, domainCtrl);
         myKakurosScreenCtrl = new MyKakurosScreenCtrl(this, domainCtrl);
         kakuroListScreenCtrl = new KakuroListScreenCtrl(this, domainCtrl);
+        statisticsScreenCtrl = new StatisticsScreenCtrl(this, domainCtrl);
         rankingsScreenCtrl = new RankingsScreenCtrl(this, domainCtrl);
-
-        // FIXME: temporary
-        statisticsScreenCtrl = new DisplayKakuroScreenCtrl(this, domainCtrl);
     }
 
     public void initializePresentationCtrl() {
@@ -149,37 +143,31 @@ public class PresentationCtrl {
     }
 
     private void onDashboardMenuItemClicked() {
-        System.out.println("DASHBOARD");
         currentScreenCtrl.onDashboardMenuItemClicked();
         setScreen(dashboardScreenCtrl);
     }
 
     private void onKakuroListMenuItemClicked() {
-        System.out.println("KAKURO LIST");
         currentScreenCtrl.onKakuroListMenuItemClicked();
         setScreen(kakuroListScreenCtrl);
     }
 
     private void onMyKakurosMenuItemClicked() {
-        System.out.println("MY KAKUROS");
         currentScreenCtrl.onMyKakurosMenuItemClicked();
         setScreen(myKakurosScreenCtrl);
     }
 
     private void onStatisticsMenuItemClicked() {
-        System.out.println("STATISTICS");
         currentScreenCtrl.onStatisticsMenuItemClicked();
-        //setScreen(statisticsScreenCtrl);
+        setScreen(statisticsScreenCtrl);
     }
 
     private void onRankingsMenuItemClicked() {
-        System.out.println("RANKINGS");
         currentScreenCtrl.onRankingsMenuItemClicked();
         setScreen(rankingsScreenCtrl);
     }
 
     private void onLogOutMenuItemClicked() {
-        System.out.println("LOG OUT");
         currentScreenCtrl.onLogOutMenuItemClicked();
         int dialogResult = JOptionPane.showConfirmDialog(
                 null,
@@ -225,7 +213,7 @@ public class PresentationCtrl {
         /**/ if (currentScreenCtrl instanceof DashboardScreenCtrl) tabIdx = 0;
         else if (currentScreenCtrl instanceof KakuroListScreenCtrl) tabIdx = 1;
         else if (currentScreenCtrl instanceof MyKakurosScreenCtrl) tabIdx = 2;
-        else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 3;
+        else if (currentScreenCtrl instanceof StatisticsScreenCtrl) tabIdx = 3;
         else if (currentScreenCtrl instanceof RankingsScreenCtrl) tabIdx = 4;
 
         for (int i = 0; i < 5; i++)

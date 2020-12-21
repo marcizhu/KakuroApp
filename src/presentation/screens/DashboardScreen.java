@@ -791,7 +791,6 @@ public class DashboardScreen extends AbstractScreen {
     @Override
     public void onResize(int width, int height) {
         hHistoryFiller = Box.createRigidArea(new Dimension(width/2 -90, 1));
-        //playedChartPanel.setSize(playedChartPanel.getWidth(), (gamePanel.getHeight()+createPanel.getHeight()-18) - (quickStatsPanel.getHeight()-playedChartPanel.getHeight()));
         playedChartPanel.layoutHistogram();
         Component[] histComp = historyPanel.getComponents();
         histComp[histComp.length-1] = hHistoryFiller;
