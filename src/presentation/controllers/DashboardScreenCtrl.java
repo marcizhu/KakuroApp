@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class DashboardScreenCtrl extends AbstractScreenCtrl{
 
-
     public DashboardScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
     }

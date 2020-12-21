@@ -32,6 +32,7 @@ public class PresentationCtrl {
     // App content
     private AbstractScreenCtrl currentScreenCtrl;          ///< The current screen controller to handle events
 
+    // List of all screen controllers to handle screen switching
     private final LoginScreenCtrl loginScreenCtrl;           ///< "Login" Screen controller
     private final DashboardScreenCtrl dashboardScreenCtrl;   ///< "Dashboard" Screen controller
     private final MyKakurosScreenCtrl myKakurosScreenCtrl;   ///< "My Kakuros" Screen controller
@@ -41,7 +42,6 @@ public class PresentationCtrl {
     // FIXME: temporary
     private final DisplayKakuroScreenCtrl statisticsScreenCtrl;
 
-    // List of all screen controllers to handle screen switching
     //private DemoScreenCtrl demoScreenCtrl;
 
     // ScreenCtrl ids
@@ -222,7 +222,7 @@ public class PresentationCtrl {
 
     private void updateMenuSelection() {
         int tabIdx = 0;
-        if (currentScreenCtrl instanceof DashboardScreenCtrl) tabIdx = 0;
+        /**/ if (currentScreenCtrl instanceof DashboardScreenCtrl) tabIdx = 0;
         else if (currentScreenCtrl instanceof KakuroListScreenCtrl) tabIdx = 1;
         else if (currentScreenCtrl instanceof MyKakurosScreenCtrl) tabIdx = 2;
         else if (currentScreenCtrl instanceof DisplayKakuroScreenCtrl) tabIdx = 3;
@@ -230,6 +230,7 @@ public class PresentationCtrl {
 
         for (int i = 0; i < 5; i++)
             menu.getComponent(i).setForeground(Color.BLACK);
+
         menu.getComponent(tabIdx).setForeground(Color.BLUE);
     }
 
@@ -379,12 +380,7 @@ public class PresentationCtrl {
                 board,
                 Palette.SelectionBlue,
                 "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
-                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
-                    @Override
-                    public void onFinished() {
-                        setScreen(myKakurosScreenCtrl);
-                    }
-                }
+                () -> setScreen(myKakurosScreenCtrl)
         );
         setScreen(nextScreen);
     }
@@ -405,12 +401,7 @@ public class PresentationCtrl {
                 board,
                 Palette.SelectionBlue,
                 "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
-                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
-                    @Override
-                    public void onFinished() {
-                        setScreen(myKakurosScreenCtrl);
-                    }
-                }
+                () -> setScreen(myKakurosScreenCtrl)
         );
         setScreen(nextScreen);
     }

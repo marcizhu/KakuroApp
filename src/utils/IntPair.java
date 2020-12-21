@@ -6,7 +6,7 @@ package src.utils;
  *
  * @version 0.1.0 (20/11/2020)
  */
-public class IntPair extends Pair implements Comparable{
+public class IntPair extends Pair<Integer, Integer> implements Comparable {
     /**
      * Constructor
      *
@@ -26,11 +26,11 @@ public class IntPair extends Pair implements Comparable{
     public int compareTo(Object o) {
         if (!(o instanceof IntPair)) return 0;
         if (equals(o)) return 0;
-        if (this.first == ((IntPair)o).first) {
-            if ((Integer)this.second < (Integer)((IntPair)o).second) return -1;
+        if (this.first.equals(((IntPair) o).first)) {
+            if (this.second < ((IntPair)o).second) return -1;
             return 1;
         }
-        if ((Integer)this.first < (Integer)((IntPair)o).first) return -1;
+        if (this.first < ((IntPair)o).first) return -1;
         return 1;
     }
 
@@ -42,6 +42,6 @@ public class IntPair extends Pair implements Comparable{
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof IntPair)) return false;
-        return this.first == ((IntPair)o).first && this.second == ((IntPair)o).second;
+        return this.first.equals(((IntPair) o).first) && this.second.equals(((IntPair) o).second);
     }
 }

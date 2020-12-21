@@ -6,7 +6,6 @@ import src.domain.entities.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public interface KakuroRepository {
     Kakuro getKakuro (String name) throws IOException;

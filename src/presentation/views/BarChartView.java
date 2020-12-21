@@ -136,21 +136,4 @@ public class BarChartView extends JPanel {
             g.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
         }
     }
-
-    // TODO: remove this, i coded this only for testing purposes
-    public static void main(String[] args) {
-        BarChartView panel = new BarChartView();
-        panel.addBar("EASY", 8, new Color(187, 255, 194));
-        panel.addBar("MEDIUM", 10, new Color(255, 247, 174));
-        panel.addBar("HARD", 5, new Color(255, 191, 191));
-        panel.addBar("EXTREME", 1, new Color(187, 185, 253));
-        panel.layoutHistogram();
-
-        JFrame frame = new JFrame("Histogram Panel");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
-        frame.setLocationByPlatform(true);
-        frame.pack();
-        frame.setVisible(true);
-    }
 }

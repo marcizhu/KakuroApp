@@ -5,7 +5,6 @@ import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.GregorianCalendar;
 
 public class KakuroInfoCardView extends JPanel {
     public static final int STATE_NEUTRAL = 0;

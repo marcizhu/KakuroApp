@@ -1,7 +1,5 @@
 package src.domain.entities;
 
-import org.mockito.internal.verification.Times;
-
 import java.sql.Timestamp;
 import java.util.UUID;
 

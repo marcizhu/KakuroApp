@@ -2,22 +2,12 @@ package src.presentation.screens;
 
 import src.presentation.controllers.DisplayKakuroScreenCtrl;
 import src.presentation.utils.RGBUtils;
-import src.presentation.views.KakuroInfoCardView;
 import src.presentation.views.KakuroView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class DisplayKakuroScreen extends AbstractScreen {
-
     JLabel title;
     KakuroView kakuroView;
     JLabel body;
@@ -62,12 +52,7 @@ public class DisplayKakuroScreen extends AbstractScreen {
         body.setVerticalAlignment(SwingConstants.CENTER);
 
         okBtn = new JButton("OK");
-        okBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DisplayKakuroScreenCtrl)ctrl).onFinishClick();
-            }
-        });
+        okBtn.addActionListener(e -> ((DisplayKakuroScreenCtrl)ctrl).onFinishClick());
 
         constraints.insets = new Insets(10,10,10,10);
         constraints.fill = GridBagConstraints.HORIZONTAL;

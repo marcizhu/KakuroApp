@@ -5,12 +5,10 @@ import src.presentation.screens.MyKakurosScreen;
 import src.presentation.utils.Dialogs;
 import src.utils.Pair;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MyKakurosScreenCtrl extends AbstractScreenCtrl {
-
     private ArrayList<Map<String, Object>> infoToDisplay;
 
     public MyKakurosScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {

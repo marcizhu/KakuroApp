@@ -1,19 +1,13 @@
 package src.domain.controllers;
 
-import src.domain.algorithms.Generator;
 import src.domain.algorithms.Solver;
 import src.domain.algorithms.helpers.KakuroConstants;
 import src.domain.algorithms.helpers.KakuroFunctions;
 import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.*;
 import src.presentation.controllers.GameScreenCtrl;
-import src.repository.DB;
-import src.repository.GameRepository;
-import src.repository.GameRepositoryDB;
 import src.utils.Pair;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -102,11 +96,13 @@ public class GameplayCtrl {
     public int getCurrentMoveIdx() {
         return currentMovement;
     }
+
     public Pair<Integer, Integer> getCoordAtMove(int move) {
         if (move > movementCount) return null;
         Pair<Integer, Integer> coord = currentGame.getMovements().get(move-1).getCoordinates();
         return new Pair<>(coord.first, coord.second);
     }
+
     public boolean selectMove(int moveIdx) {
         if (moveIdx > movementCount) return false;
         if (moveIdx == currentMovement) return false;
@@ -114,6 +110,7 @@ public class GameplayCtrl {
         sendRebuiltBoardUpToMove(currentMovement);
         return true;
     }
+
     public ArrayList<Pair<Integer, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>> getMovementList() {
         ArrayList<Pair<Integer, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>> response = new ArrayList<>();
         for (Movement move : currentGame.getMovements()) {
@@ -227,6 +224,7 @@ public class GameplayCtrl {
             colValuesUsed[i] = 0;
             firstColCoord[i] = coord.get(i);
         }
+
         for (Pair<Integer, Integer> p : forced) {
             currentColSums[colIDs[p.first][p.second]] += currentGame.getBoard().getValue(p.first, p.second);
             colValuesUsed[colIDs[p.first][p.second]] |= (1<<(currentGame.getBoard().getValue(p.first, p.second)-1));
@@ -401,24 +399,25 @@ public class GameplayCtrl {
             currentColSums[colIDs[r][c]] -= prevValue;
             currentNumberWhiteCellsAssigned--;
         }
+
         return true;
     }
 
     private int colPositionOfValueInRow (int r, int c, int value) {
         int rowID = rowIDs[r][c];
         int lastCol = firstRowCoord[rowID].second + rowSize[rowID];
-        for (int it = firstRowCoord[rowID].second; it < lastCol; it++) {
+        for (int it = firstRowCoord[rowID].second; it < lastCol; it++)
             if (currentGame.getBoard().getValue(r, it) == value) return it;
-        }
+
         return -1;
     }
 
     private int rowPositionOfValueInCol (int r, int c, int value) {
         int colID = colIDs[r][c];
         int lastRow = firstColCoord[colID].first + colSize[colID];
-        for (int it = firstColCoord[colID].first; it < lastRow; it++) {
+        for (int it = firstColCoord[colID].first; it < lastRow; it++)
             if (currentGame.getBoard().getValue(it, c) == value) return it;
-        }
+
         return -1;
     }
 
@@ -450,21 +449,23 @@ public class GameplayCtrl {
         ArrayList<Integer> rowCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSum, rowValuesUsed[rowID]);
         int colSum = currentGame.getBoard().getVerticalSum(firstColCoord[colID].first-1, firstColCoord[colID].second);
         ArrayList<Integer> colCases = KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSum, colValuesUsed[colID]);
-        String rowResponse = "";
+
+        StringBuilder rowResponse = new StringBuilder();
         for (int rCase : rowCases) {
-            String partRowCase = "";
-            for (int i = 0; i < 9; i++) if ((rCase & (1<<i)) != 0) partRowCase+=""+(i+1);
-            if (rowResponse.length() > 0) rowResponse += ", ";
-            rowResponse += partRowCase;
+            StringBuilder partRowCase = new StringBuilder();
+            for (int i = 0; i < 9; i++) if ((rCase & (1<<i)) != 0) partRowCase.append(i + 1);
+            if (rowResponse.length() > 0) rowResponse.append(", ");
+            rowResponse.append(partRowCase);
         }
-        String colResponse = "";
+
+        StringBuilder colResponse = new StringBuilder();
         for (int cCase : colCases) {
-            String partColCase = "";
-            for (int i = 0; i < 9; i++) if ((cCase & (1<<i)) != 0) partColCase+=""+(i+1);
-            if (colResponse.length() > 0) colResponse += ", ";
-            colResponse += partColCase;
+            StringBuilder partColCase = new StringBuilder();
+            for (int i = 0; i < 9; i++) if ((cCase & (1<<i)) != 0) partColCase.append(i + 1);
+            if (colResponse.length() > 0) colResponse.append(", ");
+            colResponse.append(partColCase);
         }
-        viewCtrl.setShowCombinations(rowResponse, colResponse);
+        viewCtrl.setShowCombinations(rowResponse.toString(), colResponse.toString());
     }
 
     private void autoEraseNotations(int r, int c) {
@@ -575,7 +576,7 @@ public class GameplayCtrl {
         int rows = testingBoard.getHeight();
         int columns = testingBoard.getWidth();
         // all white cells to 0 and full possibilities
-        ArrayList<Pair<Pair<Integer, Integer>, Integer>> forcedValues = new ArrayList();
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> forcedValues = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 if (testingBoard.isBlackCell(r, c)) continue;

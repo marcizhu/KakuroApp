@@ -1,8 +1,6 @@
 package src.domain.algorithms;
 
-import src.domain.algorithms.helpers.KakuroConstants;
-import src.domain.algorithms.helpers.KakuroFunctions;
-import src.domain.algorithms.helpers.SwappingCellQueue;
+import src.domain.algorithms.helpers.*;
 import src.domain.entities.BlackCell;
 import src.domain.entities.Board;
 import src.domain.entities.WhiteCell;

@@ -42,7 +42,6 @@ public class RankingCtrl {
             map.put("hardPts", hard);
             map.put("extremePts", extreme);
             map.put("totalPts", easy + medium + hard + extreme);
-
             result.add(map);
         }
 
@@ -74,7 +73,6 @@ public class RankingCtrl {
             map.put("hardGames", hard);
             map.put("extremeGames", extreme);
             map.put("totalGames", easy + medium + hard + extreme);
-
             result.add(map);
         }
 

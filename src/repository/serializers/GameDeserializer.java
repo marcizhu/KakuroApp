@@ -77,5 +77,4 @@ public class GameDeserializer implements JsonDeserializer<Game> {
 
         return new GameFinished(id, startTime, timeSpent, player, kakuro, score, timeFinished, surrendered);
     }
-
 }

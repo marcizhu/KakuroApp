@@ -47,7 +47,6 @@ public class BoardRepositoryDB implements BoardRepository {
                 return;
             }
         }
-
     }
 
     @Override

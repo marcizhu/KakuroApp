@@ -8,11 +8,7 @@ import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.sql.Timestamp;
@@ -21,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class DashboardScreen extends AbstractScreen {
-
     JPanel historyPanel;
     JScrollPane historyScroll;
     Component hHistoryFiller;
@@ -33,7 +28,7 @@ public class DashboardScreen extends AbstractScreen {
     JPanel gamePanel;
     JPanel createPanel;
     JSpinner genRows, genCols;
-    JComboBox difficultyChooser;
+    JComboBox<String> difficultyChooser;
     JCheckBox forceUnique;
     JTextField seed;
 
@@ -113,56 +108,31 @@ public class DashboardScreen extends AbstractScreen {
         easyBtn.setHorizontalAlignment(SwingConstants.CENTER);
         easyBtn.setVerticalAlignment(SwingConstants.CENTER);
         easyBtn.setForeground(Palette.StrongGreen);
-        easyBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onNewEasyGameClicked();
-            }
-        });
+        easyBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onNewEasyGameClicked());
 
         JButton mediumBtn = new JButton("MEDIUM");
         mediumBtn.setHorizontalAlignment(SwingConstants.CENTER);
         mediumBtn.setVerticalAlignment(SwingConstants.CENTER);
         mediumBtn.setForeground(Palette.StrongOrange);
-        mediumBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onNewMediumGameClicked();
-            }
-        });
+        mediumBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onNewMediumGameClicked());
 
         JButton hardBtn = new JButton(" HARD ");
         hardBtn.setHorizontalAlignment(SwingConstants.CENTER);
         hardBtn.setVerticalAlignment(SwingConstants.CENTER);
         hardBtn.setForeground(Palette.StrongRed);
-        hardBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onNewHardGameClicked();
-            }
-        });
+        hardBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onNewHardGameClicked());
 
         JButton extremeBtn = new JButton("EXTREME");
         extremeBtn.setHorizontalAlignment(SwingConstants.CENTER);
         extremeBtn.setVerticalAlignment(SwingConstants.CENTER);
         extremeBtn.setForeground(Palette.StrongBlue);
-        extremeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onNewExtremeGameClicked();
-            }
-        });
+        extremeBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onNewExtremeGameClicked());
 
         JButton importBtn = new JButton("IMPORT KAKURO");
         importBtn.setHorizontalAlignment(SwingConstants.CENTER);
         importBtn.setVerticalAlignment(SwingConstants.CENTER);
         importBtn.setForeground(Color.BLACK);
-        importBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onImportGameClicked();
-            }
-        });
+        importBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onImportGameClicked());
 
         constraints.insets = new Insets(5,5,5,5);
 
@@ -243,29 +213,23 @@ public class DashboardScreen extends AbstractScreen {
 
         genRows = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
         ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
-        genRows.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if ((Integer)genRows.getValue() > 25) ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
-                else ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
-            }
+        genRows.addChangeListener(e -> {
+            if ((Integer)genRows.getValue() > 25) ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
+            else ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
         });
 
         JLabel colsLbl = buildLabel("Columns", bodyFnt, SwingConstants.LEFT);
 
         genCols = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
         ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
-        genCols.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if ((Integer)genCols.getValue() > 25) ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
-                else ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
-            }
+        genCols.addChangeListener(e -> {
+            if ((Integer)genCols.getValue() > 25) ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
+            else ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
         });
 
         JLabel diffLbl = buildLabel("Difficulty", bodyFnt, SwingConstants.LEFT);
 
-        difficultyChooser = new JComboBox(new String[] {"Easy", "Medium", "Hard", "Extreme"});
+        difficultyChooser = new JComboBox<>(new String[] { "Easy", "Medium", "Hard", "Extreme" });
 
         forceUnique = new JCheckBox();
         forceUnique.setSelected(true);
@@ -281,12 +245,7 @@ public class DashboardScreen extends AbstractScreen {
         JButton confirmGen = new JButton("Ok"); //✅
         confirmGen.setForeground(Palette.StrongGreen);
         confirmGen.setBackground(Palette.HintGreen);
-        confirmGen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onGenerateByParameters((Integer)genRows.getValue(), (Integer)genCols.getValue(), (String)difficultyChooser.getSelectedItem(), forceUnique.isSelected());
-            }
-        });
+        confirmGen.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onGenerateByParameters((Integer)genRows.getValue(), (Integer)genCols.getValue(), (String)difficultyChooser.getSelectedItem(), forceUnique.isSelected()));
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(2, 2, 2, 2);
@@ -364,13 +323,10 @@ public class DashboardScreen extends AbstractScreen {
         JButton confirmSeed = new JButton("Ok");
         confirmSeed.setForeground(Palette.StrongGreen);
         confirmSeed.setBackground(Palette.HintGreen);
-        confirmSeed.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (seed.getText().equals("Please enter a valid seed...") || seed.getText().equals(""))
-                    Dialogs.showErrorDialog("A seed must be provided to use this functionality", "Invalid seed");
-                else ((DashboardScreenCtrl)ctrl).onGenerateBySeed(seed.getText());
-            }
+        confirmSeed.addActionListener(e -> {
+            if (seed.getText().equals("Please enter a valid seed...") || seed.getText().equals(""))
+                Dialogs.showErrorDialog("A seed must be provided to use this functionality", "Invalid seed");
+            else ((DashboardScreenCtrl)ctrl).onGenerateBySeed(seed.getText());
         });
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -436,35 +392,24 @@ public class DashboardScreen extends AbstractScreen {
 
         handRows = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
         ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
-        handRows.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if ((Integer)handRows.getValue() > 25) ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
-                else ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
-            }
+        handRows.addChangeListener(e -> {
+            if ((Integer)handRows.getValue() > 25) ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
+            else ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
         });
 
         JLabel colsLbl = buildLabel("Columns", bodyFnt, SwingConstants.LEFT);
 
         handCols = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
         ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
-        handCols.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if ((Integer)handCols.getValue() > 25) ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
-                else ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
-            }
+        handCols.addChangeListener(e -> {
+            if ((Integer)handCols.getValue() > 25) ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
+            else ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
         });
 
         JButton confirmHand = new JButton("Ok");
         confirmHand.setForeground(Palette.StrongGreen);
         confirmHand.setBackground(Palette.HintGreen);
-        confirmHand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onHandMadeClicked((Integer)handRows.getValue(), (Integer)handCols.getValue());
-            }
-        });
+        confirmHand.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onHandMadeClicked((Integer)handRows.getValue(), (Integer)handCols.getValue()));
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(2, 25, 2, 4);
@@ -500,12 +445,7 @@ public class DashboardScreen extends AbstractScreen {
         importBtn.setHorizontalAlignment(SwingConstants.CENTER);
         importBtn.setVerticalAlignment(SwingConstants.CENTER);
         importBtn.setForeground(Color.BLACK);
-        importBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onImportCreationClicked();
-            }
-        });
+        importBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onImportCreationClicked());
 
         constraints.insets = new Insets(5,4, 3, 4);
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -760,12 +700,7 @@ public class DashboardScreen extends AbstractScreen {
         resumeBtn.setForeground(Color.BLACK);
         resumeBtn.setHorizontalAlignment(SwingConstants.RIGHT);
         resumeBtn.setVerticalAlignment(SwingConstants.CENTER);
-        resumeBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((DashboardScreenCtrl)ctrl).onResumeFromHistory(name);
-            }
-        });
+        resumeBtn.addActionListener(e -> ((DashboardScreenCtrl)ctrl).onResumeFromHistory(name));
 
         JLabel nameLbl = buildLabel(name, bodyFnt, SwingConstants.LEFT);
 

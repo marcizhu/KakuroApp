@@ -31,20 +31,14 @@ public class GameFinished extends Game{
             return 0;
         }
         int diff = 0;
+
         switch(getKakuro().getDifficulty()) {
-            case EASY:
-                diff = 1;
-                break;
-            case MEDIUM:
-                diff = 2;
-                break;
-            case HARD:
-                diff = 3;
-                break;
-            case EXTREME:
-                diff = 4;
-                break;
+            case EASY:    diff = 1; break;
+            case MEDIUM:  diff = 2; break;
+            case HARD:    diff = 3; break;
+            case EXTREME: diff = 4; break;
         }
+
         float d = 1000 * diff;
         float numOfWhiteCells = 0;
         float numOfBlackCells = 0;
