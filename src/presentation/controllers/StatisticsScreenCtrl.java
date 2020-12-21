@@ -57,6 +57,34 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
         return topRanks;
     }
 
+    public ArrayList<Pair<Integer, Pair<String, String>>> getTopRankingByDifficulty(String difficulty) {
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByTimeInDifficulty(difficulty);
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return new ArrayList<>();
+        }
+        ArrayList<Pair<Integer, Pair<String, String>>> topRanks = new ArrayList<>();
+        boolean interestFound = false;
+        for (int i = 0; i < 3 && i < result.first.size(); i++) {
+            if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) interestFound = true;
+            topRanks.add(new Pair( i, new Pair<>(
+                    (String) result.first.get(i).get("name"),
+                    secondsToStringTime((int) result.first.get(i).get("avgTime"))
+            )));
+        }
+        if (!interestFound) {
+            for (int i = 3; i < result.first.size(); i++) {
+                if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
+                    topRanks.add(new Pair( i, new Pair<>(
+                            (String) result.first.get(i).get("name"),
+                            secondsToStringTime((int) result.first.get(i).get("avgTime"))
+                    )));
+                }
+            }
+        }
+        return topRanks;
+    }
+
     private String pointsToString(float points) {
         String pointsStr;
         if(Math.floor(points) == Math.ceil(points)) {
@@ -68,6 +96,22 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
             pointsStr = (Math.round(points * 100.0f) / 100.0f) + " pts";
         }
         return pointsStr;
+    }
+
+    private String secondsToStringTime(int time) {
+        int hours = time/3600;
+        int minutes = time/60 - hours*60;
+        int seconds = time - minutes*60 - hours*3600;
+        String timeStr = "";
+        if (hours > 0) {
+            timeStr += hours+":";
+            if (minutes < 10) timeStr += "0";
+        }
+        timeStr += minutes+":";
+        if (seconds < 10) timeStr += "0";
+        timeStr += seconds;
+
+        return timeStr;
     }
 
     public Map<String, Object> getTopPointer() {

@@ -201,7 +201,7 @@ public class StatisticsScreen extends AbstractScreen {
 
         JPanel easyStatsPanel = buildStatisticsDifficultyTile(
                 "EASY",
-                ((StatisticsScreenCtrl)ctrl).getTopRanking(),
+                ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EASY"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EASY"),
                 "1:20",
                 "3:43",
@@ -211,7 +211,7 @@ public class StatisticsScreen extends AbstractScreen {
 
         JPanel mediumStatsPanel = buildStatisticsDifficultyTile(
                 "MEDIUM",
-                ((StatisticsScreenCtrl)ctrl).getTopRanking(),
+                ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("MEDIUM"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("MEDIUM"),
                 "1:20",
                 "3:43",
@@ -228,7 +228,7 @@ public class StatisticsScreen extends AbstractScreen {
 
         JPanel hardStatsPanel = buildStatisticsDifficultyTile(
                 "HARD",
-                ((StatisticsScreenCtrl)ctrl).getTopRanking(),
+                ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("HARD"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("HARD"),
                 "1:20",
                 "3:43",
@@ -238,7 +238,7 @@ public class StatisticsScreen extends AbstractScreen {
 
         JPanel extremeStatsPanel = buildStatisticsDifficultyTile(
                 "EXTREME",
-                ((StatisticsScreenCtrl)ctrl).getTopRanking(),
+                ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EXTREME"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EXTREME"),
                 "1:20",
                 "3:43",
