@@ -16,9 +16,18 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
     private int hardGamesPlayed;
     private int extremeGamesPlayed;
 
+    private String easyAvgTime;
+    private String mediumAvgTime;
+    private String hardAvgTime;
+    private String extremeAvgTime;
+
     public StatisticsScreenCtrl(PresentationCtrl presentationCtrl, DomainCtrl domainCtrl) {
         super(presentationCtrl, domainCtrl);
         easyGamesPlayed = mediumGamesPlayed = hardGamesPlayed = extremeGamesPlayed = -1;
+        easyAvgTime = "";
+        mediumAvgTime = "";
+        hardAvgTime = "";
+        extremeAvgTime = "";
     }
 
     @Override
@@ -67,22 +76,39 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
         boolean interestFound = false;
         for (int i = 0; i < 3 && i < result.first.size(); i++) {
             if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) interestFound = true;
+            String time = secondsToStringTime((float) result.first.get(i).get("avgTime"));
             topRanks.add(new Pair( i, new Pair<>(
                     (String) result.first.get(i).get("name"),
-                    secondsToStringTime((float) result.first.get(i).get("avgTime"))
+                    time
             )));
+            setAvgTimeDiff(difficulty, time);
         }
-        if (!interestFound) {
-            for (int i = 3; i < result.first.size(); i++) {
-                if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
-                    topRanks.add(new Pair( i, new Pair<>(
-                            (String) result.first.get(i).get("name"),
-                            secondsToStringTime((float) result.first.get(i).get("avgTime"))
-                    )));
-                }
+        for (int i = 3; !interestFound && i < result.first.size(); i++) {
+            if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
+                interestFound = true;
+                String time = secondsToStringTime((float) result.first.get(i).get("avgTime"));
+                topRanks.add(new Pair( i, new Pair<>(
+                        (String) result.first.get(i).get("name"),
+                        time
+                )));
+                setAvgTimeDiff(difficulty, time);
             }
         }
         return topRanks;
+    }
+
+    private void setAvgTimeDiff(String difficulty, String time) {
+        if (difficulty.equals("EASY")) easyAvgTime = time;
+        else if (difficulty.equals("MEDIUM")) mediumAvgTime = time;
+        else if (difficulty.equals("HARD")) hardAvgTime = time;
+        else if (difficulty.equals("EXTREME")) extremeAvgTime = time;
+    }
+    public String getAvgTime(String difficulty) {
+        if (difficulty.equals("EASY")) return easyAvgTime;
+        else if (difficulty.equals("MEDIUM"))return  mediumAvgTime;
+        else if (difficulty.equals("HARD")) return hardAvgTime;
+        else if (difficulty.equals("EXTREME")) return extremeAvgTime;
+        return "";
     }
 
     private String pointsToString(float points) {

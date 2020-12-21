@@ -204,7 +204,7 @@ public class StatisticsScreen extends AbstractScreen {
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EASY"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EASY"),
                 "1:20",
-                "3:43",
+                ((StatisticsScreenCtrl)ctrl).getAvgTime("EASY"),
                 ((StatisticsScreenCtrl)ctrl).getEasyGamesPlayed(),
                 width*3/10
         );
@@ -214,7 +214,7 @@ public class StatisticsScreen extends AbstractScreen {
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("MEDIUM"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("MEDIUM"),
                 "1:20",
-                "3:43",
+                ((StatisticsScreenCtrl)ctrl).getAvgTime("MEDIUM"),
                 ((StatisticsScreenCtrl)ctrl).getMediumGamesPlayed(),
                 width*3/10
         );
@@ -231,7 +231,7 @@ public class StatisticsScreen extends AbstractScreen {
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("HARD"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("HARD"),
                 "1:20",
-                "3:43",
+                ((StatisticsScreenCtrl)ctrl).getAvgTime("HARD"),
                 ((StatisticsScreenCtrl)ctrl).getHardGamesPlayed(),
                 width*3/10
         );
@@ -241,7 +241,7 @@ public class StatisticsScreen extends AbstractScreen {
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EXTREME"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EXTREME"),
                 "1:20",
-                "3:43",
+                ((StatisticsScreenCtrl)ctrl).getAvgTime("EXTREME"),
                 ((StatisticsScreenCtrl)ctrl).getExtremeGamesPlayed(),
                 width*3/10
         );
