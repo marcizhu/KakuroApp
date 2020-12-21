@@ -69,7 +69,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
             if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) interestFound = true;
             topRanks.add(new Pair( i, new Pair<>(
                     (String) result.first.get(i).get("name"),
-                    secondsToStringTime((int) result.first.get(i).get("avgTime"))
+                    secondsToStringTime((float) result.first.get(i).get("avgTime"))
             )));
         }
         if (!interestFound) {
@@ -77,7 +77,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
                 if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
                     topRanks.add(new Pair( i, new Pair<>(
                             (String) result.first.get(i).get("name"),
-                            secondsToStringTime((int) result.first.get(i).get("avgTime"))
+                            secondsToStringTime((float) result.first.get(i).get("avgTime"))
                     )));
                 }
             }
@@ -98,18 +98,19 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
         return pointsStr;
     }
 
-    private String secondsToStringTime(int time) {
-        int hours = time/3600;
-        int minutes = time/60 - hours*60;
-        int seconds = time - minutes*60 - hours*3600;
+    private String secondsToStringTime(float time) {
+        if(Float.isNaN(time)) return "---";
+
+        int hours = (int)time / 3600;
+        int minutes = (int)time / 60 - hours * 60;
+        int seconds = (int)time - minutes * 60 - hours * 3600;
         String timeStr = "";
         if (hours > 0) {
-            timeStr += hours+":";
+            timeStr += hours + ":";
             if (minutes < 10) timeStr += "0";
         }
-        timeStr += minutes+":";
-        if (seconds < 10) timeStr += "0";
-        timeStr += seconds;
+
+        timeStr += minutes + String.format(":%02d", seconds);
 
         return timeStr;
     }
