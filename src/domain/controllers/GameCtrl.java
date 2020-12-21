@@ -124,13 +124,13 @@ public class GameCtrl {
         int gameCount = 0;
         for (Game game : games) {
             if (game instanceof GameFinished && !((GameFinished) game).isSurrendered()) {
-                if (bestTime == -1 || game.getTimeSpent() < bestTime) bestTime = game.getTimeSpent();
-                if (avgTime == -1) avgTime = 0;
+                if (bestTime == 0 || game.getTimeSpent() < bestTime) bestTime = game.getTimeSpent();
+                if (avgTime == 0) avgTime = 0;
                 gameCount++;
                 avgTime += game.getTimeSpent();
             }
         }
-        if (avgTime != -1) avgTime /= gameCount;
+        if (avgTime != 0) avgTime /= gameCount;
 
         Map<String, Integer> result = new HashMap<>();
         result.put("bestTime", (int)bestTime);
