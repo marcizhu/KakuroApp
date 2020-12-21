@@ -16,6 +16,8 @@ public class BarChartView extends JPanel {
     private static final int defaultSize = 200;
     private static final float barGapToWidthRatio = 1f/6f;
 
+    private int preferredHeight;
+
     private Font barValueFnt;
     private Font barLabelFnt;
 
@@ -33,6 +35,7 @@ public class BarChartView extends JPanel {
         add(labelPanel, BorderLayout.PAGE_END);
 
         setSize(new Dimension(defaultSize, defaultSize));
+        preferredHeight = defaultSize;
     }
 
     public void addBar(String label, int value, Color color) {
@@ -61,9 +64,8 @@ public class BarChartView extends JPanel {
             label.setVerticalTextPosition(JLabel.TOP);
             label.setVerticalAlignment(JLabel.BOTTOM);
 
-            final int barHeight;
-            if (maxValue == 0) label.setIcon(new ColorIcon(new Color(0,0,0,0), (int)((getWidth()/bars.size())*(1-barGapToWidthRatio)), getHeight()));
-            else label.setIcon(new ColorIcon(bar.getColor(), (int)((getWidth()/bars.size())*(1-barGapToWidthRatio)), (bar.getValue() * getHeight()) / maxValue));
+            if (maxValue == 0) label.setIcon(new ColorIcon(new Color(0,0,0,0), (int)((getWidth()/bars.size())*(0.8-barGapToWidthRatio)), preferredHeight));
+            else label.setIcon(new ColorIcon(bar.getColor(), (int)((getWidth()/bars.size())*(0.8-barGapToWidthRatio)), (bar.getValue() * preferredHeight) / maxValue));
             barPanel.add(label);
 
             JLabel barLabel = new JLabel(bar.getLabel());
@@ -75,6 +77,7 @@ public class BarChartView extends JPanel {
         revalidate();
     }
 
+    public void setPreferredHeight(int height) { this.preferredHeight = height; }
     public void setBarValueFont(Font font) { this.barValueFnt = font; }
     public void setBarLabelFont(Font font) { this.barLabelFnt = font; }
 

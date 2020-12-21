@@ -96,12 +96,10 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         }
     }
 
-    public String interestPlayer() {
-        return presentationCtrl.getUserSessionId();
-    }
+    public String interestPlayer() { return presentationCtrl.getUserSessionId(); }
 
     public ArrayList<Pair<Integer, Pair<String, String>>> getTopRanking() {
-        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByPoints(); //TODO: finish
+        Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByPoints();
         if (result.second != null) {
             Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return new ArrayList<>();

@@ -1,16 +1,9 @@
 package src.presentation.screens;
 
-import src.domain.entities.GameFinished;
-import src.domain.entities.GameInProgress;
-import src.domain.entities.Kakuro;
-import src.presentation.controllers.AbstractScreenCtrl;
 import src.presentation.controllers.DashboardScreenCtrl;
-import src.presentation.controllers.GameScreenCtrl;
-import src.presentation.controllers.MyKakurosScreenCtrl;
 import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
 import src.presentation.views.BarChartView;
-import src.presentation.views.KakuroInfoCardView;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
@@ -23,11 +16,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class DashboardScreen extends AbstractScreen {
@@ -117,12 +107,7 @@ public class DashboardScreen extends AbstractScreen {
         gamePanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel title = new JLabel("NEW GAME");
-        title.setFont(titleFnt);
-        title.setForeground(Color.BLACK);
-        title.setOpaque(false);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel title = buildLabel("NEW GAME", titleFnt, SwingConstants.CENTER);
 
         JButton easyBtn = new JButton(" EASY ");
         easyBtn.setHorizontalAlignment(SwingConstants.CENTER);
@@ -217,12 +202,7 @@ public class DashboardScreen extends AbstractScreen {
 
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel title = new JLabel("CREATE KAKURO");
-        title.setFont(titleFnt);
-        title.setForeground(Color.BLACK);
-        title.setOpaque(false);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel title = buildLabel("CREATE KAKURO", titleFnt, SwingConstants.CENTER);
 
         JPanel generatePanel = buildGeneratePanel();
         JPanel handMadePanel = buildHandMadePanel();
@@ -248,33 +228,18 @@ public class DashboardScreen extends AbstractScreen {
         generatePanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel title = new JLabel("GENERATE");
-        title.setFont(subtitleFnt);
-        title.setForeground(Color.BLACK);
-        title.setOpaque(false);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel title = buildLabel("GENERATE", subtitleFnt, SwingConstants.CENTER);
 
         JSeparator sep1 = new JSeparator();
         sep1.setForeground(Color.BLACK);
 
-        JLabel paramLbl = new JLabel("By parameters:");
-        paramLbl.setFont(bodyFnt);
-        paramLbl.setForeground(Color.BLACK);
-        paramLbl.setOpaque(false);
-        paramLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        paramLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel paramLbl = buildLabel("By parameter:", bodyFnt, SwingConstants.LEFT);
 
         // the input for parameters
         JPanel paramInput = new JPanel();
         paramInput.setLayout(new GridBagLayout());
 
-        JLabel rowsLbl = new JLabel("Rows");
-        rowsLbl.setFont(bodyFnt);
-        rowsLbl.setForeground(Color.BLACK);
-        rowsLbl.setOpaque(false);
-        rowsLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        rowsLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel rowsLbl = buildLabel("ROWS", bodyFnt, SwingConstants.LEFT);
 
         genRows = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
         ((JSpinner.DefaultEditor) genRows.getEditor()).getTextField().setForeground(Color.BLACK);
@@ -286,12 +251,7 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JLabel colsLbl = new JLabel("Columns");
-        colsLbl.setFont(bodyFnt);
-        colsLbl.setForeground(Color.BLACK);
-        colsLbl.setOpaque(false);
-        colsLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        colsLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel colsLbl = buildLabel("Columns", bodyFnt, SwingConstants.LEFT);
 
         genCols = new JSpinner(new SpinnerNumberModel(9, 2, 80, 1));
         ((JSpinner.DefaultEditor) genCols.getEditor()).getTextField().setForeground(Color.BLACK);
@@ -303,12 +263,7 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JLabel diffLbl = new JLabel("Difficulty");
-        diffLbl.setFont(bodyFnt);
-        diffLbl.setForeground(Color.BLACK);
-        diffLbl.setOpaque(false);
-        diffLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        diffLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel diffLbl = buildLabel("Difficulty", bodyFnt, SwingConstants.LEFT);
 
         difficultyChooser = new JComboBox(new String[] {"Easy", "Medium", "Hard", "Extreme"});
 
@@ -317,18 +272,10 @@ public class DashboardScreen extends AbstractScreen {
         forceUnique.setOpaque(false);
         forceUnique.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        JLabel forceUniqueLbl1 = new JLabel("Try to force unique solution by");
-        forceUniqueLbl1.setFont(smallFnt);
-        forceUniqueLbl1.setForeground(Color.BLACK);
-        forceUniqueLbl1.setOpaque(false);
-        forceUniqueLbl1.setHorizontalAlignment(SwingConstants.LEFT);
+        JLabel forceUniqueLbl1 = buildLabel("Try to force unique solution by", smallFnt, SwingConstants.LEFT);
         forceUniqueLbl1.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        JLabel forceUniqueLbl2 = new JLabel("defining initial values if needed.");
-        forceUniqueLbl2.setFont(smallFnt);
-        forceUniqueLbl2.setForeground(Color.BLACK);
-        forceUniqueLbl2.setOpaque(false);
-        forceUniqueLbl2.setHorizontalAlignment(SwingConstants.LEFT);
+        JLabel forceUniqueLbl2 = buildLabel("defining initial values if needed.", smallFnt, SwingConstants.LEFT);
         forceUniqueLbl2.setVerticalAlignment(SwingConstants.TOP);
 
         JButton confirmGen = new JButton("Ok"); //✅
@@ -392,12 +339,7 @@ public class DashboardScreen extends AbstractScreen {
         JSeparator sep2 = new JSeparator();
         sep2.setForeground(Color.BLACK);
 
-        JLabel bySeedLbl = new JLabel("By seed:");
-        bySeedLbl.setFont(bodyFnt);
-        bySeedLbl.setForeground(Color.BLACK);
-        bySeedLbl.setOpaque(false);
-        bySeedLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        bySeedLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel bySeedLbl = buildLabel("By seed:", bodyFnt, SwingConstants.LEFT);
 
         JPanel seedInput = new JPanel();
         seedInput.setLayout(new GridBagLayout());
@@ -482,12 +424,7 @@ public class DashboardScreen extends AbstractScreen {
         handMadePanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel title = new JLabel("HAND MADE");
-        title.setFont(subtitleFnt);
-        title.setForeground(Color.BLACK);
-        title.setOpaque(false);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel title = buildLabel("HAND MADE", subtitleFnt, SwingConstants.CENTER);
 
         JSeparator sep1 = new JSeparator();
         sep1.setForeground(Color.BLACK);
@@ -495,12 +432,7 @@ public class DashboardScreen extends AbstractScreen {
         JPanel creatorInput = new JPanel();
         creatorInput.setLayout(new GridBagLayout());
 
-        JLabel rowsLbl = new JLabel("Rows");
-        rowsLbl.setFont(bodyFnt);
-        rowsLbl.setForeground(Color.BLACK);
-        rowsLbl.setOpaque(false);
-        rowsLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        rowsLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel rowsLbl = buildLabel("Rows", bodyFnt, SwingConstants.LEFT);
 
         handRows = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
         ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
@@ -512,12 +444,7 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JLabel colsLbl = new JLabel("Columns");
-        colsLbl.setFont(bodyFnt);
-        colsLbl.setForeground(Color.BLACK);
-        colsLbl.setOpaque(false);
-        colsLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        colsLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel colsLbl = buildLabel("Columns", bodyFnt, SwingConstants.LEFT);
 
         handCols = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
         ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
@@ -708,7 +635,7 @@ public class DashboardScreen extends AbstractScreen {
         playedChartPanel.addBar("HARD",     kakurosPlayedInfo.get("hard"),     Palette.WarningLightRed);
         playedChartPanel.addBar("EXTREME",  kakurosPlayedInfo.get("extreme"),  Palette.SelectionBlue);
         playedChartPanel.addBar("BY USERS", kakurosPlayedInfo.get("userMade"), new Color(0xAAAAAA));
-        playedChartPanel.setSize(playedChartPanel.getWidth(), ranking.size() == 3 ? 158 : 142); //default height
+        playedChartPanel.setPreferredHeight(ranking.size() == 3 ? 144 : 128);
         playedChartPanel.layoutHistogram();
         playedChartPanel.setBackground(Color.WHITE);
         playedChartPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -760,12 +687,7 @@ public class DashboardScreen extends AbstractScreen {
         JPanel history = new JPanel();
         history.setLayout(new BoxLayout(history, BoxLayout.Y_AXIS));
 
-        JLabel title = new JLabel("HISTORY");
-        title.setFont(titleFnt);
-        title.setForeground(Color.BLACK);
-        title.setOpaque(false);
-        title.setHorizontalAlignment(SwingConstants.LEFT);
-        title.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel title = buildLabel("HISTORY", titleFnt, SwingConstants.LEFT);
 
         buildGameHistoryPanel(width);
         historyScroll = new JScrollPane(historyPanel);
@@ -791,12 +713,10 @@ public class DashboardScreen extends AbstractScreen {
         historyPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
         if (allGames.size() == 0) {
-            JLabel noGamesYetLbl = new JLabel("<html><body>Welcome! You haven't played any games yet, click on one of the buttons in the NEW GAME section to get started.</body></html>");
-            noGamesYetLbl.setFont(bodyFnt);
-            noGamesYetLbl.setForeground(Color.BLACK);
-            noGamesYetLbl.setOpaque(false);
-            noGamesYetLbl.setHorizontalAlignment(SwingConstants.CENTER);
-            noGamesYetLbl.setVerticalAlignment(SwingConstants.CENTER);
+            JLabel noGamesYetLbl = buildLabel(
+                    "<html><body>Welcome! You haven't played any games yet, click on one of the buttons in the NEW GAME section to get started.</body></html>",
+                    bodyFnt,
+                    SwingConstants.CENTER);
             //historyPanel.add(noGamesYetLbl);
         }
 
@@ -830,12 +750,10 @@ public class DashboardScreen extends AbstractScreen {
         KakuroView kakuroView = new KakuroView(board, false);
         kakuroView.setSize(200, 200);
 
-        JLabel headerLbl = new JLabel(state.equals("unfinished")? "Unfinished" : "Score: " + score);
-        headerLbl.setFont(subtitleFnt);
-        headerLbl.setForeground(Color.BLACK);
-        headerLbl.setOpaque(false);
-        headerLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        headerLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel headerLbl = buildLabel(
+                state.equals("unfinished")? "Unfinished" : "Score: " + score,
+                subtitleFnt,
+                SwingConstants.LEFT);
 
         JButton resumeBtn = new JButton("Resume game");
         resumeBtn.setFont(bodyFnt);
@@ -849,41 +767,15 @@ public class DashboardScreen extends AbstractScreen {
             }
         });
 
-        JLabel nameLbl = new JLabel(name);
-        nameLbl.setFont(bodyFnt);
-        nameLbl.setForeground(Color.BLACK);
-        nameLbl.setOpaque(false);
-        nameLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        nameLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel nameLbl = buildLabel(name, bodyFnt, SwingConstants.LEFT);
 
-        JLabel timeSpentLbl = new JLabel("Time: " + timeSpent);
-        timeSpentLbl.setFont(bodyFnt);
-        timeSpentLbl.setForeground(Color.BLACK);
-        timeSpentLbl.setOpaque(false);
-        timeSpentLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        timeSpentLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel timeSpentLbl = buildLabel("Time: " + timeSpent, bodyFnt, SwingConstants.LEFT);
 
-        JLabel sizeLbl = new JLabel("Size: " + height + " x " + width);
-        sizeLbl.setFont(bodyFnt);
-        sizeLbl.setForeground(Color.BLACK);
-        sizeLbl.setOpaque(false);
-        sizeLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        sizeLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel sizeLbl = buildLabel("Size: " + height + " x " + width, bodyFnt, SwingConstants.LEFT);
 
-        JLabel difficultyLbl = new JLabel("Difficulty: " + difficulty);
-        difficultyLbl.setFont(bodyFnt);
-        difficultyLbl.setForeground(Color.BLACK);
-        difficultyLbl.setOpaque(false);
-        difficultyLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        difficultyLbl.setVerticalAlignment(SwingConstants.CENTER);
+        JLabel difficultyLbl = buildLabel("Difficulty: " + difficulty, bodyFnt, SwingConstants.LEFT);
 
-        JLabel lastPlayedLbl = new JLabel("Last played on: " + lastPlayed);
-        lastPlayedLbl.setFont(bodyFnt);
-        lastPlayedLbl.setForeground(Color.BLACK);
-        lastPlayedLbl.setOpaque(false);
-        lastPlayedLbl.setHorizontalAlignment(SwingConstants.LEFT);
-        lastPlayedLbl.setVerticalAlignment(SwingConstants.CENTER);
-
+        JLabel lastPlayedLbl = buildLabel("Last played on: " + lastPlayed, bodyFnt, SwingConstants.LEFT);
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -964,7 +856,7 @@ public class DashboardScreen extends AbstractScreen {
     @Override
     public void onResize(int width, int height) {
         hHistoryFiller = Box.createRigidArea(new Dimension(width/2 -90, 1));
-        playedChartPanel.setSize(playedChartPanel.getWidth(), (gamePanel.getHeight()+createPanel.getHeight()-18) - (quickStatsPanel.getHeight()-playedChartPanel.getHeight()));
+        //playedChartPanel.setSize(playedChartPanel.getWidth(), (gamePanel.getHeight()+createPanel.getHeight()-18) - (quickStatsPanel.getHeight()-playedChartPanel.getHeight()));
         playedChartPanel.layoutHistogram();
         Component[] histComp = historyPanel.getComponents();
         histComp[histComp.length-1] = hHistoryFiller;
