@@ -96,9 +96,49 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         }
     }
 
-    public Pair<Map<String, Object>, String> getTopRanking() {
+    public String interestPlayer() {
+        return presentationCtrl.getUserSessionId();
+    }
+
+    public ArrayList<Pair<Integer, Pair<String, String>>> getTopRanking() {
         Pair<ArrayList<Map<String, Object>>, String> result = domainCtrl.getRankingByPoints(); //TODO: finish
-        return null;
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return new ArrayList<>();
+        }
+        ArrayList<Pair<Integer, Pair<String, String>>> topRanks = new ArrayList<>();
+        boolean interestFound = false;
+        for (int i = 0; i < 3 && i < result.first.size(); i++) {
+            if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) interestFound = true;
+            topRanks.add(new Pair( i, new Pair<>(
+                    (String) result.first.get(i).get("name"),
+                    pointsToString((Float) result.first.get(i).get("totalPts"))
+            )));
+        }
+        if (!interestFound) {
+            for (int i = 3; i < result.first.size(); i++) {
+                if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
+                    topRanks.add(new Pair( i, new Pair<>(
+                            (String) result.first.get(i).get("name"),
+                            pointsToString((Float) result.first.get(i).get("totalPts"))
+                    )));
+                }
+            }
+        }
+        return topRanks;
+    }
+
+    private String pointsToString(float points) {
+        String pointsStr;
+        if(Math.floor(points) == Math.ceil(points)) {
+            // Number is integer. Remove decimals or display "---" if zero
+            int val = Math.round(points);
+            pointsStr = (val == 0 ? "---" : "" + val);
+        } else {
+            // round to 2 decimal places
+            pointsStr = (Math.round(points * 100.0f) / 100.0f) + " pts";
+        }
+        return pointsStr;
     }
 
     public Map<String, Integer> getGamesPlayed() {

@@ -13,7 +13,7 @@ public class BarChartView extends JPanel {
     private final List<Bar> bars = new ArrayList<>();
 
     // Misc settings
-    private static final int histogramHeight = 200;
+    private static final int defaultSize = 200;
     private static final int barGap = 10;
     private static final int barWidth = 50;
 
@@ -26,6 +26,8 @@ public class BarChartView extends JPanel {
 
         add(barPanel, BorderLayout.CENTER);
         add(labelPanel, BorderLayout.PAGE_END);
+
+        setSize(new Dimension(defaultSize, defaultSize));
     }
 
     public void addBar(String label, int value, Color color) {
@@ -50,7 +52,7 @@ public class BarChartView extends JPanel {
             label.setVerticalTextPosition(JLabel.TOP);
             label.setVerticalAlignment(JLabel.BOTTOM);
 
-            final int barHeight = (bar.getValue() * histogramHeight) / maxValue;
+            final int barHeight = (bar.getValue() * getHeight()) / maxValue;
             label.setIcon(new ColorIcon(bar.getColor(), barWidth, barHeight));
             barPanel.add(label);
 
@@ -58,6 +60,8 @@ public class BarChartView extends JPanel {
             barLabel.setHorizontalAlignment(JLabel.CENTER);
             labelPanel.add(barLabel);
         }
+
+        revalidate();
     }
 
     private static class Bar {

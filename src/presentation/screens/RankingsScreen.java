@@ -180,7 +180,10 @@ public class RankingsScreen extends AbstractScreen {
         ctrs.gridy = 0;
         for (int i = 0; i < titles.length; i++) {
             ctrs.gridx = i;
+            ctrs.gridy = 0;
             titlesPanel.add(buildLabel(titles[i], subtitleFnt, SwingConstants.CENTER), ctrs);
+            ctrs.gridy = 1;
+            titlesPanel.add(Box.createRigidArea(new Dimension((width/titles.length)-25, 1)), ctrs);
         }
         ctrs.gridx = 0;
         ctrs.gridy = 1;
@@ -198,11 +201,13 @@ public class RankingsScreen extends AbstractScreen {
 
             JPanel infoLine = new JPanel();
             infoLine.setLayout(new GridBagLayout());
-            ctrs.gridy = 0;
-            ctrs.gridwidth = 1;
+
+            ctrs.fill = GridBagConstraints.HORIZONTAL;
 
             for (int j = 0; j < keys.length; j++) {
                 ctrs.gridx = j;
+                ctrs.gridy = 0;
+                ctrs.gridwidth = 1;
                 Object toAdd = userInfo.get(keys[j]);
                 String toAddStr;
                 if (toAdd instanceof Float) {
@@ -222,6 +227,9 @@ public class RankingsScreen extends AbstractScreen {
                 }
                 JLabel itemLbl = buildLabel(toAddStr, infoFont, SwingConstants.CENTER);
                 infoLine.add(itemLbl, ctrs);
+
+                ctrs.gridy = 1;
+                infoLine.add(Box.createRigidArea(new Dimension((width/keys.length)-25, 1)), ctrs);
             }
 
             if (isOfInterest) infoLine.setBackground(Color.LIGHT_GRAY);

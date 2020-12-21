@@ -86,7 +86,7 @@ public class DomainCtrl {
 
     public Pair<Map<String, Integer>, String> getNumberOfGamesPlayed(String username) {
         // TODO: alex, all difficulties
-        return null;
+        return new Pair<>(null, "Functionality not available");
     }
 
     public Pair<ArrayList<Map<String, Object>>, String> getGameHistory(String username) {
