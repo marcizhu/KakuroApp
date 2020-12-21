@@ -25,18 +25,28 @@ public class LoginScreen extends AbstractScreen {
     public void build(int width, int height) {
         super.build(width, height);
         contents = new JPanel();
-        contents.setLayout(new GridBagLayout());
+        contents.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
+
+        JPanel upperLogin = new JPanel();
+        upperLogin.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
+        //constraints.fill = GridBagConstraints.VERTICAL;
+        //constraints.gridwidth
+        //constraints.gridy = 0;
+
         JLabel userListTitle = new JLabel("Who are you? Choose your profile");
-        userListTitle.setFont(new Font(userListTitle.getFont().getName(), Font.PLAIN, 20));
+        userListTitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
         EmptyBorder border = new EmptyBorder(5, 10, 5, 10);
         userListTitle.setBorder(border);
+        userListTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        userListTitle.setVerticalAlignment(SwingConstants.BOTTOM);
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
-        constraints.gridy = 0;
-        contents.add(userListTitle, constraints);
+        constraints.gridy = 1;
+        upperLogin.add(userListTitle, constraints);
+        contents.add(upperLogin);
 
         ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUserList();
         JPanel userListLayout = new JPanel(new GridLayout(1, users.size()));
@@ -78,24 +88,28 @@ public class LoginScreen extends AbstractScreen {
         }
 
         JScrollPane userListPane = new JScrollPane(userListLayout);
+        userListPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        userListPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         userListPane.setBorder(BorderFactory.createEmptyBorder());
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        contents.add(userListPane, constraints);
+        contents.add(userListPane);
+
+        JPanel lowerLogin = new JPanel();
+        lowerLogin.setLayout(new GridBagLayout());
+
+        constraints.insets = new Insets(4,15,4,15);
 
         JLabel registerTitle = new JLabel("Create new profile");
         registerTitle.setForeground(Color.BLACK);
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
-        constraints.gridy = 2;
-        contents.add(registerTitle, constraints);
+        constraints.gridy = 0;
+        lowerLogin.add(registerTitle, constraints);
 
-        registerUsernameInput = new JTextField();
+        registerUsernameInput = new JTextField(40);
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
-        constraints.gridy = 3;
-        contents.add(registerUsernameInput, constraints);
+        constraints.gridy = 1;
+        lowerLogin.add(registerUsernameInput, constraints);
 
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(e -> {
@@ -104,8 +118,16 @@ public class LoginScreen extends AbstractScreen {
         });
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;
-        constraints.gridy = 3;
-        contents.add(registerButton, constraints);
+        constraints.gridy = 1;
+        lowerLogin.add(registerButton, constraints);
+
+        JSeparator lowerSeparator = new JSeparator();
+        lowerSeparator.setOrientation(JSeparator.VERTICAL);
+        constraints.gridy = 2;
+        constraints.fill = GridBagConstraints.VERTICAL;
+        lowerLogin.add(lowerSeparator, constraints);
+
+        contents.add(lowerLogin);
     }
 
     private static class UserIcon implements Icon {
