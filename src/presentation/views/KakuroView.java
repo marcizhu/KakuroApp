@@ -208,6 +208,11 @@ public class KakuroView extends JPanel {
         ((WhiteCellView)cells[r][c]).unselect();
     }
 
+    public void prepareCellToTurnWhite(int r, int c) {
+        if (r <= 0 || r >= rows-1 || c <= 0 || c >= columns-1) return;
+        if (cells[r][c] instanceof WhiteCellView) return;
+        ((BlackCellView)cells[r][c]).prepareToTurnWhite();
+    }
     public void setCellToWhite(int r, int c) {
         if (cells[r][c] instanceof WhiteCellView) return;
         cells[r][c].removeAll();
@@ -223,6 +228,13 @@ public class KakuroView extends JPanel {
         revalidate();
     }
 
+    public void prepareCellToTurnBlack(int r, int c) {
+        if (r <= 0 || r >= rows-1 || c <= 0 || c >= columns-1) return;
+        if (cells[r][c] instanceof BlackCellView) return;
+        ((WhiteCellView)cells[r][c]).setSelectedColor(blackCellColor);
+        ((WhiteCellView)cells[r][c]).setValue(0);
+        ((WhiteCellView)cells[r][c]).setNotations(0);
+    }
     public void setCellToBlack(int r, int c) {
         if (cells[r][c] instanceof BlackCellView) return;
         cells[r][c].removeAll();
@@ -453,9 +465,25 @@ public class KakuroView extends JPanel {
             }
             revalidate();
         }
+
+        public void prepareToTurnWhite() {
+            topToPaint = true;
+            topColor = Color.WHITE;
+            topLbl.setText("");
+            bottomToPaint = true;
+            bottomColor = Color.WHITE;
+            bottomLbl.setText("");
+            leftToPaint = true;
+            leftColor = Color.WHITE;
+            leftLbl.setText("");
+            rightToPaint = true;
+            rightColor = Color.WHITE;
+            rightLbl.setText("");
+            revalidate();
+        }
+
         public void resetBlackCellColor() {
             Color fontColor = RGBUtils.getContrastColor(blackCellColor);
-
             topColor = blackCellColor;
             topLbl.setForeground(fontColor);
             bottomColor = blackCellColor;

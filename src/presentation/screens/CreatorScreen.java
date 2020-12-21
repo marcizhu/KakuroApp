@@ -437,7 +437,6 @@ public class CreatorScreen extends AbstractScreen {
     public void selectWhiteCell(int r, int c) {
         creatorBoard.setWhiteCellSelectedColor(r, c, Palette.SelectionBlue);
     }
-    public void selectWhiteCellColor(int r, int c, Color col) { creatorBoard.setWhiteCellSelectedColor(r, c, col); }
     public void unselectWhiteCell(int r, int c) {
         creatorBoard.unselectWhiteCell(r, c);
     }
@@ -461,14 +460,6 @@ public class CreatorScreen extends AbstractScreen {
         onResize(contents.getWidth(), contents.getHeight());
     }
 
-    public void selectBlackCellColor(int r, int c, Color col) {
-        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_TOP, col);
-        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_BOTTOM, col);
-        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_LEFT, col);
-        creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_RIGHT, col);
-        onResize(contents.getWidth(), contents.getHeight());
-    }
-
     public void selectModified(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.HintGreen);
@@ -487,11 +478,18 @@ public class CreatorScreen extends AbstractScreen {
         }
     }
 
+    public void prepareCellToWhite(int r, int c) {
+        creatorBoard.prepareCellToTurnWhite(r, c);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
     public void setCellToWhite(int r, int c) {
         creatorBoard.setCellToWhite(r, c);
         onResize(contents.getWidth(), contents.getHeight());
     }
-
+    public void prepareCellToBlack(int r, int c) {
+        creatorBoard.prepareCellToTurnBlack(r, c);
+        //onResize(contents.getWidth(), contents.getHeight());
+    }
     public void setCellToBlack(int r, int c) {
         creatorBoard.setCellToBlack(r, c);
         onResize(contents.getWidth(), contents.getHeight());
