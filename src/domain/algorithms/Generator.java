@@ -17,6 +17,8 @@ import java.util.*;
 
 public class Generator {
 
+    private static final int MAX_ATTEMPTS = 3;
+
     private Board generatedBoard;
     private Board workingBoard;
     private SwappingCellQueue notationsQueue;
@@ -44,6 +46,9 @@ public class Generator {
     private Coordinates[] firstColCoord;    // coordinates to the first white cell in each colLine
     private final int[][] colLine;          // Pointers to position at array of colValuesUsed and colSums
     private int colLineSize;                // Number of different colLines
+
+    private int numOfWhiteCells;
+    private int attempt;
 
     /**
      * Constructor.
@@ -109,6 +114,7 @@ public class Generator {
         rowLine = new int[rows][columns];
         colLine = new int[rows][columns];
         this.random = new Random(this.seed);
+        attempt = 0;
     }
 
     /**
@@ -137,7 +143,6 @@ public class Generator {
         if (forceUniqueSolution) encodedSeed+="F_";
         else encodedSeed+="N_";
         encodedSeed += seed;
-        System.out.println(encodedSeed);
         return encodedSeed;
     }
 
@@ -410,6 +415,7 @@ public class Generator {
     }
 
     private void preprocessRows() {
+        numOfWhiteCells = 0;
         int size = 0;
         int rowLineID = 0;
         ArrayList<Integer> sizes = new ArrayList<>();
@@ -432,6 +438,7 @@ public class Generator {
                     // assign rowLineID to this member of current rowLine
                     rowLine[i][j] = rowLineID;
                     size++;
+                    numOfWhiteCells ++;
                 }
             }
             if (size > 0) { //last rowLine in row if we have seen whiteCells
@@ -563,6 +570,11 @@ public class Generator {
         commonGenerationProcess();
     }
 
+    /**
+     * Generate a new board.
+     * This function generates the new board using the given initial board as base to build upon.
+     * It is assumed that the board has no lines of white cells of size greater than nine.
+     */
     public void generateFromInitialBoard() {
         if (initialBoard == null) return;
 
@@ -609,8 +621,6 @@ public class Generator {
         TreeSet<Coordinates> possibleAmbiguities = new TreeSet<>();
         resolveEnqueuedCellValues(possibleAmbiguities);
 
-        //System.out.println("Before ambiguity check");
-        //printNotations();
         // After assigning as many cells as possible we check for existing ambiguities and resolve them
         TreeSet<Coordinates> forcedValues = new TreeSet<>();
         TreeSet<Coordinates> realAmbiguities = new TreeSet<>(); // should never be used if everything is okay
@@ -634,20 +644,28 @@ public class Generator {
             }
             if (!notationsQueue.isEmpty()) resolveEnqueuedCellValues(possibleAmbiguities);
         }
-        //System.out.println("After ambiguity check");
-        //printNotations();
 
         if (realAmbiguities.size() > 0) {
-            //System.out.println("THIS SHOULDN'T HAPPEN!!! Cells are left without options... Unique solution can't be guaranteed");
             ArrayList<Coordinates> toSolve = new ArrayList<>();
             for (Coordinates c : realAmbiguities)
                 if (workingBoard.isEmpty(c.r, c.c)) toSolve.add(c);
-            provisionalFillInBacktracking(toSolve);
+
+            if (!provisionalFillInBacktracking(toSolve) && attempt < MAX_ATTEMPTS) {
+                attempt++;
+                if (initialBoard == null) generate();
+                else generateFromInitialBoard();
+                return;
+            }
             computeRowSums();
             computeColSums();
         } else {
-            //System.out.println("Unique solution found!");
             defineBlackCellSums();
+        }
+
+        if (((float)forcedValues.size() / (float)numOfWhiteCells > .2f) || realAmbiguities.size() > 0) {
+            // too many initial values are not pretty to have in a kakuro, we leave it without values and multiple solutions
+            // or it was ambiguous all along and it doesn't make sense to have them.
+            forcedValues.clear();
         }
 
         // Finally, after resolving all ambiguities we proceed to create the generated board.
@@ -680,9 +698,6 @@ public class Generator {
 
     private void resolveEnqueuedCellValues(TreeSet<Coordinates> possibleAmbiguities) {
         while (!notationsQueue.isEmpty()) {
-            //System.out.println("Notations at iter: " + iter);
-            //printNotations();
-            //System.out.println();
             // then we have elements with no known value so we must do an assignation
             WhiteCell candidate = notationsQueue.getFirstElement(); //should never return a cell with value
             Pair<Integer, Integer> coord = candidate.getCoordinates();
@@ -694,8 +709,7 @@ public class Generator {
             if (!isRowSumAssigned || !isColSumAssigned) {
                 boolean success = valueBiasedSumAssignation(coord.first, coord.second, workingBoard.getCellNotations(coord.first, coord.second));
                 if (success) {
-                    if (workingBoard.isEmpty(coord.first, coord.second)) { // if valueBiasedSumAssignation is working perfectly this shouldn't happen
-                        //System.out.println("Success at valueBiasedSumAssig but no value was assigned at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
+                    if (workingBoard.isEmpty(coord.first, coord.second)) { // if valueBiasedSumAssignation is working this should get checked in it
                         if (notationsQueue.getFirstElement().equals(candidate))
                             notationsQueue.hideFirstElement();
                     } else {
@@ -727,8 +741,6 @@ public class Generator {
                     if (!workingBoard.isEmpty(coord.first, coord.second)) {
                         notationsQueue.removeOrderedCell(coord.first, coord.second);
                         continue; // ambiguity solved
-                    } else {
-                        //System.out.println("Wasnt avoided but did success... shouldnt happen at iter: " + iter + ", coord: " + coord.first + "," + coord.second);
                     }
                 }
             }
@@ -794,8 +806,8 @@ public class Generator {
         }
     }
 
-    private void provisionalFillInBacktracking(ArrayList<Coordinates> toSolve) {
-        fillWhiteCells(toSolve, 0); //System.out.println("No correct assignment of values found");
+    private boolean provisionalFillInBacktracking(ArrayList<Coordinates> toSolve) {
+        return fillWhiteCells(toSolve, 0);
     }
 
     private boolean fillWhiteCells (ArrayList<Coordinates> coord, int pos) {
