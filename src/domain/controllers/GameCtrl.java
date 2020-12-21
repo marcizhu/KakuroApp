@@ -113,6 +113,7 @@ public class GameCtrl {
         result.put("height", topKakuro.getBoard().getHeight());
         result.put("difficulty", topKakuro.getDifficulty().toString());
         result.put("timeSpent", (int)topPointer.getTimeSpent());
+        result.put("score", ((GameFinished) topPointer).getScore());
         return result;
     }
 
