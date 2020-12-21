@@ -2,7 +2,6 @@ package test.repository;
 
 import org.junit.jupiter.api.Test;
 import src.domain.entities.Board;
-import src.domain.entities.User;
 import src.repository.*;
 import src.repository.serializers.BoardDeserializer;
 import src.repository.serializers.BoardSerializer;
