@@ -44,8 +44,15 @@ public class DisplayKakuroScreen extends AbstractScreen {
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setVerticalAlignment(SwingConstants.CENTER);
 
+        JPanel kakuroWrapper = new JPanel();
+        kakuroWrapper.setLayout(new GridBagLayout());
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.BOTH;
         kakuroView = new KakuroView(((DisplayKakuroScreenCtrl)ctrl).getBoard(), true);
         kakuroView.setSize(height/2, height/2);
+        kakuroWrapper.add(kakuroView, constraints);
+        kakuroWrapper.setOpaque(false);
 
         body = new JLabel("<html><body>" + ((DisplayKakuroScreenCtrl)ctrl).getBody() + "</body></html>");
         body.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
@@ -71,7 +78,7 @@ public class DisplayKakuroScreen extends AbstractScreen {
 
         constraints.gridy = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        contents.add(kakuroView, constraints);
+        contents.add(kakuroWrapper, constraints);
 
         constraints.gridy = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;

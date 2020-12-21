@@ -78,7 +78,7 @@ public class DashboardScreen extends AbstractScreen {
 
         buildNewGamePanel();
         buildCreatePanel();
-        quickStatsPanel = buildQuickStatsPanel();
+        JPanel quickPanel = buildQuickStatsPanel();
 
         constraints.insets = new Insets(10,10,10,10);
         constraints.fill = GridBagConstraints.BOTH;
@@ -89,18 +89,18 @@ public class DashboardScreen extends AbstractScreen {
         constraints.gridy = 1;
         interactiveActionsPanel.add(createPanel, constraints);
 
-        JPanel statsWrapper = new JPanel();
-        statsWrapper.setLayout(new GridBagLayout());
+        quickStatsPanel = new JPanel();
+        quickStatsPanel.setLayout(new GridBagLayout());
         constraints.insets = new Insets(10,10,10,20);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        statsWrapper.add(quickStatsPanel, constraints);
+        quickStatsPanel.add(quickPanel, constraints);
 
         JPanel history = buildHistoryPanel(width);
 
         contentWrapper.add(interactiveActionsPanel);
-        contentWrapper.add(statsWrapper);
+        contentWrapper.add(quickStatsPanel);
         contentWrapper.add(history);
 
         contents.add(contentWrapper, BorderLayout.CENTER);
@@ -608,7 +608,13 @@ public class DashboardScreen extends AbstractScreen {
     }
 
     public void updateQuickStats() {
-        quickStatsPanel = buildQuickStatsPanel();
+        quickStatsPanel.removeAll();
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10,10,10,20);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        quickStatsPanel.add(buildQuickStatsPanel(), constraints);
         quickStatsPanel.revalidate();
     }
 
@@ -649,33 +655,43 @@ public class DashboardScreen extends AbstractScreen {
 
         JLabel topPointerLbl = buildLabel("Your top pointer", subtitleFnt, SwingConstants.LEFT);
 
-        // TODO: unhardcode this ------
+        Map<String, Object> topPointerInfo = ((DashboardScreenCtrl)ctrl).getTopPointer();
         JPanel topPointerPanel = new JPanel();
         topPointerPanel.setLayout(new GridBagLayout());
 
-        KakuroView topPointerKak = new KakuroView("9,9\n" +
-                "*,*,C19,C12,*,*,*,C7,C10\n" +
-                "*,F14,?,?,C4,C11,C17F4,?,?\n" +
-                "*,C7F36,?,?,?,?,?,?,?\n" +
-                "F12,?,?,F10,?,?,?,C25,C14\n" +
-                "F3,?,?,C20,C11F20,?,?,?,?\n" +
-                "F17,?,?,?,?,C8,F6,?,?\n" +
-                "*,C11,C7F13,?,?,?,C4F10,?,?\n" +
-                "F28,?,?,?,?,?,?,?,*\n" +
-                "F6,?,?,*,*,F8,?,?,*\n", false);
-        topPointerKak.setSize(150, 150);
+        if (topPointerInfo.size() == 0) {
+            constraints.insets = new Insets(65,0,65,0);
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            topPointerPanel.add(buildLabel("No games played yet.", bodyFnt, SwingConstants.CENTER), constraints);
+        } else {
+            KakuroView topPointerKak = new KakuroView((String) topPointerInfo.get("board"), false);
+            topPointerKak.setSize(150, 150);
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.insets = new Insets(0,5,0,25);
-        topPointerPanel.add(topPointerKak, constraints);
-        constraints.gridx = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets.right = 5;
-        topPointerPanel.add(buildLabel("34 pts.", subtitleFnt, SwingConstants.RIGHT));
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridheight = 5;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.insets = new Insets(0,5,0,25);
+            topPointerPanel.add(topPointerKak, constraints);
+            constraints.gridx = 1;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.insets.right = 5;
+            constraints.insets.bottom = 10;
+            constraints.gridheight = 1;
+            topPointerPanel.add(buildLabel((String) topPointerInfo.get("score"), subtitleFnt, SwingConstants.RIGHT), constraints);
+            constraints.insets.bottom = 2;
+            constraints.gridy = 1;
+            topPointerPanel.add(buildLabel((String) topPointerInfo.get("name"), bodyFnt, SwingConstants.RIGHT), constraints);
+            constraints.gridy = 2;
+            topPointerPanel.add(buildLabel("Difficulty: " + topPointerInfo.get("difficulty"), bodyFnt, SwingConstants.RIGHT), constraints);
+            constraints.gridy = 3;
+            topPointerPanel.add(buildLabel("Size: " + topPointerInfo.get("height") + "x" + topPointerInfo.get("width"), bodyFnt, SwingConstants.RIGHT), constraints);
+            constraints.gridy = 4;
+            constraints.insets.bottom = 0;
+            topPointerPanel.add(buildLabel("Time: " + secondsToStringTime((int) topPointerInfo.get("timeSpent")), bodyFnt, SwingConstants.RIGHT), constraints);
+        }
         topPointerPanel.setOpaque(false);
-        // ----------------------------
 
         JSeparator sep3 = new JSeparator();
         sep3.setForeground(Color.BLACK);
@@ -685,10 +701,13 @@ public class DashboardScreen extends AbstractScreen {
         Map<String, Integer> kakurosPlayedInfo = ((DashboardScreenCtrl)ctrl).getGamesPlayed();
 
         playedChartPanel = new BarChartView();
-        playedChartPanel.addBar("EASY", 8, Palette.HintGreen);
-        playedChartPanel.addBar("MEDIUM", 10, Palette.HintOrange);
-        playedChartPanel.addBar("HARD", 5, Palette.WarningLightRed);
-        playedChartPanel.addBar("EXTREME", 1, Palette.SelectionBlue);
+        playedChartPanel.setBarValueFont(subtitleFnt);
+        playedChartPanel.setBarLabelFont(smallFnt);
+        playedChartPanel.addBar("EASY",     kakurosPlayedInfo.get("easy"),     Palette.HintGreen);
+        playedChartPanel.addBar("MEDIUM",   kakurosPlayedInfo.get("medium"),   Palette.HintOrange);
+        playedChartPanel.addBar("HARD",     kakurosPlayedInfo.get("hard"),     Palette.WarningLightRed);
+        playedChartPanel.addBar("EXTREME",  kakurosPlayedInfo.get("extreme"),  Palette.SelectionBlue);
+        playedChartPanel.addBar("BY USERS", kakurosPlayedInfo.get("userMade"), new Color(0xAAAAAA));
         playedChartPanel.setSize(playedChartPanel.getWidth(), ranking.size() == 3 ? 158 : 142); //default height
         playedChartPanel.layoutHistogram();
         playedChartPanel.setBackground(Color.WHITE);

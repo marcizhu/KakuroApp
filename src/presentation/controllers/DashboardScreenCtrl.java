@@ -141,6 +141,16 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
         return pointsStr;
     }
 
+    public Map<String, Object> getTopPointer() {
+        Pair<Map<String, Object>, String> result = domainCtrl.getTopPointer(presentationCtrl.getUserSessionId());
+        if (result.second != null) {
+            Dialogs.showErrorDialog(result.second, "Something went wrong!");
+            return new HashMap<>();
+        }
+        if (result.first.size() != 0) result.first.put("score", pointsToString((float) result.first.get("score")));
+        return result.first;
+    }
+
     public Map<String, Integer> getGamesPlayed() {
         Pair<Map<String, Integer>, String> result = domainCtrl.getNumberOfGamesPlayed(presentationCtrl.getUserSessionId());
         if (result.second != null) {
@@ -166,5 +176,6 @@ public class DashboardScreenCtrl extends AbstractScreenCtrl{
     @Override
     public void onFocusRegained(int width, int height) {
         ((DashboardScreen)screen).updateHistoryPanel();
+        ((DashboardScreen)screen).updateQuickStats();
     }
 }

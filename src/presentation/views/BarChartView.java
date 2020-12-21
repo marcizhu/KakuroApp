@@ -14,15 +14,20 @@ public class BarChartView extends JPanel {
 
     // Misc settings
     private static final int defaultSize = 200;
-    private static final int barGap = 10;
-    private static final int barWidth = 50;
+    private static final float barGapToWidthRatio = 1f/6f;
+
+    private Font barValueFnt;
+    private Font barLabelFnt;
 
     public BarChartView() {
         setBorder(new EmptyBorder(0, 0, 0, 0));
         setLayout(new BorderLayout());
 
-        barPanel = new JPanel(new GridLayout(1, 0, barGap, 0));
-        labelPanel = new JPanel(new GridLayout(1, 0, barGap, 0));
+        barValueFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
+        barLabelFnt = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
+
+        barPanel = new JPanel(new GridLayout(1, 0, 10, 0));
+        labelPanel = new JPanel(new GridLayout(1, 0, 10, 0));
 
         add(barPanel, BorderLayout.CENTER);
         add(labelPanel, BorderLayout.PAGE_END);
@@ -39,6 +44,9 @@ public class BarChartView extends JPanel {
         barPanel.removeAll();
         labelPanel.removeAll();
 
+        ((GridLayout) barPanel.getLayout()).setHgap((int)((getWidth()/bars.size()) * barGapToWidthRatio));
+        ((GridLayout) labelPanel.getLayout()).setHgap((int)((getWidth()/bars.size()) * barGapToWidthRatio));
+
         int maxValue = 0;
 
         for (Bar bar: bars) {
@@ -47,22 +55,28 @@ public class BarChartView extends JPanel {
 
         for (Bar bar: bars) {
             JLabel label = new JLabel(bar.getValue() + "");
+            label.setFont(barValueFnt);
             label.setHorizontalTextPosition(JLabel.CENTER);
             label.setHorizontalAlignment(JLabel.CENTER);
             label.setVerticalTextPosition(JLabel.TOP);
             label.setVerticalAlignment(JLabel.BOTTOM);
 
-            final int barHeight = (bar.getValue() * getHeight()) / maxValue;
-            label.setIcon(new ColorIcon(bar.getColor(), barWidth, barHeight));
+            final int barHeight;
+            if (maxValue == 0) label.setIcon(new ColorIcon(new Color(0,0,0,0), (int)((getWidth()/bars.size())*(1-barGapToWidthRatio)), getHeight()));
+            else label.setIcon(new ColorIcon(bar.getColor(), (int)((getWidth()/bars.size())*(1-barGapToWidthRatio)), (bar.getValue() * getHeight()) / maxValue));
             barPanel.add(label);
 
             JLabel barLabel = new JLabel(bar.getLabel());
+            barLabel.setFont(barLabelFnt);
             barLabel.setHorizontalAlignment(JLabel.CENTER);
             labelPanel.add(barLabel);
         }
 
         revalidate();
     }
+
+    public void setBarValueFont(Font font) { this.barValueFnt = font; }
+    public void setBarLabelFont(Font font) { this.barLabelFnt = font; }
 
     private static class Bar {
         private final String label;
