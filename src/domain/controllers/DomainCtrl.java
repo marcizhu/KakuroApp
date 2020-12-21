@@ -121,6 +121,16 @@ public class DomainCtrl {
         }
     }
 
+    public Pair<Map<String, Integer>, String> getTimeStatisticsInDifficulty(String username, String difficulty) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Integer> data = gameCtrl.getTimeStatisticsInDifficulty(user, Difficulty.valueOf(difficulty));
+            return new Pair<>(data, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
+    }
+
     public Pair<ArrayList<Map<String, Object>>, String> getRankingByPoints() {
         try {
             ArrayList<Map<String, Object>> data = rankingCtrl.getRankingByPoints();
