@@ -6,14 +6,11 @@ import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
 public class CreatorScreen extends AbstractScreen {
-
     JPanel leftContent;
     JTabbedPane blackWhiteSelectors;
     JPanel selectorBlack;
@@ -86,14 +83,11 @@ public class CreatorScreen extends AbstractScreen {
         buildSelectorWhite();
         blackWhiteSelectors.addTab("WHITE CELLS", selectorWhite);
 
-        blackWhiteSelectors.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int tab = blackWhiteSelectors.getSelectedIndex();
-                ((CreatorScreenCtrl)ctrl).onSelectedTabChanged(tab);
-                if (tab == 0) whiteBrushChk.setSelected(false);
-                else if (tab == 1) blackBrushChk.setSelected(false);
-            }
+        blackWhiteSelectors.addChangeListener(e -> {
+            int tab = blackWhiteSelectors.getSelectedIndex();
+            ((CreatorScreenCtrl)ctrl).onSelectedTabChanged(tab);
+            if (tab == 0) whiteBrushChk.setSelected(false);
+            else if (tab == 1) blackBrushChk.setSelected(false);
         });
 
         JPanel lowerLeft = new JPanel();
@@ -115,12 +109,7 @@ public class CreatorScreen extends AbstractScreen {
 
         kakuroStateBtn = new JButton("VALIDATE");
         kakuroStateBtn.setForeground(Palette.HintOrange);
-        kakuroStateBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((CreatorScreenCtrl)ctrl).onKakuroStateButtonPressed(kakuroName.getText());
-            }
-        });
+        kakuroStateBtn.addActionListener(e -> ((CreatorScreenCtrl)ctrl).onKakuroStateButtonPressed(kakuroName.getText()));
 
         horizontalLeftFiller = Box.createRigidArea(new Dimension(width/3, 5));
 
@@ -184,12 +173,7 @@ public class CreatorScreen extends AbstractScreen {
         upperSelector.add(brushToolLbl, constraints);
 
         blackBrushChk = new JCheckBox();
-        blackBrushChk.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                ((CreatorScreenCtrl)ctrl).setBlackBrushEnabled(e.getStateChange() == ItemEvent.SELECTED);
-            }
-        });
+        blackBrushChk.addItemListener(e -> ((CreatorScreenCtrl)ctrl).setBlackBrushEnabled(e.getStateChange() == ItemEvent.SELECTED));
         constraints.gridx = 1;
         constraints.fill = GridBagConstraints.NONE;
         upperSelector.add(blackBrushChk, constraints);
@@ -239,7 +223,7 @@ public class CreatorScreen extends AbstractScreen {
     private void buildBlackPossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
         blackPossibleValues = new JPanel();
         int numItems = allPossibilities.first.size() + (allPossibilities.second ? 1 : 0);
-        int gridWidth = 6 < numItems ? 6 : numItems;
+        int gridWidth = Math.min(6, numItems);
         if (gridWidth == 0) gridWidth = 1;
         int gridHeight = numItems / gridWidth + (numItems%gridWidth == 0 ? 0 : 1);
         blackPossibleValues.setLayout(new GridLayout(gridHeight, gridWidth, 2, 2));
@@ -307,12 +291,7 @@ public class CreatorScreen extends AbstractScreen {
         upperSelector.add(brushToolLbl, constraints);
 
         whiteBrushChk = new JCheckBox();
-        whiteBrushChk.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                ((CreatorScreenCtrl)ctrl).setWhiteBrushEnabled(e.getStateChange() == ItemEvent.SELECTED);
-            }
-        });
+        whiteBrushChk.addItemListener(e -> ((CreatorScreenCtrl)ctrl).setWhiteBrushEnabled(e.getStateChange() == ItemEvent.SELECTED));
         constraints.gridx = 1;
         constraints.fill = GridBagConstraints.NONE;
         upperSelector.add(whiteBrushChk, constraints);
@@ -362,7 +341,7 @@ public class CreatorScreen extends AbstractScreen {
     private void buildWhitePossibleValues(Pair<ArrayList<Integer>, Boolean> allPossibilities) {
         whitePossibleValues = new JPanel();
         int numItems = allPossibilities.first.size() + (allPossibilities.second ? 1 : 0);
-        int gridWidth = 3 < numItems ? 3 : numItems;
+        int gridWidth = Math.min(3, numItems);
         if (gridWidth == 0) gridWidth = 1;
         int gridHeight = numItems / gridWidth + (numItems%gridWidth == 0 ? 0 : 1);
         whitePossibleValues.setLayout(new GridLayout(gridHeight, gridWidth, 2, 2));
@@ -416,24 +395,14 @@ public class CreatorScreen extends AbstractScreen {
         // Export button
         JButton exportBtn = new JButton("EXPORT");
         exportBtn.setForeground(Color.BLACK);
-        exportBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((CreatorScreenCtrl)ctrl).onExportButtonClicked();
-            }
-        });
+        exportBtn.addActionListener(e -> ((CreatorScreenCtrl)ctrl).onExportButtonClicked());
         constraints.gridx = 0;
         buttonPanel.add(exportBtn, constraints);
 
         // Fill kakuro button
         JButton fillKakuroBtn = new JButton("FILL IT FOR ME");
         fillKakuroBtn.setForeground(Color.BLACK);
-        fillKakuroBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((CreatorScreenCtrl)ctrl).onFillKakuroButtonClicked();
-            }
-        });
+        fillKakuroBtn.addActionListener(e -> ((CreatorScreenCtrl)ctrl).onFillKakuroButtonClicked());
         constraints.gridx = 1;
         buttonPanel.add(fillKakuroBtn, constraints);
 
@@ -446,12 +415,7 @@ public class CreatorScreen extends AbstractScreen {
         // Clear values button
         JButton clearValuesBtn = new JButton("CLEAR ALL VALUES");
         clearValuesBtn.setForeground(Palette.StrongRed);
-        clearValuesBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ((CreatorScreenCtrl)ctrl).onClearBoardButtonClicked();
-            }
-        });
+        clearValuesBtn.addActionListener(e -> ((CreatorScreenCtrl)ctrl).onClearBoardButtonClicked());
         constraints.gridx = 3;
         buttonPanel.add(clearValuesBtn, constraints);
 
@@ -481,18 +445,22 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setWhiteCellValue(r, c, value);
     }
     public void setNotationWhiteCell(int r, int c, int notations) { creatorBoard.setWhiteCellNotations(r, c, notations); }
+
     public void selectBlackCell(int r, int c, int s) {
         creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.SelectionBlue);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void unselectBlackCell(int r, int c, int s) {
         creatorBoard.unselectBlackCell(r, c, s);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void setValueBlackCell(int r, int c, int s, int value) {
         creatorBoard.setBlackCellValue(r, c, s, value);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void selectBlackCellColor(int r, int c, Color col) {
         creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_TOP, col);
         creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_BOTTOM, col);
@@ -500,6 +468,7 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setBlackCellSelectedColor(r, c, KakuroView.BLACK_SECTION_RIGHT, col);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void selectModified(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.HintGreen);
@@ -508,6 +477,7 @@ public class CreatorScreen extends AbstractScreen {
             onResize(contents.getWidth(), contents.getHeight());
         }
     }
+
     public void selectConflictive(int r, int c, int s) {
         if (s == CreatorScreenCtrl.WHITE_CELL) {
             creatorBoard.setWhiteCellSelectedColor(r, c, Palette.WarningLightRed);
@@ -516,14 +486,17 @@ public class CreatorScreen extends AbstractScreen {
             onResize(contents.getWidth(), contents.getHeight());
         }
     }
+
     public void setCellToWhite(int r, int c) {
         creatorBoard.setCellToWhite(r, c);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void setCellToBlack(int r, int c) {
         creatorBoard.setCellToBlack(r, c);
         onResize(contents.getWidth(), contents.getHeight());
     }
+
     public void updateWholeBoardFromString(String b) {
         creatorBoard.updateFromString(b, true);
         onResize(contents.getWidth(), contents.getHeight());

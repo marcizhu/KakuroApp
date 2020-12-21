@@ -3,12 +3,10 @@ package src.presentation.controllers;
 import src.domain.controllers.DomainCtrl;
 import src.domain.controllers.GameplayCtrl;
 import src.presentation.screens.GameScreen;
-import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -251,12 +249,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
                 board,
                 Palette.HintGreen,
                 "You spent " + secondsToStringTime(timeUsed) + " during this game and obtained a total of " + score + " points!",
-                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
-                    @Override
-                    public void onFinished() {
-                        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
-                    }
-                }
+                () -> presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD))
         );
 
         presentationCtrl.setScreen(nextScreen);
@@ -276,19 +269,14 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
                 board,
                 Palette.WarningLightRed,
                 "You spent " + secondsToStringTime(timeUsed) + " during this game. As you surrendered you get 0 points. The solver has determined that his board has " + solutions + " The solver took exactly " + timeSolving + " ms to achieve these results.",
-                new DisplayKakuroScreenCtrl.DefaultFinishOperation() {
-                    @Override
-                    public void onFinished() {
-                        presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD));
-                    }
-                }
+                () -> presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD))
         );
 
         presentationCtrl.setScreen(nextScreen);
     }
 
     private String secondsToStringTime(float time) {
-        int hours = (int)time/3600;
+        int hours = (int)time / 3600;
         int minutes = (int)time/60 - hours*60;
         int seconds = (int)time - minutes*60 - hours*3600;
         String timeStr = "";

@@ -85,9 +85,9 @@ public class WhiteCell extends Cell {
      * Set value of the cell
      * @param value Value to set
      */
-    public void setValue(int value) throws IllegalArgumentException {
+    public void setValue(int value) throws IndexOutOfBoundsException {
         if (value > 9 || value < 1)
-            throw new IllegalArgumentException("Value is out of range");
+            throw new IndexOutOfBoundsException("Value is out of range");
 
         this.value = value;
     }
@@ -98,12 +98,6 @@ public class WhiteCell extends Cell {
      */
     public int getNotations() {
         return notations;
-        /*boolean[] ret = new boolean[9];
-
-        for(int i = 0; i < 9; i++)
-            ret[i] = ((notations & (1 << i)) != 0);
-
-        return ret;*/
     }
 
     /**
@@ -171,9 +165,7 @@ public class WhiteCell extends Cell {
         return (value == 0 ? "?" : Integer.toString(value));
     }
 
-    private void
-
-    initAllNotations(boolean b) {
+    private void initAllNotations(boolean b) {
         notations = b ? 0b111111111 : 0b000000000;
     }
 }

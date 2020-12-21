@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 public class DB {
     private final String path;
     public DB() {
@@ -74,5 +73,4 @@ public class DB {
     public void writeToFile(Collection<?> col, String fileName) throws IOException {
         writeToFile(col, fileName, null, Object.class); // Fixme: replace Object.class with the actual type of the Collection elements
     }
-
 }

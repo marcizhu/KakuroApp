@@ -6,7 +6,6 @@ import src.presentation.screens.DisplayKakuroScreen;
 import java.awt.*;
 
 public class DisplayKakuroScreenCtrl extends AbstractScreenCtrl {
-
     private String title;
     private String board;
     private Color background;

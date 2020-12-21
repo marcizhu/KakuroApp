@@ -3,7 +3,11 @@ package src.domain.entities;
 import src.utils.Pair;
 
 public class Movement {
-    private int index, previous, next, rowIdx, colIdx;
+    private final int index;
+    private final int previous;
+    private final int next;
+    private final int rowIdx;
+    private final int colIdx;
 
     public Movement(int index, int previous, int next, int r, int c) {
         this.index = index;

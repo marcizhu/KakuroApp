@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
 public class GameRepositoryDB implements GameRepository {
 
     private final DB driver;

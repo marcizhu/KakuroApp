@@ -3,8 +3,6 @@ package src.domain.algorithms.helpers;
 import src.domain.entities.Board;
 import src.domain.entities.WhiteCell;
 
-import java.util.ArrayList;
-
 /**
  * Swapping Cell queue.
  *

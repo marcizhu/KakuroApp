@@ -8,7 +8,6 @@ import src.repository.serializers.KakuroSeializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class KakuroRepositoryDB implements KakuroRepository {
 

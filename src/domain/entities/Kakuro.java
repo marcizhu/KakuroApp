@@ -1,7 +1,6 @@
 package src.domain.entities;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 public class Kakuro {
     private final String seed;
@@ -17,7 +16,7 @@ public class Kakuro {
         this.name = name;
         this.createdBy = null;
         this.difficulty = difficulty;
-        this.createdAt = new Timestamp(System.currentTimeMillis());;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
         this.board = board;
     }
 

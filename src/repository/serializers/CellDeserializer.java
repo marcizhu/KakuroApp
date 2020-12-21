@@ -5,7 +5,6 @@ import src.domain.entities.*;
 
 import java.lang.reflect.Type;
 
-
 public class CellDeserializer implements JsonDeserializer<Cell[][]> {
     private final int width, height;
 

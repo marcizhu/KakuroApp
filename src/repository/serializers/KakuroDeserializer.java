@@ -28,7 +28,6 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
         String seed = obj.get("seed").getAsString();
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
 
-
         Board b;
 
         try {

@@ -193,8 +193,7 @@ public class RankingsScreen extends AbstractScreen {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(allUserInfo.size(), titles.length, 2, 2));
 
-        for (int i = 0; i < allUserInfo.size(); i++) {
-            Map<String, Object> userInfo = allUserInfo.get(i);
+        for (Map<String, Object> userInfo : allUserInfo) {
             boolean isOfInterest = userInfo.get(keys[0]).equals(userOfInterest);
             Font infoFont = bodyFnt;
             if (isOfInterest) infoFont = importantBodyFnt;
@@ -213,9 +212,9 @@ public class RankingsScreen extends AbstractScreen {
                 if (toAdd instanceof Float) {
                     if (keys[j].contains("time") || keys[j].contains("Time"))
                         toAddStr = secondsToStringTime((float) toAdd);
-                    else if(Math.floor((float)toAdd) == Math.ceil((float)toAdd)) {
+                    else if (Math.floor((float) toAdd) == Math.ceil((float) toAdd)) {
                         // Number is integer. Remove decimals or display "---" if zero
-                        int val = Math.round((float)toAdd);
+                        int val = Math.round((float) toAdd);
                         toAddStr = (val == 0 ? "---" : "" + val);
                     } else
                         // round to 2 decimal places
@@ -229,7 +228,7 @@ public class RankingsScreen extends AbstractScreen {
                 infoLine.add(itemLbl, ctrs);
 
                 ctrs.gridy = 1;
-                infoLine.add(Box.createRigidArea(new Dimension((width/keys.length)-25, 1)), ctrs);
+                infoLine.add(Box.createRigidArea(new Dimension((width / keys.length) - 25, 1)), ctrs);
             }
 
             if (isOfInterest) infoLine.setBackground(Color.LIGHT_GRAY);
@@ -277,17 +276,16 @@ public class RankingsScreen extends AbstractScreen {
     private String secondsToStringTime(float time) {
         if(Float.isNaN(time)) return "---";
 
-        int hours = (int)time/3600;
-        int minutes = (int)time/60 - hours*60;
-        int seconds = (int)time - minutes*60 - hours*3600;
+        int hours = (int)time / 3600;
+        int minutes = (int)time / 60 - hours * 60;
+        int seconds = (int)time - minutes * 60 - hours * 3600;
         String timeStr = "";
         if (hours > 0) {
-            timeStr += hours+":";
+            timeStr += hours + ":";
             if (minutes < 10) timeStr += "0";
         }
-        timeStr += minutes+":";
-        if (seconds < 10) timeStr += "0";
-        timeStr += seconds;
+
+        timeStr += minutes + String.format(":%02d", seconds);
 
         return timeStr;
     }

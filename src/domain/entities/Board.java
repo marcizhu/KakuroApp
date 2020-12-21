@@ -1,8 +1,5 @@
 package src.domain.entities;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import java.util.UUID;
 
 /**
@@ -15,7 +12,7 @@ public class Board {
     private final UUID id;
     private final int width;
     private final int height;
-    private Cell[][] cells;
+    private final Cell[][] cells;
 
 
     /**
@@ -285,7 +282,9 @@ public class Board {
      * @param col  Column of the cell to set
      */
     public void setCell(Cell cell, int row, int col) {
-        // TODO: handle out of bounds exception
+        if(row >= width || col >= height || row < 0 || col < 0)
+            throw new IndexOutOfBoundsException("Invalid row/column");
+
         cells[row][col] = cell; // Reminder: this assigns the same instance cell to cells[row][col]. NOT a copy
         cells[row][col].setCoordinates(row, col);
     }

@@ -113,7 +113,7 @@ public class KakuroListScreen extends AbstractScreen {
 
     private int difficultyToInt(String difficulty) {
         int diff = 0;
-        if (difficulty.equals("EASY")) diff = 0;
+        /**/ if (difficulty.equals("EASY")) diff = 0;
         else if (difficulty.equals("MEDIUM")) diff = 1;
         else if (difficulty.equals("HARD")) diff = 2;
         else if (difficulty.equals("EXTREME")) diff = 3;

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class GameInProgress extends Game{
     private Board board;
-    private ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
+    private final ArrayList<Movement> movements; // Should always be ordered from idx 1 to n
     private Timestamp lastPlayed;
     private int numberOfHints;
 

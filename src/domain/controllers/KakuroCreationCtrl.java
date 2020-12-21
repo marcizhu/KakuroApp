@@ -7,7 +7,6 @@ import src.domain.algorithms.helpers.KakuroFunctions;
 import src.domain.algorithms.helpers.SwappingCellQueue;
 import src.domain.entities.*;
 import src.presentation.controllers.CreatorScreenCtrl;
-import src.presentation.controllers.GameScreenCtrl;
 import src.utils.IntPair;
 import src.utils.Pair;
 
@@ -31,12 +30,12 @@ public class KakuroCreationCtrl {
     private static final String NAME_REQUESTED = "Please enter a name for your creation.";
     private static final String NAME_INVALID = "Oh no! Someone is already using this name... Please come up with a different one and try again, you're very close to publishing your creation!";
     private static final String KAKURO_VALIDATION_SUCCESSFUL = "The kakuro you created has been successfully validated! It seems to have ";
-    private static final String KAKURO_VALIDATION_FAILED = "Oupsie... Seems like the kakuro you created has no solutions! In order to publish it please change it so it has at least one solution.";
+    private static final String KAKURO_VALIDATION_FAILED = "Oopsie... Seems like the kakuro you created has no solutions! In order to publish it please change it so it has at least one solution.";
 
     private CreatorScreenCtrl viewCtrl;
     private final KakuroCtrl kakuroCtrl;
 
-    private User user;
+    private final User user;
     private Board workingBoard;
 
     private final int rows, columns;
@@ -475,10 +474,10 @@ public class KakuroCreationCtrl {
                 if (workingBoard.isBlackCell(i, j)) {
                     if (workingBoard.getHorizontalSum(i, j) == 0 && workingBoard.getVerticalSum(i,j) == 0) {
                         int sections = 0;
-                        if (i-1>=0 && workingBoard.isWhiteCell(i-1, j)) sections |= (1<<(viewCtrl.BLACK_SECTION_TOP));
-                        if (i+1<height && workingBoard.isWhiteCell(i+1, j)) sections |= (1<<(viewCtrl.BLACK_SECTION_BOTTOM));
-                        if (j-1>=0 && workingBoard.isWhiteCell(i, j-1)) sections |= (1<<(viewCtrl.BLACK_SECTION_LEFT));
-                        if (j+1<width && workingBoard.isWhiteCell(i, j+1)) sections |= (1<<(viewCtrl.BLACK_SECTION_RIGHT));
+                        if (i - 1 >= 0 && workingBoard.isWhiteCell(i - 1, j))     sections |= (1 << CreatorScreenCtrl.BLACK_SECTION_TOP);
+                        if (i + 1 < height && workingBoard.isWhiteCell(i + 1, j)) sections |= (1 << CreatorScreenCtrl.BLACK_SECTION_BOTTOM);
+                        if (j - 1 >= 0 && workingBoard.isWhiteCell(i, j - 1))      sections |= (1 << CreatorScreenCtrl.BLACK_SECTION_LEFT);
+                        if (j + 1 < width && workingBoard.isWhiteCell(i, j + 1))   sections |= (1 << CreatorScreenCtrl.BLACK_SECTION_RIGHT);
                         col[j] = sections == 0 ? "*" : "#"+sections;
                     } else {
                         col[j] = workingBoard.getCell(i,j).toString();

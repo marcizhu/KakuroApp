@@ -1,8 +1,6 @@
 package src.repository.serializers;
 
-
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import src.domain.controllers.Reader;
 import src.domain.entities.*;
 
@@ -21,13 +19,9 @@ public class BoardDeserializer implements JsonDeserializer<Board> {
         int height = obj.get("height").getAsInt();
 
         String cells = obj.get("cells").getAsString();
-
         String formattedBoard = height + "," + width + "\n" + cells;
-
         String notations = obj.get("notations").getAsString();
 
-        Board b = Reader.fromString(id, notations, formattedBoard);
-
-        return b;
+        return Reader.fromString(id, notations, formattedBoard);
     }
 }
