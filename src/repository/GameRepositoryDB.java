@@ -115,18 +115,6 @@ public class GameRepositoryDB implements GameRepository {
     }
 
     @Override
-    public float getBestTime(String kakuroName) throws IOException {
-        // TODO maybe implement this in the use case
-        return 0;
-    }
-
-    @Override
-    public int getKakuroState(String kakuroName) throws IOException {
-        // TODO:
-        return 0;
-    }
-
-    @Override
     public ArrayList<Game> getAllGames() throws IOException {
         return (ArrayList<Game>)(ArrayList<?>) driver.readAll(Game.class, deserializer);
     }

@@ -2,7 +2,6 @@ package test.repository;
 
 import org.junit.jupiter.api.Test;
 import src.domain.entities.Board;
-import src.domain.entities.User;
 import src.repository.*;
 import src.repository.serializers.BoardDeserializer;
 import src.repository.serializers.BoardSerializer;
@@ -55,7 +54,7 @@ public class BoardRepositoryDBTest {
     }
 
     @Test
-    public void testDeleteBoard() throws IOException { // TODO!!
+    public void testDeleteBoard() throws IOException {
         DB dbMock = mock(DB.class);
         Board board = new Board(5, 5);
 

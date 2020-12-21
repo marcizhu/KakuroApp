@@ -17,11 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class KakuroRepositoryDBTest {
+    private final DB dbMock = mock(DB.class);
 
     @Test
     public void testGetKakuro () throws IOException {
-        DB dbMock = mock(DB.class);
-
         Kakuro expectedKakuro = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), new User("Larry"), "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
@@ -40,8 +39,6 @@ public class KakuroRepositoryDBTest {
 
     @Test
     public void testDeleteKakuro () throws IOException {
-        DB dbMock = mock(DB.class);
-
         Kakuro expectedKakuro = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), new User("Larry"), "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
@@ -58,27 +55,24 @@ public class KakuroRepositoryDBTest {
 
     @Test
     public void testSaveKakuro () throws IOException {
-        DB dbMock = mock(DB.class);
+        Kakuro kakuro = new Kakuro("test", Difficulty.EASY, new Board(5, 5), "");
 
-        Kakuro expectedKakuro = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), new User("Larry"), "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
-        expectedKakuros.add(expectedKakuro);
+        expectedKakuros.add(kakuro);
 
-        when(dbMock.readAll(any(), any(JsonDeserializer.class))).thenReturn(new ArrayList<>());
+        when(dbMock.readAll(any(Kakuro.class.getClass()), any(KakuroDeserializer.class))).thenReturn(new ArrayList<>());
 
         KakuroRepository repo = new KakuroRepositoryDB(dbMock);
-        repo.saveKakuro(expectedKakuro);
+        repo.saveKakuro(kakuro);
 
 
         // Assert that the database driver was called properly
-        //verify(dbMock).readAll(any(), any(JsonDeserializer.class)); //FIXME: fix test !!!
-        //verify(dbMock).writeToFile(any(ArrayList.class), any(String.class), any(KakuroSeializer.class), any()); // FIXME: fix bug with this line
+        verify(dbMock).readAll(any(Kakuro.class.getClass()), any(KakuroDeserializer.class));
+        verify(dbMock).writeToFile(any(ArrayList.class), any(String.class), any(KakuroSeializer.class), any(Kakuro.class.getClass()));
     }
 
     @Test
     public void testGetAllKakuros () throws IOException {
-        DB dbMock = mock(DB.class);
-
         Kakuro expectedKakuro1 = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), new User("Larry"), "");
         Kakuro expectedKakuro2 = new Kakuro("Test2", Difficulty.EASY, new Board(1, 1), new User("Kanye"), "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
@@ -100,8 +94,6 @@ public class KakuroRepositoryDBTest {
 
     @Test
     public void testGetAllKakurosByUser () throws IOException {
-        DB dbMock = mock(DB.class);
-
         User larry = new User("Larry");
         Kakuro expectedKakuro = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), larry, "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
@@ -127,8 +119,6 @@ public class KakuroRepositoryDBTest {
 
     @Test
     public void testGetAllKakurosByDifficulty () throws IOException {
-        DB dbMock = mock(DB.class);
-
         Kakuro expectedKakuro = new Kakuro("Test", Difficulty.EXTREME, new Board(1, 1), new User("Larry"), "");
         ArrayList<Object> expectedKakuros = new ArrayList<>();
         expectedKakuros.add(expectedKakuro);
