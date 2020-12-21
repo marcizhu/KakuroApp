@@ -81,22 +81,42 @@ public class DomainCtrl {
         }
     }
 
-    public Pair<Map<String, Integer>, String> getNumberOfGamesPlayed(String username) {
-        try {
-            User user = userCtrl.getUser(username);
-            Map<String, Integer> data = gameCtrl.countGamesPlayedByDifficulty(user);
-            return new Pair<>(data, null);
-        } catch (Exception e) {
-            return new Pair<>(null, e.getMessage());
-        }
-    }
-
     public Pair<ArrayList<Map<String, Object>>, String> getGameHistory(String username) {
         try {
             ArrayList<Map<String, Object>> data = gameCtrl.getGameHistory(username);
             return new Pair<>(data, null);
         } catch (Exception e) {
             e.printStackTrace();
+            return new Pair<>(null, e.getMessage());
+        }
+    }
+
+    public Pair<Map<String, Integer>, String> getNumberOfGamesPlayed(String username) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Integer> data = gameCtrl.getNumberOfGamesPlayed(user);
+            return new Pair<>(data, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
+    }
+
+    public Pair<Map<String, Object>, String> getTopPointer(String username) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Object> data = gameCtrl.getTopPointer(user);
+            return new Pair<>(data, null);
+        } catch (Exception e) {
+            return new Pair<>(null, e.getMessage());
+        }
+    }
+
+    public Pair<Map<String, Object>, String> getTopPointerInDifficulty(String username, String difficulty) {
+        try {
+            User user = userCtrl.getUser(username);
+            Map<String, Object> data = gameCtrl.getTopPointerInDifficulty(user, Difficulty.valueOf(difficulty));
+            return new Pair<>(data, null);
+        } catch (Exception e) {
             return new Pair<>(null, e.getMessage());
         }
     }

@@ -4,7 +4,6 @@ import src.domain.entities.*;
 import src.repository.GameRepository;
 import src.repository.UserRepository;
 
-import java.io.IOException;
 import java.util.*;
 
 public class GameCtrl {
@@ -64,7 +63,7 @@ public class GameCtrl {
         return result;
     }
 
-    public Map<String, Integer> countGamesPlayedByDifficulty(User user) throws IOException {
+    public Map<String, Integer> getNumberOfGamesPlayed(User user) throws Exception {
         ArrayList<Game> games = gameRepository.getAllGamesByUser(user);
         int easy = 0, medium = 0, hard = 0, extreme = 0, userMade = 0;
         for (Game game : games) {
@@ -85,6 +84,35 @@ public class GameCtrl {
         result.put("extreme", extreme);
         result.put("userMade", userMade);
 
+        return result;
+    }
+
+    public Map<String, Object> getTopPointer(User user) throws Exception {
+        ArrayList<Game> games = gameRepository.getAllGamesByUser(user);
+        return getTopPointerFromGameList(games);
+    }
+
+    public Map<String, Object> getTopPointerInDifficulty(User user, Difficulty difficulty) throws Exception {
+        ArrayList<Game> games = gameRepository.getAllGamesByDifficultyAndUser(difficulty, user);
+        return getTopPointerFromGameList(games);
+    }
+
+    private Map<String, Object> getTopPointerFromGameList(ArrayList<Game> games) {
+        Game topPointer = null;
+        for (Game game : games) {
+            if (game instanceof GameFinished && (topPointer == null || ((GameFinished) game).getScore() > ((GameFinished)topPointer).getScore())) {
+                topPointer = game;
+            }
+        }
+        Map<String, Object> result = new HashMap<>();
+        if (topPointer == null) return result;
+        Kakuro topKakuro = topPointer.getKakuro();
+        result.put("board", topKakuro.getBoard().toString());
+        result.put("name", topKakuro.getName());
+        result.put("width", topKakuro.getBoard().getWidth());
+        result.put("height", topKakuro.getBoard().getHeight());
+        result.put("difficulty", topKakuro.getDifficulty().toString());
+        result.put("timeSpent", (int)topPointer.getTimeSpent());
         return result;
     }
 
