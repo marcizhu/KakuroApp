@@ -52,7 +52,7 @@ public class Reader {
      * @param input String representing the board
      * @return the board represented by the Id, notations and the contents of the string
      */
-    public static Board fromString(UUID boardId, String notations, String input) {
+    public static Board fromString(UUID boardId, String notations, String input) throws RuntimeException {
         Matcher m = pattern.matcher("");
         String[] rows = input.split("\\n");
         String[] line1 = rows[0].split(",");
@@ -61,11 +61,11 @@ public class Reader {
         int width  = Integer.parseInt(line1[1].trim());
 
         Board board = new Board(boardId, width, height);
-        assert(rows.length - 1 == height);
+        if(rows.length - 1 != height) throw new RuntimeException("Missing rows");
 
         for(int i = 0; i < height; i++) {
             String[] cols = rows[i + 1].split(",");
-            assert(cols.length == width);
+            if(cols.length != width) throw new RuntimeException("Missing columns");
 
             for (int j = 0; j < width; j++) {
                 cols[j] = cols[j].trim();
@@ -87,10 +87,14 @@ public class Reader {
 
                     cell = new BlackCell(col, row);
                 } else {
-                    int val = Integer.parseInt(cols[j]);
-                    int notation = 0;
-                    if (notations != null) notation = Character.getNumericValue(notations.charAt(width*i + j));
-                    cell = new WhiteCell(i, j, val, notation);
+                    try {
+                        int val = Integer.parseInt(cols[j]);
+                        int notation = 0;
+                        if (notations != null) notation = Character.getNumericValue(notations.charAt(width * i + j));
+                        cell = new WhiteCell(i, j, val, notation);
+                    } catch(NumberFormatException e) {
+                        throw new RuntimeException("Invalid character at position (" + i + ", " + j + ")");
+                    }
                 }
 
                 board.setCell(cell, i, j);
