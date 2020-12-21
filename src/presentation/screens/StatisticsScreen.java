@@ -10,6 +10,7 @@ import src.utils.Pair;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class StatisticsScreen extends AbstractScreen {
@@ -199,22 +200,24 @@ public class StatisticsScreen extends AbstractScreen {
         JPanel rightTop = new JPanel();
         rightTop.setLayout(new BoxLayout(rightTop, BoxLayout.X_AXIS));
 
+        Map<String, String> userTimesEasy = ((StatisticsScreenCtrl)ctrl).getUserTimesInDifficulty("EASY");
         JPanel easyStatsPanel = buildStatisticsDifficultyTile(
                 "EASY",
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EASY"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EASY"),
-                "1:20",
-                ((StatisticsScreenCtrl)ctrl).getAvgTime("EASY"),
+                userTimesEasy.get("bestTime"),
+                userTimesEasy.get("avgTime"),
                 ((StatisticsScreenCtrl)ctrl).getEasyGamesPlayed(),
                 width*3/10
         );
 
+        Map<String, String> userTimesMedium = ((StatisticsScreenCtrl)ctrl).getUserTimesInDifficulty("MEDIUM");
         JPanel mediumStatsPanel = buildStatisticsDifficultyTile(
                 "MEDIUM",
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("MEDIUM"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("MEDIUM"),
-                "1:20",
-                ((StatisticsScreenCtrl)ctrl).getAvgTime("MEDIUM"),
+                userTimesMedium.get("bestTime"),
+                userTimesMedium.get("avgTime"),
                 ((StatisticsScreenCtrl)ctrl).getMediumGamesPlayed(),
                 width*3/10
         );
@@ -226,22 +229,24 @@ public class StatisticsScreen extends AbstractScreen {
         JPanel rightBottom = new JPanel();
         rightBottom.setLayout(new BoxLayout(rightBottom, BoxLayout.X_AXIS));
 
+        Map<String, String> userTimesHard = ((StatisticsScreenCtrl)ctrl).getUserTimesInDifficulty("HARD");
         JPanel hardStatsPanel = buildStatisticsDifficultyTile(
                 "HARD",
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("HARD"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("HARD"),
-                "1:20",
-                ((StatisticsScreenCtrl)ctrl).getAvgTime("HARD"),
+                userTimesHard.get("bestTime"),
+                userTimesHard.get("avgTime"),
                 ((StatisticsScreenCtrl)ctrl).getHardGamesPlayed(),
                 width*3/10
         );
 
+        Map<String, String> userTimesExtreme = ((StatisticsScreenCtrl)ctrl).getUserTimesInDifficulty("EXTREME");
         JPanel extremeStatsPanel = buildStatisticsDifficultyTile(
                 "EXTREME",
                 ((StatisticsScreenCtrl)ctrl).getTopRankingByDifficulty("EXTREME"),
                 ((StatisticsScreenCtrl)ctrl).getTopPointerInDifficulty("EXTREME"),
-                "1:20",
-                ((StatisticsScreenCtrl)ctrl).getAvgTime("EXTREME"),
+                userTimesExtreme.get("bestTime"),
+                userTimesExtreme.get("avgTime"),
                 ((StatisticsScreenCtrl)ctrl).getExtremeGamesPlayed(),
                 width*3/10
         );

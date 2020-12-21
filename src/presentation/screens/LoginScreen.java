@@ -17,6 +17,12 @@ public class LoginScreen extends AbstractScreen {
     private static final EmptyBorder thinBorder = new EmptyBorder(0, 10, 0, 10);
     private static final EmptyBorder thickBorder = new EmptyBorder(10, 20, 10, 20);
 
+    private int verticalFill;
+    private int horizontalFill;
+    private int numUsers;
+
+    JPanel innerContents;
+
     public LoginScreen(AbstractScreenCtrl ctrl) {
         super(ctrl);
     }
@@ -25,15 +31,14 @@ public class LoginScreen extends AbstractScreen {
     public void build(int width, int height) {
         super.build(width, height);
         contents = new JPanel();
-        contents.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
+        contents.setLayout(new BorderLayout());
+
+        innerContents = new JPanel();
+        innerContents.setLayout(new BoxLayout(innerContents, BoxLayout.Y_AXIS));
 
         JPanel upperLogin = new JPanel();
         upperLogin.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-
-        //constraints.fill = GridBagConstraints.VERTICAL;
-        //constraints.gridwidth
-        //constraints.gridy = 0;
 
         JLabel userListTitle = new JLabel("Who are you? Choose your profile");
         userListTitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
@@ -46,7 +51,7 @@ public class LoginScreen extends AbstractScreen {
         constraints.gridx = 0;
         constraints.gridy = 1;
         upperLogin.add(userListTitle, constraints);
-        contents.add(upperLogin);
+        innerContents.add(upperLogin);
 
         ArrayList<String> users = ((LoginScreenCtrl)ctrl).getUserList();
         JPanel userListLayout = new JPanel(new GridLayout(1, users.size()));
@@ -91,7 +96,7 @@ public class LoginScreen extends AbstractScreen {
         userListPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         userListPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         userListPane.setBorder(BorderFactory.createEmptyBorder());
-        contents.add(userListPane);
+        innerContents.add(userListPane);
 
         JPanel lowerLogin = new JPanel();
         lowerLogin.setLayout(new GridBagLayout());
@@ -121,13 +126,17 @@ public class LoginScreen extends AbstractScreen {
         constraints.gridy = 1;
         lowerLogin.add(registerButton, constraints);
 
-        JSeparator lowerSeparator = new JSeparator();
-        lowerSeparator.setOrientation(JSeparator.VERTICAL);
-        constraints.gridy = 2;
-        constraints.fill = GridBagConstraints.VERTICAL;
-        lowerLogin.add(lowerSeparator, constraints);
+        innerContents.add(lowerLogin);
 
-        contents.add(lowerLogin);
+        numUsers = users.size();
+        verticalFill = (height - 400) / 2;
+        horizontalFill = (width - numUsers*200) / 2;
+
+        contents.add(Box.createRigidArea(new Dimension(width, verticalFill)), BorderLayout.NORTH);
+        contents.add(Box.createRigidArea(new Dimension(width, verticalFill)), BorderLayout.SOUTH);
+        contents.add(Box.createRigidArea(new Dimension(horizontalFill, height - verticalFill*2)), BorderLayout.WEST);
+        contents.add(Box.createRigidArea(new Dimension(horizontalFill, height - verticalFill*2)), BorderLayout.EAST);
+        contents.add(innerContents, BorderLayout.CENTER);
     }
 
     private static class UserIcon implements Icon {
@@ -188,5 +197,18 @@ public class LoginScreen extends AbstractScreen {
     public void onDestroy() {}
 
     @Override
-    public void onResize(int width, int height) {}
+    public void onResize(int width, int height) {
+        verticalFill = (height - 400) / 2;
+        if (verticalFill < 0) verticalFill = 0;
+        horizontalFill = (width - numUsers*200) / 2;
+        if (horizontalFill < 0) horizontalFill = 0;
+
+        contents.removeAll();
+
+        contents.add(Box.createRigidArea(new Dimension(width, verticalFill)), BorderLayout.NORTH);
+        contents.add(Box.createRigidArea(new Dimension(width, verticalFill)), BorderLayout.SOUTH);
+        contents.add(Box.createRigidArea(new Dimension(horizontalFill, height - verticalFill*2)), BorderLayout.WEST);
+        contents.add(Box.createRigidArea(new Dimension(horizontalFill, height - verticalFill*2)), BorderLayout.EAST);
+        contents.add(innerContents, BorderLayout.CENTER);
+    }
 }
