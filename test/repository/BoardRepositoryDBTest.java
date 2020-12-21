@@ -54,7 +54,7 @@ public class BoardRepositoryDBTest {
     }
 
     @Test
-    public void testDeleteBoard() throws IOException { // TODO!!
+    public void testDeleteBoard() throws IOException {
         DB dbMock = mock(DB.class);
         Board board = new Board(5, 5);
 
