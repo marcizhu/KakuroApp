@@ -286,9 +286,9 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
             brushPath.add(new IntPair(r, c));
 
             if (blackBrushActive) {
-                ((CreatorScreen)screen).selectWhiteCellColor(r, c, Color.BLACK);
+                ((CreatorScreen)screen).prepareCellToBlack(r, c);
             } else {
-                ((CreatorScreen)screen).selectBlackCellColor(r, c, Color.WHITE);
+                ((CreatorScreen)screen).prepareCellToWhite(r, c);
             }
         }
     }
@@ -297,9 +297,9 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
             brushPath.add(new IntPair(r, c));
 
             if (blackBrushActive) {
-                ((CreatorScreen)screen).selectWhiteCellColor(r, c, Color.BLACK);
+                ((CreatorScreen)screen).prepareCellToBlack(r, c);
             } else {
-                ((CreatorScreen)screen).selectBlackCellColor(r, c, Color.WHITE);
+                ((CreatorScreen)screen).prepareCellToWhite(r, c);
             }
         }
     }
