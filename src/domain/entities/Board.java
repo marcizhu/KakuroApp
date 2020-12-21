@@ -282,7 +282,7 @@ public class Board {
      * @param col  Column of the cell to set
      */
     public void setCell(Cell cell, int row, int col) {
-        if(row >= width || col >= height || row < 0 || col < 0)
+        if(row >= height || col >= width || row < 0 || col < 0)
             throw new IndexOutOfBoundsException("Invalid row/column");
 
         cells[row][col] = cell; // Reminder: this assigns the same instance cell to cells[row][col]. NOT a copy
