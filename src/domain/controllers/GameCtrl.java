@@ -122,18 +122,17 @@ public class GameCtrl {
 
     public Map<String, Integer> getTimeStatisticsInDifficulty(User user, Difficulty difficulty) throws Exception {
         ArrayList<Game> games = gameRepository.getAllGamesByDifficultyAndUser(difficulty, user);
-        float bestTime = -1;
-        float avgTime = -1;
+        float bestTime = 0;
+        float avgTime = 0;
         int gameCount = 0;
         for (Game game : games) {
             if (game instanceof GameFinished && !((GameFinished) game).isSurrendered()) {
                 if (bestTime == 0 || game.getTimeSpent() < bestTime) bestTime = game.getTimeSpent();
-                if (avgTime == 0) avgTime = 0;
                 gameCount++;
                 avgTime += game.getTimeSpent();
             }
         }
-        if (avgTime != 0) avgTime /= gameCount;
+        if (gameCount > 0) avgTime /= gameCount;
 
         Map<String, Integer> result = new HashMap<>();
         result.put("bestTime", (int)bestTime);
