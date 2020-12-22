@@ -59,12 +59,14 @@ If the given parameters are correct, then the generation process begins and fina
 
 ## Building & executing
 
-This repository was built using IntelliJ IDEA, so it can easily be built using it. In case this IDE is not available for building, we also provide a Makefile to compile all applications. Simply run `make` on the root folder to build the solver app, the generator app and the unit tests. You can also use `make solver` to _only_ build the solver app, `make generator` to _only_ build the generator app and `make tests` to _only_ build unit tests.
+This repository was built using IntelliJ IDEA, so it can easily be built using it. In case this IDE is not available for building, we also provide a Makefile to compile all applications. Simply run `make` on the root folder to build the solver app, the generator app and the unit tests. You can also use `make solver` to _only_ build the solver app, `make generator` to _only_ build the generator app, `make tests` to _only_ build unit tests and finally `make app` to _only_ make the main application.
 
 This makefile also allows to run the tests as well as all the apps:
 
 - To execute the tests, just execute `make run-tests`. The execution of all tests should take around one minute (the first test takes ~50s, the others should run in a few milliseconds each)
 
 - To execute the solver use `make run-solver`. Since the program reads from standard input, stdin redirections can be used to pipe a kakuro to the application. For example, try `make run-solver < data/kakuros/unsolved/sample.kak`. Alternatively, using `java app/SolverApp < file.txt` after a `make solver` should work just as fine.
+
+- To execute the main application use either `make run-app` or `java src/Main`. This application requires no command line parameters to be executed. Additionally, we have provided a `.jar` file for the application, so you can run that by using `java -jar bin/app.jar`. Any of these commands should result in the app opening without any issue. However, the JAR version has its own database (located at `bin/data/DB`), so changes in that application will NOT be shown if the app is executed using any of the first two commands. 
 
 - However, to execute the generator you **must** use `java app/GeneratorApp <width> <height> <difficulty>`. This is due to the fact that you cannot pipe command-line arguments through `make`. Running `make run-generator` will execute the app but since it will not recieve command line arguments, it will only display the help output and exit. For example, try running `java app/GeneratorApp 10 10 4` to generate an extreme 10 by 10 Kakuro! :D
