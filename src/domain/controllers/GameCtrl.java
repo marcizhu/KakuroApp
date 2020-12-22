@@ -46,6 +46,7 @@ public class GameCtrl {
             HashMap<String, Object> gameData = new HashMap<>();
             Kakuro kakuro = game.getKakuro();
             gameData.put("board", kakuro.getBoard().toString());
+            gameData.put("color", kakuro.getColorCode());
             gameData.put("name", kakuro.getName());
             gameData.put("width", kakuro.getBoard().getWidth());
             gameData.put("height", kakuro.getBoard().getHeight());
@@ -109,6 +110,7 @@ public class GameCtrl {
         if (topPointer == null) return result;
         Kakuro topKakuro = topPointer.getKakuro();
         result.put("board", topKakuro.getBoard().toString());
+        result.put("color", topKakuro.getColorCode());
         result.put("name", topKakuro.getName());
         result.put("width", topKakuro.getBoard().getWidth());
         result.put("height", topKakuro.getBoard().getHeight());

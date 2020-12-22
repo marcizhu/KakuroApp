@@ -75,4 +75,6 @@ public class Kakuro {
     public String getSeed() {
         return seed == null ? "" : this.seed;
     }
+
+    public int getColorCode() { return colorCode; }
 }

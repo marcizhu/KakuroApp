@@ -81,6 +81,7 @@ public class KakuroCtrl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
+        result.put("color", kakuro.getColorCode());
         result.put("seed", kakuro.getSeed());
         result.put("generatorTime", generatorTime);
 
@@ -120,6 +121,7 @@ public class KakuroCtrl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("board", board.toString());
+        result.put("color", kakuro.getColorCode());
         result.put("seed", kakuro.getSeed());
         result.put("generatorTime", generatorTime);
 
@@ -147,6 +149,7 @@ public class KakuroCtrl {
 
             HashMap<String, Object> kakuroData = new HashMap<>();
             kakuroData.put("board", kakuro.getBoard().toString());
+            kakuroData.put("color", kakuro.getColorCode());
             kakuroData.put("name", kakuro.getName());
             kakuroData.put("difficulty", kakuro.getDifficulty().toString());
             kakuroData.put("timesPlayed", timesPlayed);
