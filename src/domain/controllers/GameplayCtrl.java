@@ -765,6 +765,7 @@ public class GameplayCtrl {
 
     public void surrender() {
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+        currentGame.setNumberOfHints(currentGame.getNumberOfHints() + totalNumOfHints);
 
         // Correct solution
         GameFinished finished = new GameFinished(currentGame, true);
@@ -817,6 +818,7 @@ public class GameplayCtrl {
         }
 
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
+        currentGame.setNumberOfHints(currentGame.getNumberOfHints() + totalNumOfHints);
 
         // Correct solution
         GameFinished finished = new GameFinished(currentGame, false);
