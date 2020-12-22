@@ -1,12 +1,13 @@
 package src.domain.algorithms;
 
 import src.domain.algorithms.helpers.*;
-import src.domain.entities.BlackCell;
-import src.domain.entities.Board;
-import src.domain.entities.WhiteCell;
+import src.domain.entities.*;
+import src.utils.IntPair;
 import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Solver {
     private final Board initialBoard;
@@ -189,31 +190,60 @@ public class Solver {
         if (notationsQueue.isEmpty()) {
             // there is only one solution,
             // we can't just add the working board because rowSum and colSum assignations aren't done directly to the black cells
-            solutions.add(copySolution());
+            solutions.add(copySolution(workingBoard));
             return 1;
         }
 
+        ArrayList<IntPair> remainingCells = new ArrayList<>();
+        Board justInCaseBoard = new Board(workingBoard);
+        int[] rowValuesUsedLocal = new int[rowLineSize];
+        int[] colValuesUsedLocal = new int[colLineSize];
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
-                if (workingBoard.isWhiteCell(r, c) && workingBoard.isEmpty(r, c) && notationsQueue.isHiding(r, c)) {
-                    notationsQueue.insertOrderedCell(r, c);
+                if (workingBoard.isWhiteCell(r, c)) {
+                    if (workingBoard.isEmpty(r, c)) {
+                        remainingCells.add(new IntPair(r, c));
+                        if (notationsQueue.isHiding(r, c)) notationsQueue.insertOrderedCell(r, c);
+                    } else {
+                        rowValuesUsedLocal[rowLine[r][c]] |= (1 << (workingBoard.getValue(r,c)-1));
+                        colValuesUsedLocal[colLine[r][c]] |= (1 << (workingBoard.getValue(r,c)-1));
+                    }
                 }
             }
         }
 
         inferenceBacktracking();
 
+        if (solutions.size() != 0) return solutions.size();
+
+        Collections.sort(remainingCells, new Comparator<IntPair>() {
+            @Override
+            public int compare(IntPair a, IntPair b) {
+                int aNot = justInCaseBoard.getCellNotationSize(a.first, a.second);
+                int bNot = justInCaseBoard.getCellNotationSize(b.first, b.second);
+                if (aNot < bNot) return -1;
+                if (aNot > bNot) return 1;
+                return a.compareTo(b);
+            }
+        });
+
+        backtrackingSolve(justInCaseBoard, rowValuesUsedLocal, colValuesUsedLocal, remainingCells, 0);
+
         return solutions.size();
     }
 
-    private Board copySolution() {
+    private Board copySolution(Board b) {
         Board solvedBoard = new Board(columns, rows);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (workingBoard.isBlackCell(i, j)) {
+                if (b.isBlackCell(i, j)) {
                     solvedBoard.setCell(new BlackCell((BlackCell)initialBoard.getCell(i, j)), i, j);
                 } else {
-                    solvedBoard.setCell(new WhiteCell(workingBoard.getValue(i, j)), i, j);
+                    if (b.isEmpty(i, j)) {
+                        solvedBoard.setCell(new WhiteCell(), i, j);
+                    }
+                    else solvedBoard.setCell(new WhiteCell(b.getValue(i, j)), i, j);
                 }
             }
         }
@@ -223,7 +253,7 @@ public class Solver {
     private void inferenceBacktracking() {
         if (solutions.size() > 1) return;
         if (notationsQueue.isEmpty()) {
-            solutions.add(copySolution());
+            solutions.add(copySolution(workingBoard));
             return;
         }
 
@@ -231,7 +261,6 @@ public class Solver {
         ArrayList<Pair<Integer, Integer>> colSumsRollback = new ArrayList<>();
         ArrayList<Pair<Integer, Integer>> cellValuesRollback = new ArrayList<>();
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> cellNotationsRollback = new ArrayList<>();
-        ArrayList<Pair<Pair<Integer, Integer>, Integer>> hidingCellNotationsRollback = new ArrayList<>();
 
         assigFunctions.setAssignationEventListener(new KakuroFunctions.AssignationEventListener() {
             @Override
@@ -240,10 +269,7 @@ public class Solver {
             }
             @Override
             public void onCellNotationsChanged(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> p) {
-                if (notationsQueue.isHiding(p.first.first, p.first.second))
-                    hidingCellNotationsRollback.add(new Pair<>(p.first, p.second.first));
-                else
-                    cellNotationsRollback.add(new Pair<>(p.first, p.second.first));
+                cellNotationsRollback.add(new Pair<>(p.first, p.second.first));
             }
             @Override
             public void onRowSumAssignation(Pair<Pair<Integer, Integer>, Integer> p) {
@@ -269,19 +295,73 @@ public class Solver {
             if ((notations&(1<<i)) == 0) continue;
             if (assigFunctions.cellValueAssignation(cell.getCoordinates().first, cell.getCoordinates().second, i+1)) {
                 inferenceBacktracking();
+                if (solutions.size() > 1) return;
                 assigFunctions.externalRollback(
                         rowSumsRollback,
                         colSumsRollback,
                         cellValuesRollback,
                         cellNotationsRollback,
-                        hidingCellNotationsRollback
+                        new ArrayList<>()
                 );
             }
             rowSumsRollback.clear();
             colSumsRollback.clear();
             cellValuesRollback.clear();
             cellNotationsRollback.clear();
-            hidingCellNotationsRollback.clear();
+            if (solutions.size() > 1) return;
+        }
+    }
+
+    private int getPossibleValues(int[] rowValuesUsedLocal, int[] colValuesUsedLocal, int row, int col) {
+        // Get options for each row and column
+        final int rowID = rowLine[row][col];
+        final int colID = colLine[row][col];
+        int hAvailable = 0;
+        int vAvailable = 0;
+
+        ArrayList<Integer> hOptions =
+                KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSums[rowID], rowValuesUsedLocal[rowID]);
+        ArrayList<Integer> vOptions =
+                KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSums[colID], colValuesUsedLocal[colID]);
+
+        // Calculate available options for this row
+        for (Integer i : hOptions)
+            hAvailable |= i;
+
+        // Calculate available options for this column
+        for (Integer i : vOptions)
+            vAvailable |= i;
+
+        // Do the intersection
+        return hAvailable & vAvailable   // A value is available if it is available in both row & col...
+                & ~colValuesUsedLocal[colID]  // ...and it is not used in the current column...
+                & ~rowValuesUsedLocal[rowID]; // ...nor in the current row.
+    }
+
+    private void backtrackingSolve(Board b, int[] rowValuesUsedLocal, int[] colValuesUsedLocal, ArrayList<IntPair> cells, int idx) {
+        // Check if we found a solution
+        if (cells.size() == idx) {
+            // At this point a solution has been found
+            // Add a copy of this board to the list of solutions
+            solutions.add(copySolution(b));
+            return;
+        }
+
+        int row = cells.get(idx).first;
+        int col = cells.get(idx).second;
+
+        int possibleValues = getPossibleValues(rowValuesUsedLocal, colValuesUsedLocal, row, col);
+
+        for (int i = 1; i <= 9; i++) {
+            if(((possibleValues >> (i - 1)) & 1) == 0) continue; // if n-th bit is 0, skip
+
+            b.setCellValue(row, col, i);
+            rowValuesUsedLocal[rowLine[row][col]] |= (1 << (i-1));
+            colValuesUsedLocal[colLine[row][col]] |= (1 << (i-1));
+            backtrackingSolve(b, rowValuesUsedLocal, colValuesUsedLocal, cells, idx+1);
+            b.clearCellValue(row, col);
+            rowValuesUsedLocal[rowLine[row][col]] &= ~(1 << (i-1));
+            colValuesUsedLocal[colLine[row][col]] &= ~(1 << (i-1));
             if (solutions.size() > 1) return;
         }
     }
