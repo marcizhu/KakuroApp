@@ -47,6 +47,10 @@ public class PresentationCtrl {
     public static final int STATISTICS = 4;
     public static final int RANKINGS = 5;
 
+    /**
+     * Constructor:
+     * Instance of the main presentation controller.
+     */
     public PresentationCtrl() {
         // Initialize JFrame;
         app = new JFrame();
@@ -63,6 +67,9 @@ public class PresentationCtrl {
         rankingsScreenCtrl = new RankingsScreenCtrl(this, domainCtrl);
     }
 
+    /**
+     * Initializes the presentation controller, the frame and its contents and some window event listeners.
+     */
     public void initializePresentationCtrl() {
         // Define the initial screen
         currentScreenCtrl = loginScreenCtrl;
@@ -181,6 +188,10 @@ public class PresentationCtrl {
     }
 
     // Screen management
+    /**
+     * Sets the screen controller to nextScreen
+     * @param nextScreen The AbstractScreenCtrl subclass that will be set to the current screen controller.
+     */
     public void setScreen(AbstractScreenCtrl nextScreen) {
         currentScreenCtrl.onDestroy();
         currentScreenCtrl = nextScreen;
@@ -191,6 +202,10 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    /**
+     * Retrieves the instance of the screen controller identified by screenID
+     * @param screenID The ID of the screen controller to be retrieved.
+     */
     public AbstractScreenCtrl getScreenCtrl(int screenID) {
         switch (screenID) {
             case DASHBOARD:
@@ -223,6 +238,11 @@ public class PresentationCtrl {
     }
 
     // Domain communication
+    /**
+     * If it is successful the current session is owned by the user of name name.
+     * If not an error dialog is showed explaining the reason.
+     * @param name Name of the user that is trying to log in.
+     */
     public boolean logIn(String name) {
         Pair<Boolean, String> result = domainCtrl.loginUser(name);
         if (result.second != null) {
@@ -241,6 +261,9 @@ public class PresentationCtrl {
         return false;
     }
 
+    /**
+     * Closes the current user's session and invalidates the screen controllers so they need to be rebuilt if another user logs in.
+     */
     public void logOut() {
         userSessionId = "";
         app.setJMenuBar(null);
@@ -252,11 +275,20 @@ public class PresentationCtrl {
         rankingsScreenCtrl.invalidate();
     }
 
+    /**
+     * Retrieve the current user session id (as it is implemented now it coincides with the user's name).
+     * @return the current user session id.
+     */
     public String getUserSessionId() {
         if (userSessionId == null) return "";
         return userSessionId;
     }
 
+    /**
+     * Asks for a connection to the domain layer to obtain a GameplayCtrl instance, sets the current screen controller to GameScreenCtrl for the kakuro identified by kakuroID.
+     * If it fails it informs why in an error dialog.
+     * @param kakuroID Id of the kakuro to be played.
+     */
     public void startNewGame(String kakuroID) {
         currentScreenCtrl.onDestroy();
 
@@ -276,6 +308,11 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    /**
+     * Asks domain layer to import a kakuro to start a new game, and if it is successful a new game is started and the screen controller is set to an instance of GameScreenCtrl
+     * @param name Name that the new kakuro will have.
+     * @param filePath Path to the file to be imported.
+     */
     public void importNewGame(String name, String filePath) {
         Pair<GameplayCtrl, String> result = domainCtrl.newImportedGameInstance(userSessionId, filePath, name);
         if (result.second != null) {
@@ -295,6 +332,12 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    /**
+     * Asks for a connection to the domain layer to obtain a KakuroCreatorCtrl instance, sets the current screen controller to CreatorScreenCtrl for a new kakuro of dimensions numRows and numCols.
+     * If it fails it informs why in an error dialog.
+     * @param numRows Name that the new kakuro will have.
+     * @param numCols Path to the file to be imported.
+     */
     public void startNewCreation(int numRows, int numCols) {
         currentScreenCtrl.onDestroy();
 
@@ -314,6 +357,11 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    /**
+     * Asks domain layer to import a kakuro to start a new Creation. Asks the domain layer to obtain a KakuroCreatorCtrl instance, sets the current screen controller to CreatorScreenCtrl for a new kakuro encoded in the file.
+     * If it fails it informs why in an error dialog.
+     * @param filePath Path to the file to be imported.
+     */
     public void importNewCreation(String filePath) {
         Pair<KakuroCreationCtrl, String> result = domainCtrl.newImportedCreatorInstance(userSessionId, filePath);
         if (result.second != null) {
@@ -333,6 +381,10 @@ public class PresentationCtrl {
         app.revalidate();
     }
 
+    /**
+     * Asks domain layer to export a kakuro to an external file.
+     * @param kakuroID ID of the kakuro to be exported.
+     */
     public void exportKakuro(String kakuroID) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Export kakuro");
@@ -352,6 +404,14 @@ public class PresentationCtrl {
         }
     }
 
+    /**
+     * Asks domain layer to generate a new kakuro from necessary parameters.
+     * @param name ID of the kakuro to be generated.
+     * @param rows number of rows of the kakuro to be generated.
+     * @param columns number of columns of the kakuro to be generated.
+     * @param difficulty difficulty of the kakuro to be generated.
+     * @param forceUnique whether the generator should try to force a unique solution by adding initial values.
+     */
     public void generateKakuroFromParameters(String name, int rows, int columns, String difficulty, boolean forceUnique) {
         Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromParameters(userSessionId, rows, columns, difficulty, forceUnique, name);
         if (result.second != null) {
@@ -375,6 +435,11 @@ public class PresentationCtrl {
         setScreen(nextScreen);
     }
 
+    /**
+     * Asks domain layer to generate a new kakuro from an encoded seed.
+     * @param name ID of the kakuro to be generated.
+     * @param seed encoded seed.
+     */
     public void generateKakuroFromSeed(String name, String seed) {
         Pair<Map<String, Object>, String> result = domainCtrl.generateKakuroFromSeed(userSessionId, seed, name);
         if (result.second != null) {
@@ -398,6 +463,10 @@ public class PresentationCtrl {
         setScreen(nextScreen);
     }
 
+    /**
+     * Get a new DisplayKakuroScreenCtrl.
+     * @returns new instance of DisplayKakuroScreenCtrl
+     */
     public DisplayKakuroScreenCtrl getNewDisplayKakuroScreenCtrlInstance() {
         return new DisplayKakuroScreenCtrl(this, domainCtrl);
     }
