@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,7 +30,8 @@ public class DB {
         else gson = new Gson();
 
         try {
-            fileContents = Files.readString(Path.of(path + objectClass.getSimpleName() + ".json"));
+            // fileContents = Files.readString(Path.of(path + objectClass.getSimpleName() + ".json"));
+            fileContents = new String(Files.readAllBytes(Paths.get(path + objectClass.getSimpleName() + ".json")));
         } catch (NoSuchFileException e) {
             System.err.println("Class " + objectClass.getSimpleName() + " has no entry in the database");
             e.printStackTrace();

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,7 +77,8 @@ public class DBTest {
 
         testDB.writeToFile(expectedObjects, "TestObject");
 
-        String fileContents = Files.readString(Path.of("test/database/TestObject.json"));
+        //String fileContents = Files.readString(Path.of("test/database/TestObject.json"));
+        String fileContents = new String(Files.readAllBytes(Paths.get("test/database/TestObject.json")));
 
         assertTrue(fileContents.equals(expectedFileContents));
     }
