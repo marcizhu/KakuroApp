@@ -3,6 +3,7 @@ package src.domain.controllers;
 import src.domain.algorithms.Generator;
 import src.domain.algorithms.Solver;
 import src.domain.entities.*;
+import src.presentation.utils.RGBUtils;
 import src.repository.GameRepository;
 import src.repository.KakuroRepository;
 import src.repository.UserRepository;
@@ -57,7 +58,7 @@ public class KakuroCtrl {
         solver.solve();
         if (solver.getSolutions().size() <= 0) throw new Exception("The provided Kakuro has no solution");
 
-        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user, "");
+        Kakuro kakuro = new Kakuro(kakuroname, Difficulty.USER_MADE, board, user, "", RGBUtils.rndColorCode(board.hashCode()));
         kakuroRepository.saveKakuro(kakuro);
 
         return kakuro;
@@ -72,7 +73,10 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
+        String[] parameters = generator.getEncodedSeed().split("_");
+        long seedValue = Long.parseLong(parameters[4]);
+
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed(), RGBUtils.rndColorCode(seedValue));
         kakuroRepository.saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
@@ -111,7 +115,7 @@ public class KakuroCtrl {
         long generatorTime = System.currentTimeMillis() - initTime;
         Board board = generator.getGeneratedBoard();
 
-        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed());
+        Kakuro kakuro = new Kakuro(kakuroname, difficulty, board, user, generator.getEncodedSeed(), RGBUtils.rndColorCode(seedValue));
         kakuroRepository.saveKakuro(kakuro);
 
         Map<String, Object> result = new HashMap<>();
