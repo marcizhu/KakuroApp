@@ -50,6 +50,8 @@ public class GameplayCtrl {
     private final boolean isCurrentGameInDB;
     private long initialTime;
 
+    private int colorCode;
+
     public GameplayCtrl(User user, Kakuro kakuro, GameCtrl gameCtrl) {
         this.user = user;
         this.kakuro = kakuro;
@@ -73,6 +75,7 @@ public class GameplayCtrl {
     }
 
     private void initializeCommon() {
+        colorCode = currentGame.getKakuro().getColorCode();
         hintAtMove = -1;
         lastHint = new Pair<>(new Pair<>(-1, -1), -1);
         usedValuesHelpIsActive = false;
@@ -88,6 +91,8 @@ public class GameplayCtrl {
         initialTime = System.currentTimeMillis();
         return currentGame.getBoard().toString();
     }
+
+    public int getColorCode() { return colorCode; }
 
     public Pair<Integer, Integer> getBoardSize() {
         return new Pair<>(currentGame.getBoard().getHeight(), currentGame.getBoard().getWidth());

@@ -360,12 +360,14 @@ public class PresentationCtrl {
         }
 
         String board = (String) result.first.get("board");
+        int colorCode = (Integer) result.first.get("color");
         float time = (float) (long) result.first.get("generatorTime");
 
         DisplayKakuroScreenCtrl nextScreen = new DisplayKakuroScreenCtrl(this, domainCtrl);
         nextScreen.prepareContents(
                 "GENERATION COMPLETE",
                 board,
+                new Color(colorCode),
                 Palette.SelectionBlue,
                 "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
                 () -> setScreen(myKakurosScreenCtrl)
@@ -381,12 +383,14 @@ public class PresentationCtrl {
         }
 
         String board = (String) result.first.get("board");
+        int colorCode = (Integer) result.first.get("color");
         float time = (float) (long) result.first.get("generatorTime");
 
         DisplayKakuroScreenCtrl nextScreen = new DisplayKakuroScreenCtrl(this, domainCtrl);
         nextScreen.prepareContents(
                 "GENERATION COMPLETE",
                 board,
+                new Color(colorCode),
                 Palette.SelectionBlue,
                 "The generator has created this board for you in exactly " + time + " ms. We hope you like it!",
                 () -> setScreen(myKakurosScreenCtrl)

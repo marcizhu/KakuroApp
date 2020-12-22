@@ -47,7 +47,8 @@ public class GameScreen extends AbstractScreen {
         buildRightContent(width, height);
 
         String initialBoard = ((GameScreenCtrl)ctrl).getBoardToDisplay();
-        gameBoard = new KakuroView(initialBoard, true);
+        int colorCode = ((GameScreenCtrl)ctrl).getColorCode();
+        gameBoard = new KakuroView(initialBoard, colorCode, true);
         gameBoard.setSize(width/2, height);
         gameBoard.setVisible(true);
         setUpListener();

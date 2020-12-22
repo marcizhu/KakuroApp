@@ -26,8 +26,8 @@ public class KakuroView extends JPanel {
 
     private BoardMouseEventListener listener;
 
-    public KakuroView(String board, boolean showValues) {
-        blackCellColor = Color.BLACK;
+    public KakuroView(String board, int colorCode, boolean showValues) {
+        blackCellColor = new Color(colorCode);
 
         String[] rows = board.split("\\n");
         String[] line1 = rows[0].split(",");

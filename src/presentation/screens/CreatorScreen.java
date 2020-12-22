@@ -44,7 +44,7 @@ public class CreatorScreen extends AbstractScreen {
         lowerRightContent = buildRightContent();
 
         String initialBoard = ((CreatorScreenCtrl)ctrl).getBoardToDisplay();
-        creatorBoard = new KakuroView(initialBoard, true);
+        creatorBoard = new KakuroView(initialBoard, 0, true);
         creatorBoard.setSize(width/2, height - lowerRightContent.getSize().height);
         creatorBoard.setVisible(true);
         creatorBoard.setBorder(BorderFactory.createLineBorder(Color.BLACK));

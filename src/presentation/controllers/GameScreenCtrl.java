@@ -39,6 +39,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         ignoreDestroy = false;
     }
 
+    public int getColorCode() { return game.getColorCode(); }
+
     @Override
     public void build(int width, int height) {
         screen = new GameScreen(this);
@@ -253,6 +255,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         nextScreen.prepareContents(
                 "KAKURO SOLVED!",
                 board,
+                new Color(game.getColorCode()),
                 Palette.HintGreen,
                 "You spent " + secondsToStringTime(timeUsed) + " during this game and obtained a total of " + score + " points!",
                 () -> presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD))
@@ -273,6 +276,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         nextScreen.prepareContents(
                 "YOU SURRENDERED",
                 board,
+                new Color(game.getColorCode()),
                 Palette.WarningLightRed,
                 "You spent " + secondsToStringTime(timeUsed) + " during this game. As you surrendered you get 0 points. The solver has determined that his board has " + solutions + " The solver took exactly " + timeSolving + " ms to achieve these results.",
                 () -> presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD))

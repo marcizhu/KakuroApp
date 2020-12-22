@@ -102,7 +102,7 @@ public class StatisticsScreen extends AbstractScreen {
             constraints.gridy = 0;
             topPointerPanel.add(buildLabel("No games played yet.", bodyFnt, SwingConstants.CENTER), constraints);
         } else {
-            KakuroView topPointerKak = new KakuroView((String) topPointerInfo.get("board"), false);
+            KakuroView topPointerKak = new KakuroView((String) topPointerInfo.get("board"), (Integer) topPointerInfo.get("color"), false);
             topPointerKak.setSize(150, 150);
 
             constraints.gridx = 0;
@@ -347,7 +347,7 @@ public class StatisticsScreen extends AbstractScreen {
             constraints.fill = GridBagConstraints.BOTH;
             topPointerPanel.add(buildLabel("No games played yet.", bodyFnt, SwingConstants.CENTER), constraints);
         } else {
-            KakuroView topPointerKak = new KakuroView((String) topPointer.get("board"), false);
+            KakuroView topPointerKak = new KakuroView((String) topPointer.get("board"), (Integer) topPointer.get("color"), false);
             topPointerKak.setSize(150, 150);
 
             constraints.gridx = 0;

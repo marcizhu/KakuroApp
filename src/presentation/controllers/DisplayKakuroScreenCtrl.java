@@ -8,6 +8,7 @@ import java.awt.*;
 public class DisplayKakuroScreenCtrl extends AbstractScreenCtrl {
     private String title;
     private String board;
+    private Color blackCellColor;
     private Color background;
     private String body;
 
@@ -27,9 +28,10 @@ public class DisplayKakuroScreenCtrl extends AbstractScreenCtrl {
         body = "";
     }
 
-    public void prepareContents(String title, String board, Color background, String body, DefaultFinishOperation callback) {
+    public void prepareContents(String title, String board, Color blackCellColor, Color background, String body, DefaultFinishOperation callback) {
         this.title = title;
         this.board = board;
+        this.blackCellColor = blackCellColor;
         this.background = background;
         this.body = body;
         this.callback = callback;
@@ -37,6 +39,7 @@ public class DisplayKakuroScreenCtrl extends AbstractScreenCtrl {
 
     public String getTitle() { return title; }
     public String getBoard() { return board; }
+    public Color getBlackCellColor() { return blackCellColor; }
     public Color getBackground() { return background; }
     public String getBody() { return body; }
 

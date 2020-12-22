@@ -39,7 +39,7 @@ public class DisplayKakuroScreen extends AbstractScreen {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.fill = GridBagConstraints.BOTH;
-        kakuroView = new KakuroView(((DisplayKakuroScreenCtrl)ctrl).getBoard(), true);
+        kakuroView = new KakuroView(((DisplayKakuroScreenCtrl)ctrl).getBoard(), ((DisplayKakuroScreenCtrl)ctrl).getBlackCellColor().getRGB(), true);
         kakuroView.setSize(height/2, height/2);
         kakuroWrapper.add(kakuroView, constraints);
         kakuroWrapper.setOpaque(false);

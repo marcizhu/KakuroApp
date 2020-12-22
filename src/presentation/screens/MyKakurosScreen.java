@@ -53,7 +53,9 @@ public class MyKakurosScreen extends AbstractScreen {
                     (String) kakuroData.get("createdBy"),
                     (Timestamp) kakuroData.get("createdAt"),
                     (Integer) kakuroData.get("bestTime"),
-                    stateCode);
+                    stateCode,
+                    (Integer) kakuroData.get("color")
+            );
             kak.setListener(new KakuroInfoCardView.InfoCardButtonsClickListener() {
                 @Override
                 public void onExportClicked(String id) {

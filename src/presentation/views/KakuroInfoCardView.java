@@ -21,12 +21,12 @@ public class KakuroInfoCardView extends JPanel {
         void onPlayClicked(String id);
     }
 
-    public KakuroInfoCardView(String board, final String name, String difficulty, Integer timesPlayed, String ownerName, Timestamp date, Integer recordTime, int state) {
+    public KakuroInfoCardView(String board, final String name, String difficulty, Integer timesPlayed, String ownerName, Timestamp date, Integer recordTime, int state, int colorCode) {
         //setLayout(new GridBagLayout());
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Main kakuro view
-        kakuroView = new KakuroView(board, false);
+        kakuroView = new KakuroView(board, colorCode, false);
         add(kakuroView);
 
         kakuroInfoAndButtons = new JPanel();

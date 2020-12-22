@@ -532,7 +532,7 @@ public class DashboardScreen extends AbstractScreen {
             constraints.gridy = 0;
             topPointerPanel.add(buildLabel("No games played yet.", bodyFnt, SwingConstants.CENTER), constraints);
         } else {
-            KakuroView topPointerKak = new KakuroView((String) topPointerInfo.get("board"), false);
+            KakuroView topPointerKak = new KakuroView((String) topPointerInfo.get("board"), (int) topPointerInfo.get("color"), false);
             topPointerKak.setSize(150, 150);
 
             constraints.gridx = 0;
@@ -637,8 +637,6 @@ public class DashboardScreen extends AbstractScreen {
         history.add(title);
         history.add(historyScroll);
 
-        //history.add(hHistoryFiller);
-
         return history;
     }
 
@@ -668,12 +666,13 @@ public class DashboardScreen extends AbstractScreen {
             int width = (Integer) gameData.get("width");
             int height = (Integer) gameData.get("height");
             String difficulty = (String) gameData.get("difficulty");
-            int timeSpent = (int) gameData.get("timeSpent");
+            int timeSpent = (Integer) gameData.get("timeSpent");
             String lastPlayed = ((Timestamp) gameData.get("lastPlayed")).toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("EEEE d MMMM uuuu"));
             float score = 0;
             if (!state.equals("unfinished")) score = (float) gameData.get("score");
+            int colorCode = (Integer) gameData.get("color");
 
-            JPanel tile = buildHistoryGameTile(board, name, width, height, difficulty, secondsToStringTime(timeSpent), lastPlayed, score, state);
+            JPanel tile = buildHistoryGameTile(board, colorCode, name, width, height, difficulty, secondsToStringTime(timeSpent), lastPlayed, score, state);
 
             historyPanel.add(tile);
         }
@@ -682,12 +681,12 @@ public class DashboardScreen extends AbstractScreen {
         historyPanel.add(hHistoryFiller);
     }
 
-    private JPanel buildHistoryGameTile(String board, String name, int width, int height, String difficulty, String timeSpent, String lastPlayed, float score, String state) {
+    private JPanel buildHistoryGameTile(String board, int colorCode, String name, int width, int height, String difficulty, String timeSpent, String lastPlayed, float score, String state) {
         JPanel tile = new JPanel();
         tile.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        KakuroView kakuroView = new KakuroView(board, false);
+        KakuroView kakuroView = new KakuroView(board, colorCode,false);
         kakuroView.setSize(200, 200);
 
         JLabel headerLbl = buildLabel(
