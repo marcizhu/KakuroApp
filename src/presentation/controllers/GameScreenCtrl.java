@@ -257,7 +257,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
                 board,
                 new Color(game.getColorCode()),
                 Palette.HintGreen,
-                "You spent " + secondsToStringTime(timeUsed) + " during this game and obtained a total of " + score + " points!",
+                "You spent " + secondsToStringTime(timeUsed) + " during this game and obtained a total of " + Math.round(score) + " points!",
                 () -> presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.DASHBOARD))
         );
 

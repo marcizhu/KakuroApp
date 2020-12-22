@@ -41,7 +41,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
             if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) interestFound = true;
             topRanks.add(new Pair( i, new Pair<>(
                     (String) result.first.get(i).get("name"),
-                    pointsToString((float) result.first.get(i).get("totalPts"))
+                    pointsToString(Math.round((float) result.first.get(i).get("totalPts")))
             )));
         }
         if (!interestFound) {
@@ -49,7 +49,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
                 if (result.first.get(i).get("name").equals(presentationCtrl.getUserSessionId())) {
                     topRanks.add(new Pair( i, new Pair<>(
                             (String) result.first.get(i).get("name"),
-                            pointsToString((float) result.first.get(i).get("totalPts"))
+                            pointsToString(Math.round((float) result.first.get(i).get("totalPts")))
                     )));
                 }
             }
@@ -96,17 +96,9 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
         return timeTransformed;
     }
 
-    private String pointsToString(float points) {
-        String pointsStr;
-        if(Math.floor(points) == Math.ceil(points)) {
-            // Number is integer. Remove decimals or display "---" if zero
-            int val = Math.round(points);
-            pointsStr = (val == 0 ? "---" : "" + val);
-        } else {
-            // round to 2 decimal places
-            pointsStr = (Math.round(points * 100.0f) / 100.0f) + " pts";
-        }
-        return pointsStr;
+    private String pointsToString(int points) {
+        if (points == 0) return "---";
+        return points+" pts";
     }
 
     private String secondsToStringTime(int time) {
@@ -132,7 +124,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
             Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return new HashMap<>();
         }
-        if (result.first.size() != 0) result.first.put("score", pointsToString((float) result.first.get("score")));
+        if (result.first.size() != 0) result.first.put("score", pointsToString(Math.round((float) result.first.get("score"))));
         return result.first;
     }
     public Map<String, Object> getTopPointerInDifficulty(String difficulty) {
@@ -141,7 +133,7 @@ public class StatisticsScreenCtrl extends AbstractScreenCtrl {
             Dialogs.showErrorDialog(result.second, "Something went wrong!");
             return new HashMap<>();
         }
-        if (result.first.size() != 0) result.first.put("score", pointsToString((float) result.first.get("score")));
+        if (result.first.size() != 0) result.first.put("score", pointsToString(Math.round((float) result.first.get("score"))));
         return result.first;
     }
 

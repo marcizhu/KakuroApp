@@ -55,7 +55,7 @@ public class KakuroInfoCardView extends JPanel {
         String[] line1 = rows[0].split(",");
         int boardHeight = Integer.parseInt(line1[0].trim());
         int boardWidth  = Integer.parseInt(line1[1].trim());
-        JLabel sizeLbl = new JLabel("Size: "+boardWidth+","+boardHeight);
+        JLabel sizeLbl = new JLabel("Size: "+boardHeight+"x"+boardWidth);
         sizeLbl.setHorizontalAlignment(SwingConstants.LEFT);
         sizeLbl.setForeground(Color.BLACK);
         constraints.gridy = 2;

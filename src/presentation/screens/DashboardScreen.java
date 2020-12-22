@@ -668,8 +668,8 @@ public class DashboardScreen extends AbstractScreen {
             String difficulty = (String) gameData.get("difficulty");
             int timeSpent = (Integer) gameData.get("timeSpent");
             String lastPlayed = ((Timestamp) gameData.get("lastPlayed")).toLocalDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("EEEE d MMMM uuuu"));
-            float score = 0;
-            if (!state.equals("unfinished")) score = (float) gameData.get("score");
+            int score = 0;
+            if (!state.equals("unfinished")) score = Math.round((float) gameData.get("score"));
             int colorCode = (Integer) gameData.get("color");
 
             JPanel tile = buildHistoryGameTile(board, colorCode, name, width, height, difficulty, secondsToStringTime(timeSpent), lastPlayed, score, state);
@@ -681,7 +681,7 @@ public class DashboardScreen extends AbstractScreen {
         historyPanel.add(hHistoryFiller);
     }
 
-    private JPanel buildHistoryGameTile(String board, int colorCode, String name, int width, int height, String difficulty, String timeSpent, String lastPlayed, float score, String state) {
+    private JPanel buildHistoryGameTile(String board, int colorCode, String name, int width, int height, String difficulty, String timeSpent, String lastPlayed, int score, String state) {
         JPanel tile = new JPanel();
         tile.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -690,7 +690,7 @@ public class DashboardScreen extends AbstractScreen {
         kakuroView.setSize(200, 200);
 
         JLabel headerLbl = buildLabel(
-                state.equals("unfinished")? "Unfinished" : "Score: " + score,
+                state.equals("unfinished")? "Unfinished" : "Score: " + score + " pts",
                 subtitleFnt,
                 SwingConstants.LEFT);
 

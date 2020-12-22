@@ -27,31 +27,43 @@ public class GameFinished extends Game{
     }
 
     private float computeScore(int numOfHints) {
-        if (getKakuro().getDifficulty() == Difficulty.USER_MADE || surrendered) {
+        if (getKakuro().getDifficulty() == Difficulty.USER_MADE || surrendered || getTimeSpent() == 0) {
             return 0;
         }
-        int diff = 0;
+        int expected_time_per_move = 0;
+        int point_for_expected_completion = 0;
 
         switch(getKakuro().getDifficulty()) {
-            case EASY:    diff = 1; break;
-            case MEDIUM:  diff = 2; break;
-            case HARD:    diff = 3; break;
-            case EXTREME: diff = 4; break;
+            case EASY:
+                expected_time_per_move = 10;
+                point_for_expected_completion = 10;
+                break;
+            case MEDIUM:
+                expected_time_per_move = 15;
+                point_for_expected_completion = 15;
+                break;
+            case HARD:
+                expected_time_per_move = 20;
+                point_for_expected_completion = 20;
+                break;
+            case EXTREME:
+                expected_time_per_move = 25;
+                point_for_expected_completion = 25;
+                break;
         }
 
-        float d = 1000 * diff;
-        float numOfWhiteCells = 0;
-        float numOfBlackCells = 0;
+        int numOfWhiteCells = 0;
         for (int i = 0; i < getKakuro().getBoard().getHeight(); i++) {
             for (int j = 0; j < getKakuro().getBoard().getWidth(); j++) {
                 if (getKakuro().getBoard().isWhiteCell(i, j)) numOfWhiteCells++;
-                else numOfBlackCells++;
             }
         }
-        float k = numOfWhiteCells > 0 ? numOfBlackCells / numOfWhiteCells : 0;
 
-        if (getTimeSpent() != 0) return d/getTimeSpent() - numOfHints*k;
-        else return 0;
+        int expected_time_to_solve = expected_time_per_move*numOfWhiteCells - (expected_time_per_move*numOfHints)*3/4;
+
+        float proportion = (float) expected_time_to_solve / getTimeSpent();
+
+        return proportion * point_for_expected_completion;
     }
 
     public float getScore() {

@@ -212,7 +212,9 @@ public class RankingsScreen extends AbstractScreen {
                 if (toAdd instanceof Float) {
                     if (keys[j].contains("time") || keys[j].contains("Time"))
                         toAddStr = secondsToStringTime((float) toAdd);
-                    else if (Math.floor((float) toAdd) == Math.ceil((float) toAdd)) {
+                    else if (keys[j].contains("Pts")) {
+                        toAddStr = Math.round((float) toAdd) + " pts";
+                    } else if (Math.floor((float) toAdd) == Math.ceil((float) toAdd)) {
                         // Number is integer. Remove decimals or display "---" if zero
                         int val = Math.round((float) toAdd);
                         toAddStr = (val == 0 ? "---" : "" + val);

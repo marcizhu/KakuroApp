@@ -367,6 +367,8 @@ public class StatisticsScreen extends AbstractScreen {
             constraints.gridy = 2;
             topPointerPanel.add(buildLabel((String) topPointer.get("name"), bodyFnt, SwingConstants.RIGHT), constraints);
             constraints.gridy = 3;
+            topPointerPanel.add(buildLabel("Size: " + topPointer.get("height") + "x" + topPointer.get("width"), bodyFnt, SwingConstants.RIGHT), constraints);
+            constraints.gridy = 4;
             constraints.insets.bottom = 0;
             topPointerPanel.add(buildLabel("Time: " + secondsToStringTime((int) topPointer.get("timeSpent")), bodyFnt, SwingConstants.RIGHT), constraints);
         }
