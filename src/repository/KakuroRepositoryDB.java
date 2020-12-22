@@ -47,9 +47,6 @@ public class KakuroRepositoryDB implements KakuroRepository {
                 return;
             }
         }
-
-        // TODO: delete board!
-        //boardRepository.deleteBoard(kakuro.getBoard().getId());
     }
 
     @Override
