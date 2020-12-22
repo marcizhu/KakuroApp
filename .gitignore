@@ -5,4 +5,3 @@ out/*
 .DS_Store
 kakurosolver.tar.gz
 kakurogenerator.tar.gz
-test/database/*
