@@ -3,6 +3,7 @@ package src.presentation.controllers;
 import src.domain.controllers.DomainCtrl;
 import src.domain.controllers.GameplayCtrl;
 import src.presentation.screens.GameScreen;
+import src.presentation.utils.Dialogs;
 import src.presentation.utils.Palette;
 import src.presentation.views.KakuroView;
 import src.utils.Pair;
@@ -115,6 +116,8 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     }
 
     public void resetGame() {
+        if (!Dialogs.showYesNoOptionDialog("This action will remove all your progress int this game and will leave the board in \"initial state\".", "Are you sure?"))
+            return;
         game.resetGame();
         unselectConflictiveCoord();
         ((GameScreen)screen).updateMovesPanel(0);
@@ -217,7 +220,10 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
         Pair<Pair<Integer, Integer>, Integer> response = game.getHint();
         System.out.println("Response is: " + response.first.first + " . " + response.first.second + ": " + response.second);
         if (response.first.first == -1) {
-            if (response.first.second == -1) return;
+            if (response.first.second == -1) {
+                Dialogs.showInfoDialog("The hint system hasn't found any useful hints in this position, you may try again after making some move.", "Oups!");
+                return;
+            }
             selectMovement(response.first.second);
             Pair<Integer, Integer> coord = game.getCoordAtMove(response.first.second);
             setSelectedPos(coord.first, coord.second);

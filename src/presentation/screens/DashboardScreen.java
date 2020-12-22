@@ -390,7 +390,7 @@ public class DashboardScreen extends AbstractScreen {
 
         JLabel rowsLbl = buildLabel("Rows", bodyFnt, SwingConstants.LEFT);
 
-        handRows = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
+        handRows = new JSpinner(new SpinnerNumberModel(9, 3, 30, 1));
         ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Color.BLACK);
         handRows.addChangeListener(e -> {
             if ((Integer)handRows.getValue() > 25) ((JSpinner.DefaultEditor) handRows.getEditor()).getTextField().setForeground(Palette.StrongRed);
@@ -399,7 +399,7 @@ public class DashboardScreen extends AbstractScreen {
 
         JLabel colsLbl = buildLabel("Columns", bodyFnt, SwingConstants.LEFT);
 
-        handCols = new JSpinner(new SpinnerNumberModel(9, 2, 30, 1));
+        handCols = new JSpinner(new SpinnerNumberModel(9, 3, 30, 1));
         ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Color.BLACK);
         handCols.addChangeListener(e -> {
             if ((Integer)handCols.getValue() > 25) ((JSpinner.DefaultEditor) handCols.getEditor()).getTextField().setForeground(Palette.StrongRed);
