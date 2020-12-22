@@ -236,6 +236,18 @@ public class GameplayCtrl {
         }
     }
 
+    public void fetchInitialNotations() {
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> message = new ArrayList<>();
+        for (int i = 1; i < currentGame.getBoard().getHeight(); i++) {
+            for (int j = 1; j < currentGame.getBoard().getWidth(); j++) {
+                if (currentGame.getBoard().isWhiteCell(i,j) && currentGame.getBoard().getCellNotationSize(i,j) > 0) {
+                    message.add(new Pair<>(new Pair<>(i, j), currentGame.getBoard().getCellNotations(i, j)));
+                }
+            }
+        }
+        viewCtrl.setNotations(message);
+    }
+
     private void sendRebuiltBoardUpToMove(int toMove) {
         Board b = new Board(kakuro.getBoard());
         ArrayList<Movement> allMoves = currentGame.getMovements();

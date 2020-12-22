@@ -45,6 +45,7 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
     public void build(int width, int height) {
         screen = new GameScreen(this);
         super.build(width, height);
+        game.fetchInitialNotations();
     }
 
     public String getBoardToDisplay() {

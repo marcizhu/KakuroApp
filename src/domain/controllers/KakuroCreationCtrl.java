@@ -981,7 +981,7 @@ public class KakuroCreationCtrl {
             kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user, "", selectedColorCode));
             viewCtrl.onKakuroPublished();
         } catch (Exception e) {
-            sendMessageToPresentation(e.getMessage());
+            sendMessageToPresentation(NAME_INVALID);
         }
     }
 

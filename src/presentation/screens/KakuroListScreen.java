@@ -64,6 +64,7 @@ public class KakuroListScreen extends AbstractScreen {
 
                 KakuroInfoCardView kak = new KakuroInfoCardView(
                         (String) kakuroData.get("board"),
+                        (String) kakuroData.get("seed"),
                         (String) kakuroData.get("name"),
                         (String) kakuroData.get("difficulty"),
                         (Integer) kakuroData.get("timesPlayed"),

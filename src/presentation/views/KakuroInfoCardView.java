@@ -2,6 +2,8 @@ package src.presentation.views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +23,7 @@ public class KakuroInfoCardView extends JPanel {
         void onPlayClicked(String id);
     }
 
-    public KakuroInfoCardView(String board, final String name, String difficulty, Integer timesPlayed, String ownerName, Timestamp date, Integer recordTime, int state, int colorCode) {
+    public KakuroInfoCardView(String board, final String seed, final String name, String difficulty, Integer timesPlayed, String ownerName, Timestamp date, Integer recordTime, int state, int colorCode) {
         //setLayout(new GridBagLayout());
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -62,7 +64,7 @@ public class KakuroInfoCardView extends JPanel {
         kakuroInfoAndButtons.add(sizeLbl, constraints);
 
         String recordTimeStr = "";
-        if (recordTime == -1) recordTimeStr = "none";
+        if (recordTime == -1) recordTimeStr = "---";
         else {
             int hours = recordTime/3600;
             int minutes = recordTime/60 - hours*60;
@@ -153,6 +155,17 @@ public class KakuroInfoCardView extends JPanel {
         constraints.insets = new Insets(3,2,2,2);
         kakuroInfoAndButtons.add(exportBtn, constraints);
 
+        JPanel sharedCol = new JPanel();
+        sharedCol.setLayout(new GridBagLayout());
+
+        JButton copySeed = new JButton("COPY SEED");
+        copySeed.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
+        copySeed.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(seed);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
+        });
+
         String playStr = state == STATE_UNFINISHED ? "RESUME" : "PLAY";
         JButton playBtn = new JButton(playStr);
         playBtn.addActionListener(e -> {
@@ -160,11 +173,24 @@ public class KakuroInfoCardView extends JPanel {
         });
         playBtn.setForeground(Color.BLACK);
         playBtn.setFocusable(false);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.fill = GridBagConstraints.VERTICAL;
+        sharedCol.add(copySeed, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 4;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        sharedCol.add(playBtn, constraints);
+
         constraints.gridx = 6;
         constraints.gridy = 3;
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        kakuroInfoAndButtons.add(playBtn, constraints);
+        kakuroInfoAndButtons.add(sharedCol, constraints);
 
         JSeparator separator = new JSeparator();
         separator.setForeground(new Color(0,0,0,0));

@@ -66,6 +66,7 @@ public class KakuroCtrl {
 
             HashMap<String, Object> kakuroData = new HashMap<>();
             kakuroData.put("board", kakuro.getBoard().toString());
+            kakuroData.put("seed", kakuro.getSeed());
             kakuroData.put("color", kakuro.getColorCode());
             kakuroData.put("name", kakuro.getName());
             kakuroData.put("difficulty", kakuro.getDifficulty().toString());
