@@ -65,6 +65,6 @@ This makefile also allows to run the tests as well as all the apps:
 
 - To execute the tests, just execute `make run-tests`. The execution of all tests should take around one minute (the first test takes ~50s, the others should run in a few milliseconds each)
 
-- To execute the solver use `make run-solver`. Since the program reads from standard input, stdin redirections can be used to pipe a kakuro to the application. For example, try `make run-solver < data/kakuros/unsolved/sample.kak`. Alternatively, using `java app/SolverApp < file.txt` should work just as fine.
+- To execute the solver use `make run-solver`. Since the program reads from standard input, stdin redirections can be used to pipe a kakuro to the application. For example, try `make run-solver < data/kakuros/unsolved/sample.kak`. Alternatively, using `java app/SolverApp < file.txt` after a `make solver` should work just as fine.
 
 - However, to execute the generator you **must** use `java app/GeneratorApp <width> <height> <difficulty>`. This is due to the fact that you cannot pipe command-line arguments through `make`. Running `make run-generator` will execute the app but since it will not recieve command line arguments, it will only display the help output and exit. For example, try running `java app/GeneratorApp 10 10 4` to generate an extreme 10 by 10 Kakuro! :D
