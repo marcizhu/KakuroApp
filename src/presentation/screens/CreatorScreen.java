@@ -453,9 +453,6 @@ public class CreatorScreen extends AbstractScreen {
         blackWhiteSelectors.setSelectedIndex(tabIdx);
     }
 
-    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
-    //  it only works if there is a resize for some reason
-
     public void selectWhiteCell(int r, int c) {
         creatorBoard.setWhiteCellSelectedColor(r, c, Palette.SelectionBlue);
     }

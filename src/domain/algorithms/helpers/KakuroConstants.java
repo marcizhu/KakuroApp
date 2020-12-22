@@ -85,8 +85,6 @@ public class KakuroConstants {
      * @param diff     Difficulty of the kakuro being generated
      * @return an ArrayList of values unique in that cell
      */
-    // TODO: as it is, it always returns the possibilities in a specific order for the same input, maybe should apply
-    //       some randomness to the order of the partial solutions
     public ArrayList<int[]> getUniqueCrossValues(int rowSpace, int colSpace, Difficulty diff) {
         ArrayList<int[]> result = new ArrayList<>(); // every element has 3 values: {rowSum, colSum, uniqueValueInCommon}
         if (rowSpace < 1 || rowSpace > 9 || colSpace < 1 || colSpace > 9) return result;

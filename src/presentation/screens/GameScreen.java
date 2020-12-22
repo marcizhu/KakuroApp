@@ -516,8 +516,6 @@ public class GameScreen extends AbstractScreen {
         gameBoard.setWhiteCellNotations(r, c, notations);
     }
 
-    // FIXME: the resize is only a patch to solve visual problems when turning a cell to black/white,
-    //  it only works if there is a resize for some reason
     public void unselectBlackCell(int r, int c, int s) {
         gameBoard.unselectBlackCell(r, c, s);
         onResize(contents.getWidth(), contents.getHeight());
