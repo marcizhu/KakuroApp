@@ -182,7 +182,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         }
     }
     public void setCellsToBlack(ArrayList<IntPair> coords) {
-        for (IntPair p : coords) ((CreatorScreen)screen).setCellToBlack((Integer) p.first, (Integer) p.second);
+        for (IntPair p : coords) ((CreatorScreen)screen).setCellToBlack(p.first, p.second);
     }
 
 
@@ -218,7 +218,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
         }
     }
     public void setCellsToWhite(ArrayList<IntPair> coords) {
-        for (IntPair p : coords) ((CreatorScreen)screen).setCellToWhite((Integer) p.first, (Integer) p.second);
+        for (IntPair p : coords) ((CreatorScreen)screen).setCellToWhite(p.first, p.second);
     }
 
     // Tab events
@@ -235,6 +235,11 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
             ((CreatorScreen)screen).updateBlackPossibleValues(new Pair<>(new ArrayList<>(), false));
             if (selectedPos.second != WHITE_CELL) unselectPrevPos();
         }
+    }
+
+    public void onSelectedColor(int colorCode) {
+        ((CreatorScreen)screen).setBlackCellColor(new Color(colorCode));
+        creator.setSelectedColorCode(colorCode);
     }
 
     // Button events

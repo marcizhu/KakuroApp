@@ -6,6 +6,7 @@ import src.presentation.views.KakuroView;
 import src.utils.Pair;
 
 import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class CreatorScreen extends AbstractScreen {
         super.build(width, height);
         contents = new JPanel();
 
-        buildLeftContent(width);
+        buildLeftContent(width, height);
         lowerRightContent = buildRightContent();
 
         String initialBoard = ((CreatorScreenCtrl)ctrl).getBoardToDisplay();
@@ -71,7 +72,7 @@ public class CreatorScreen extends AbstractScreen {
         onResize(width, height);
     }
 
-    private void buildLeftContent(int width) {
+    private void buildLeftContent(int width, int height) {
         leftContent = new JPanel();
         leftContent.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -111,6 +112,21 @@ public class CreatorScreen extends AbstractScreen {
         kakuroStateBtn.setForeground(Palette.HintOrange);
         kakuroStateBtn.addActionListener(e -> ((CreatorScreenCtrl)ctrl).onKakuroStateButtonPressed(kakuroName.getText()));
 
+        JColorChooser colorChooser = new JColorChooser();
+        colorChooser.getSelectionModel().addChangeListener(e -> {
+            ((CreatorScreenCtrl)ctrl).onSelectedColor(colorChooser.getColor().getRGB());
+        });
+        AbstractColorChooserPanel[] panels = colorChooser.getChooserPanels();
+        for (AbstractColorChooserPanel accp : panels) {
+            if(!accp.getDisplayName().equals("Swatches")) {
+                colorChooser.removeChooserPanel(accp);
+            }
+        }
+        colorChooser.setPreviewPanel(new JPanel());
+        colorChooser.setMinimumSize(new Dimension(width*4/11, height/5));
+        colorChooser.setPreferredSize(new Dimension(width*4/11, height/5));
+        colorChooser.setMaximumSize(new Dimension(width*4/11, height/5));
+
         horizontalLeftFiller = Box.createRigidArea(new Dimension(width/3, 5));
 
         constraints.insets = new Insets(5, 20, 5, 20);
@@ -147,10 +163,16 @@ public class CreatorScreen extends AbstractScreen {
         leftContent.add(tipBox, constraints);
 
         constraints.gridy = 2;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.NONE;
+        leftContent.add(colorChooser, constraints);
+
+        constraints.gridy = 3;
+        constraints.insets.bottom = 0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         leftContent.add(lowerLeft, constraints);
 
-        constraints.gridy = 3;
+        constraints.gridy = 4;
         leftContent.add(horizontalLeftFiller, constraints);
     }
 
@@ -444,12 +466,14 @@ public class CreatorScreen extends AbstractScreen {
         creatorBoard.setWhiteCellValue(r, c, value);
     }
     public void setNotationWhiteCell(int r, int c, int notations) { creatorBoard.setWhiteCellNotations(r, c, notations); }
-
+    public void setBlackCellColor(Color c) {
+        creatorBoard.setBlackCellColor(c);
+        onResize(contents.getWidth(), contents.getHeight());
+    }
     public void selectBlackCell(int r, int c, int s) {
         creatorBoard.setBlackCellSelectedColor(r, c, s, Palette.SelectionBlue);
         onResize(contents.getWidth(), contents.getHeight());
     }
-
     public void unselectBlackCell(int r, int c, int s) {
         creatorBoard.unselectBlackCell(r, c, s);
         onResize(contents.getWidth(), contents.getHeight());

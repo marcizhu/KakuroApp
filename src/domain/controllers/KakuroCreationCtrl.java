@@ -62,6 +62,8 @@ public class KakuroCreationCtrl {
     private boolean invalidSizes;
     private boolean validatedKakuro;
 
+    private int selectedColorCode;
+
     // To be able to send feedback to presentation layer when doing assignations.
 
     private ArrayList<Integer> modifiedRowSums; //saves rowID, always clear before an assignation process
@@ -88,6 +90,7 @@ public class KakuroCreationCtrl {
         forcedInitialValues = new boolean[rows][columns];
         invalidSizes = false;
         validatedKakuro = false;
+        selectedColorCode = 0;
     }
 
     public KakuroCreationCtrl(User user, Board initialBoard, KakuroCtrl kakuroCtrl) {
@@ -104,6 +107,8 @@ public class KakuroCreationCtrl {
             }
         }
         invalidSizes = false;
+        validatedKakuro = false;
+        selectedColorCode = 0;
     }
 
     public void initializeCreatorStructures() {
@@ -937,6 +942,8 @@ public class KakuroCreationCtrl {
         viewCtrl.setKakuroStateButtonValidate();
     }
 
+    public void setSelectedColorCode(int colorCode) { this.selectedColorCode = colorCode; }
+
     public void publishKakuro(String kakuroName) {
         if (!validatedKakuro) {
             Solver solver = new Solver(workingBoard);
@@ -971,7 +978,7 @@ public class KakuroCreationCtrl {
         }
 
         try {
-            kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user, ""));
+            kakuroCtrl.saveKakuro(new Kakuro(kakuroName, Difficulty.USER_MADE, toPublish, user, "", selectedColorCode));
             viewCtrl.onKakuroPublished();
         } catch (Exception e) {
             sendMessageToPresentation(e.getMessage());

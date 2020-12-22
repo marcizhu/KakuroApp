@@ -1,6 +1,7 @@
 package src.presentation.utils;
 
 import java.awt.*;
+import java.util.Random;
 
 public class RGBUtils {
     // Misc settings
@@ -22,5 +23,14 @@ public class RGBUtils {
 
     public static Color Hash2Color(Object obj) {
         return new Color(obj.hashCode());
+    }
+
+    public static int rndColorCode(long seed) {
+        Random random = new Random(seed);
+        int r = random.nextInt(255);
+        int g = random.nextInt(255);
+        int min = r < g ? r : g;
+        int b = random.nextInt(min < 220 ? 255 : 220);
+        return (r<<16)|(g<<8)|b;
     }
 }
