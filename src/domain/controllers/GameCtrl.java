@@ -101,8 +101,8 @@ public class GameCtrl {
     private Map<String, Object> getTopPointerFromGameList(ArrayList<Game> games) {
         Game topPointer = null;
         for (Game game : games) {
-            if (game instanceof GameFinished && (topPointer == null || !((GameFinished) game).isSurrendered() &&
-                    ((GameFinished) game).getScore() > ((GameFinished)topPointer).getScore())) {
+            if (game instanceof GameFinished && (!((GameFinished) game).isSurrendered() && ( topPointer == null ||
+                    ((GameFinished) game).getScore() > ((GameFinished)topPointer).getScore()))) {
                 topPointer = game;
             }
         }
