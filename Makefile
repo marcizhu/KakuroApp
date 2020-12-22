@@ -1,5 +1,5 @@
 # Default target: Build solver, generator and tests
-all: solver generator tests
+all: solver generator app tests
 
 # Solver target
 solver: app/SolverApp.class
@@ -12,6 +12,13 @@ generator: app/GeneratorApp.class
 
 app/GeneratorApp.class: app/GeneratorApp.java src/domain/algorithms/Generator.java src/domain/entities/Board.java src/domain/entities/Difficulty.java
 	javac app/GeneratorApp.java
+
+# Main app
+app: src/Main.class
+
+src/Main.class: src/Main.java
+	javac -cp .:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar src/Main.java
+	javac -cp .:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar src/*.java
 
 # Unit tests
 tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class
@@ -46,6 +53,9 @@ run-generator: app/GeneratorApp.class
 
 run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class
 	java -jar lib/junit-platform-console-standalone-1.7.0.jar -cp .:test/SolverTest.class --scan-classpath
+
+run-app: app
+	java -cp .:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar src/Main
 
 clean:
 	find src app test -name "*.class" -type f -delete
