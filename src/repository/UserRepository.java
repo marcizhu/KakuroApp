@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public interface UserRepository {
     /**
-     * Returns a User with a given name
+     * Returns a User with the given name
      * @throws IOException if an unexpected problem occurs when reading from the database
-     * @param userName  Name that tidentifies the user that we want to get
+     * @param userName  Name that identifies the user that we want to get
      * @return the User with the given name or null if it does not exist
      */
     User getUser (String userName) throws IOException;
