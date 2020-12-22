@@ -1,14 +1,16 @@
 package src;
 
 import src.domain.algorithms.Generator;
+import src.domain.controllers.KakuroCtrl;
 import src.domain.entities.*;
 import src.repository.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class PopulateDB {
-    public static void populateDB() throws IOException {
+    public static void populateDB() throws Exception {
         cleanDB();
 
         createUser("Cesc");
@@ -58,14 +60,9 @@ public class PopulateDB {
         createKakuro("Extreme 13x13 3", Difficulty.EXTREME, 13, 13);
     }
 
-    public static void createKakuro(String name, Difficulty diff, int width, int height) throws IOException{
-        Generator gen = new Generator(width, height, diff);
-        gen.generate();
-        Board board = gen.getGeneratedBoard();
-        Kakuro kak = new Kakuro(name, diff, board, null, "", 0);
-
-        KakuroRepository kr = new KakuroRepositoryDB(new DB());
-        kr.saveKakuro(kak);
+    public static void createKakuro(String name, Difficulty diff, int width, int height) throws Exception {
+        KakuroCtrl kc = new KakuroCtrl(new KakuroRepositoryDB(new DB()), new UserRepositoryDB(new DB()), new GameRepositoryDB(new DB()));
+        Map<String, Object> m = kc.saveKakuroFromGeneratorParameters(null, height, width, diff, true, name);
     }
 
     public static void createUser (String name) throws IOException {
