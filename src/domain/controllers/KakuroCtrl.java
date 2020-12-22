@@ -9,9 +9,7 @@ import src.repository.KakuroRepository;
 import src.repository.UserRepository;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class KakuroCtrl {
     KakuroRepository kakuroRepository;
@@ -36,6 +34,49 @@ public class KakuroCtrl {
     public ArrayList<Map<String, Object>> getKakuroListByUser(User user) throws Exception {
         ArrayList<Kakuro> kakuroList = kakuroRepository.getAllKakurosByUser(user);
         return computeResultFromKakuroList(kakuroList, user);
+    }
+
+    private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList, User user) throws IOException {
+        ArrayList<Map<String, Object>> result = new ArrayList<>();
+
+        Collections.sort(kakuroList, new Comparator<Kakuro>() {
+            @Override
+            public int compare(Kakuro a, Kakuro b) {
+                if (a.getCreatedAt().getTime() == b.getCreatedAt().getTime()) return 0;
+                if (a.getCreatedAt().getTime() < b.getCreatedAt().getTime()) return 1;
+                return -1;
+            }
+        });
+
+        for (Kakuro kakuro : kakuroList) {
+            ArrayList<Game> kakuroGames = gameRepository.getAllGamesInKakuro(kakuro);
+            int timesPlayed = kakuroGames.size();
+            float bestTime = -1;
+            String state = "neutral";
+            for (Game game : kakuroGames) {
+                if (game instanceof GameFinished && !((GameFinished) game).isSurrendered() &&
+                        (game.getTimeSpent() < bestTime || bestTime == -1)) bestTime = game.getTimeSpent();
+                if (game.getPlayerName().equals(user.getName())) {
+                    if (game instanceof GameInProgress) state = "unfinished";
+                    else if (state.equals("neutral") && game instanceof GameFinished) {
+                        state = ((GameFinished) game).isSurrendered() ? "surrendered" : "solved";
+                    }
+                }
+            }
+
+            HashMap<String, Object> kakuroData = new HashMap<>();
+            kakuroData.put("board", kakuro.getBoard().toString());
+            kakuroData.put("color", kakuro.getColorCode());
+            kakuroData.put("name", kakuro.getName());
+            kakuroData.put("difficulty", kakuro.getDifficulty().toString());
+            kakuroData.put("timesPlayed", timesPlayed);
+            kakuroData.put("createdBy", kakuro.getCreatedBy() == null ? "System" : kakuro.getCreatedBy().getName());
+            kakuroData.put("createdAt", kakuro.getCreatedAt());
+            kakuroData.put("bestTime", (int)bestTime);
+            kakuroData.put("state", state);
+            result.add(kakuroData);
+        }
+        return result;
     }
 
     public void validateKakuroName(String kakuroname) throws Exception {
@@ -125,40 +166,6 @@ public class KakuroCtrl {
         result.put("seed", kakuro.getSeed());
         result.put("generatorTime", generatorTime);
 
-        return result;
-    }
-
-    private ArrayList<Map<String, Object>> computeResultFromKakuroList(ArrayList<Kakuro> kakuroList, User user) throws IOException {
-        ArrayList<Map<String, Object>> result = new ArrayList<>();
-
-        for (Kakuro kakuro : kakuroList) {
-            ArrayList<Game> kakuroGames = gameRepository.getAllGamesInKakuro(kakuro);
-            int timesPlayed = kakuroGames.size();
-            float bestTime = -1;
-            String state = "neutral";
-            for (Game game : kakuroGames) {
-                if (game instanceof GameFinished && !((GameFinished) game).isSurrendered() &&
-                        (game.getTimeSpent() < bestTime || bestTime == -1)) bestTime = game.getTimeSpent();
-                if (game.getPlayerName().equals(user.getName())) {
-                    if (game instanceof GameInProgress) state = "unfinished";
-                    else if (state.equals("neutral") && game instanceof GameFinished) {
-                        state = ((GameFinished) game).isSurrendered() ? "surrendered" : "solved";
-                    }
-                }
-            }
-
-            HashMap<String, Object> kakuroData = new HashMap<>();
-            kakuroData.put("board", kakuro.getBoard().toString());
-            kakuroData.put("color", kakuro.getColorCode());
-            kakuroData.put("name", kakuro.getName());
-            kakuroData.put("difficulty", kakuro.getDifficulty().toString());
-            kakuroData.put("timesPlayed", timesPlayed);
-            kakuroData.put("createdBy", kakuro.getCreatedBy() == null ? "System" : kakuro.getCreatedBy().getName());
-            kakuroData.put("createdAt", kakuro.getCreatedAt());
-            kakuroData.put("bestTime", (int)bestTime);
-            kakuroData.put("state", state);
-            result.add(kakuroData);
-        }
         return result;
     }
 }
