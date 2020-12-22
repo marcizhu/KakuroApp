@@ -2,6 +2,9 @@ package src.domain.algorithms.helpers;
 
 import src.domain.entities.Board;
 import src.domain.entities.WhiteCell;
+import src.utils.IntPair;
+
+import java.util.TreeSet;
 
 /**
  * Swapping Cell queue.
@@ -79,7 +82,13 @@ public class SwappingCellQueue {
         return endElement;
     }
 
-    // returns the new notation size
+    /**
+     * Erases the values encoded in toErase from the notations of the cell of coordinates (r, c).
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     * @param toErase encoded values that should be removed from cell's notations
+     * @return the size of the notations after the operation
+     */
     public int eraseNotationsFromCell(int r, int c, int toErase) {
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
@@ -114,7 +123,13 @@ public class SwappingCellQueue {
         return notSize;
     }
 
-    // returns the new notation size
+    /**
+     * Adds the values encoded in toAdd to the notations of the cell of coordinates (r, c).
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     * @param toAdd encoded values that should be added to the cell's notations
+     * @return the size of the notations after the operation
+     */
     public int addNotationsToCell(int r, int c, int toAdd) {
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
@@ -149,10 +164,17 @@ public class SwappingCellQueue {
         return notSize;
     }
 
+    /**
+     * Get the white cell at the front of the queue.
+     * @return the WhiteCell at the front of the queue.
+     */
     public WhiteCell getFirstElement() {
         return orderedCells[firstElement];
     }
 
+    /**
+     * Hide element in the first position. Does NOT remove the element.
+     */
     public void hideFirstElement() {
         for (int i = 1; i <= 9; i++) {
             if (startPos[i] == firstElement) startPos[i]++;
@@ -161,6 +183,11 @@ public class SwappingCellQueue {
         firstElement++;
     }
 
+    /**
+     * Hide element WhiteCell with coordinates (r, c). Does NOT remove the element.
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     */
     public void hideElement(int r, int c) {
         removeOrderedCell(r, c);
         int pos = findCell(r, c, 0);
@@ -172,10 +199,21 @@ public class SwappingCellQueue {
         startPos[0]--;
     }
 
+    /**
+     * Checkes if the element is in a hiding position.
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     * @return Boolean indicating the presence of the element in the hiding section.
+     */
     public boolean isHiding(int r, int c) {
         return findCell(r, c, -1) != endElement;
     }
 
+    /**
+     * Removes the element of coordinates (r, c) from the queue.
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     */
     public void removeOrderedCell(int r, int c) { // Must be a cell in a valid position
         int notSize = workingBoard.getCellNotationSize(r, c);
         int pos = findCell(r, c, notSize);
@@ -189,6 +227,11 @@ public class SwappingCellQueue {
         }
     }
 
+    /**
+     * Inserts the element of coordinates (r, c) into the queue if it was in a removes or hiding state.
+     * @param r row coordinate of a cell.
+     * @param c column coordinate of a cell.
+     */
     public void insertOrderedCell(int r, int c) { // Must be a cell in a position previous to firstElement
         boolean elementFound = false;
         for (int i = firstElement-1; !elementFound &&  i >= 0; i--) {

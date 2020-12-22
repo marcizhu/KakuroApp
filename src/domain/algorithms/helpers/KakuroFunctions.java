@@ -12,9 +12,12 @@ public class KakuroFunctions {
     private AssignationEventListener assignationEventListener;
     private boolean abort;
 
+    /** KakuroFunctionsMaster Interface.
+     * Responsible for the well-functioning of the instance, it provides all necessary information.
+     */
     public interface KakuroFunctionsMaster {
-        int getRowID(int r, int c); //id between 0 and number of rowLines-1
-        int getColID(int r, int c); //id between 0 and number of columnLines-1
+        int getRowID(int r, int c);
+        int getColID(int r, int c);
 
         int getRowLineSize(int r, int c);
         int getColLineSize(int r, int c);
@@ -39,6 +42,9 @@ public class KakuroFunctions {
         SwappingCellQueue getNotationsQueue();
     }
 
+    /** AssignationEventListener Interface.
+     * To get notified on events that occur during assignations.
+     */
     public interface AssignationEventListener {
         // Non-confirmed modifications, only acceptable if operation is successful.
         // Called right before change is updated.
@@ -55,18 +61,32 @@ public class KakuroFunctions {
         //Note: Row and col related pass coordinates of some cell inside the row/col.
     }
 
+    /** Constructor.
+     * @param m Mater of this instance which provides the necessary information for it to work.
+     */
     public KakuroFunctions(KakuroFunctionsMaster m) {
         master = m;
         abort = false;
     }
 
+    /** Sets the AssignationEventListener to receive alerts on events related to assignations.
+     */
     public void setAssignationEventListener(AssignationEventListener listener) {
         assignationEventListener = listener;
     }
+
+    /** It aborts a current ongoing assignation. Only useful when called from an AssignationEventListener.
+     */
     public void abortOperation() {
         abort = true;
     }
 
+    /** Tries to make a value assignation to the cell of coordinates (r,c), rollbacks if it fails.
+     * @param r Row coordinate of a cell in the row to be assigned.
+     * @param c Column coordinate of a cell in the row to be assigned.
+     * @param value Value to be assigned to the row sum.
+     * @returns Whether the assignation was successful.
+     */
     public boolean cellValueAssignation(int r, int c, int value) {
         if (value == 0) return false;
         abort = false;
@@ -82,8 +102,20 @@ public class KakuroFunctions {
         return success;
     }
 
-
+    /** Tries to make a sum assignation to the row, rollbacks if it fails.
+     * @param r Row coordinate of a cell in the row to be assigned.
+     * @param c Column coordinate of a cell in the row to be assigned.
+     * @param value Value to be assigned to the row sum.
+     * @returns Whether the assignation was successful.
+     */
     public boolean rowSumAssignation(int r, int c, int value) { return initRowSumAssignation(r, c, value, false); }
+
+    /** Tries to make a sum assignation to the row, rollbacks if it fails or if the cell of coordinates (r,c) hasn't had a value assigned to it.
+     * @param r Row coordinate of a cell in the row to be assigned.
+     * @param c Column coordinate of a cell in the row to be assigned.
+     * @param value Value to be assigned to the row sum.
+     * @returns Whether the assignation was successful and the cell in r, c has had a value assigned to it.
+     */
     public boolean rowSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initRowSumAssignation(r, c, value, true); }
     private boolean initRowSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
         if (value == 0) return false;
@@ -100,7 +132,20 @@ public class KakuroFunctions {
         return success;
     }
 
+    /** Tries to make a sum assignation to the column, rollbacks if it fails.
+     * @param r Row coordinate of a cell in the column to be assigned.
+     * @param c Column coordinate of a cell in the column to be assigned.
+     * @param value Value to be assigned to the column sum.
+     * @returns Whether the assignation was successful.
+     */
     public boolean colSumAssignation(int r, int c, int value) { return initColSumAssignation(r, c, value, false); }
+
+    /** Tries to make a sum assignation to the column, rollbacks if it fails or if the cell of coordinates (r,c) hasn't had a value assigned to it.
+     * @param r Row coordinate of a cell in the column to be assigned.
+     * @param c Column coordinate of a cell in the column to be assigned.
+     * @param value Value to be assigned to the column sum.
+     * @returns Whether the assignation was successful and the cell in r, c has had a value assigned to it.
+     */
     public boolean colSumAssignationAssertCellValueAssigned(int r, int c, int value) { return initColSumAssignation(r, c, value, true); }
     private boolean initColSumAssignation(int r, int c, int value, boolean assertRCValueAssigned) {
         if (value == 0) return false;
@@ -117,7 +162,22 @@ public class KakuroFunctions {
         return success;
     }
 
+    /** Tries to make an assignation of sums (rowValue, colValue) to the row and column, rollbacks if it fails.
+     * @param r Row coordinate of the intersection of the row and column to be assigned.
+     * @param c Column coordinate of the intersection of the row and column to be assigned.
+     * @param rowValue Value to be assigned to the row sum.
+     * @param colValue Value to be assigned to the column sum.
+     * @returns Whether the assignation was successful.
+     */
     public boolean bothRowColSumAssignation(int r, int c, int rowValue, int colValue) { return initBothRowColSumAssignation(r, c, rowValue, colValue, false); }
+
+    /** Tries to make an assignation of sums (rowValue, colValue) to the row and column, rollbacks if it fails or if the cell in the intersection hasn't had a value assigned to it.
+     * @param r Row coordinate of the intersection of the row and column to be assigned.
+     * @param c Column coordinate of the intersection of the row and column to be assigned.
+     * @param rowValue Value to be assigned to the row sum.
+     * @param colValue Value to be assigned to the column sum.
+     * @returns Whether the assignation was successful and the cell in r, c has had a value assigned to it.
+     */
     public boolean bothRowColSumAssignationAssertCellValueAssigned(int r, int c, int rowValue, int colValue) { return initBothRowColSumAssignation(r, c, rowValue, colValue, true); }
     private boolean initBothRowColSumAssignation(int r, int c, int rowValue, int colValue, boolean assertRCValueAssigned) {
         if (rowValue == 0 || colValue == 0) return false;
@@ -135,7 +195,12 @@ public class KakuroFunctions {
         return success;
     }
 
-    // Generator also need to use this independently of an assignation process
+    /**
+     * Checks if a combination of values can be assigned according to the WhiteCells' notations.
+     * @param comb Integers in the combination to check.
+     * @param cells WhiteCells that need to be used to fulfill this combination.
+     * @returns Whether the combination could be assigned to the cells or not.
+     */
     public boolean isCombinationPossible(ArrayList<Integer> comb, ArrayList<WhiteCell> cells) {
         if (cells.size() < comb.size() || comb.size() == 0) return false;
         if (comb.size() == 1) {
@@ -622,6 +687,25 @@ public class KakuroFunctions {
                     }
                 }
             }
+    }
+
+    /**
+     * Permits doing rollback from externally catched assignation events. It is responsibility of the listener that is catching
+     * the assignation events to make sure the arrays are well constructed and will function.
+     * @param rowSumRollBack Corresponding array of rowSums to perform a rollback.
+     * @param colSumRollBack Corresponding array of colSums to perform a rollback.
+     * @param cellValueRollBack Corresponding array of cellValues to perform a rollback.
+     * @param cellNotationsRollBack Corresponding array of cellNotations to perform a rollback.
+     * @param hidingCellNotationsRollBack Corresponding array of cellNotations that were hiding to perform a rollback.
+     */
+    public void externalRollback(ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<Pair<Pair<Integer, Integer>, Integer>> cellNotationsRollBack, ArrayList<Pair<Pair<Integer, Integer>, Integer>> hidingCellNotationsRollBack) {
+        ArrayList<RollbackNotations> realNotationsRollBack = new ArrayList<>();
+        for (Pair<Pair<Integer, Integer>, Integer> notations : cellNotationsRollBack)
+            realNotationsRollBack.add(new RollbackNotations(notations.first.first, notations.first.second, notations.second));
+        ArrayList<RollbackNotations> realHidingNotationsRollBack = new ArrayList<>();
+        for (Pair<Pair<Integer, Integer>, Integer> notations : hidingCellNotationsRollBack)
+            realHidingNotationsRollBack.add(new RollbackNotations(notations.first.first, notations.first.second, notations.second));
+        rollBack(rowSumRollBack, colSumRollBack, cellValueRollBack, realNotationsRollBack, realHidingNotationsRollBack);
     }
 
     private void rollBack(ArrayList<Pair<Integer, Integer>> rowSumRollBack, ArrayList<Pair<Integer, Integer>> colSumRollBack, ArrayList<Pair<Integer, Integer>> cellValueRollBack, ArrayList<RollbackNotations> cellNotationsRollBack, ArrayList<RollbackNotations> hidingCellNotationsRollBack) {
