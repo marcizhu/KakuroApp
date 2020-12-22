@@ -133,23 +133,33 @@ public class KakuroCtrl {
         validateKakuroName(kakuroname);
 
         String[] parameters = seed.split("_");
-        int rows = Integer.parseInt(parameters[0]);
-        int columns = Integer.parseInt(parameters[1]);
+        int rows, columns;
+        try {
+            rows = Integer.parseInt(parameters[0]);
+            columns = Integer.parseInt(parameters[1]);
+        } catch (Exception e) {
+            throw new Exception("seed_format");
+        }
         Difficulty difficulty;
         switch (parameters[2]) {
             case "E": difficulty = Difficulty.EASY;    break;
             case "M": difficulty = Difficulty.MEDIUM;  break;
             case "H": difficulty = Difficulty.HARD;    break;
             case "X": difficulty = Difficulty.EXTREME; break;
-            default: throw new Exception("Invalid seed, difficulty could not be decoded");
+            default: throw new Exception("seed_format");
         }
         boolean forceUnique;
         switch (parameters[3]) {
             case "F": forceUnique = true;  break;
             case "N": forceUnique = false; break;
-            default: throw new Exception("Invalid seed, force unique could not be decoded");
+            default: throw new Exception("seed_format");
         }
-        long seedValue = Long.parseLong(parameters[4]);
+        long seedValue;
+        try {
+            seedValue = Long.parseLong(parameters[4]);
+        } catch (Exception e) {
+            throw new Exception("seed_format");
+        }
 
         Generator generator = new Generator(rows, columns, difficulty, seedValue, forceUnique);
         long initTime = System.currentTimeMillis();

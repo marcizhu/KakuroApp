@@ -215,6 +215,7 @@ public class DomainCtrl {
             Map<String, Object> data = kakuroCtrl.saveKakuroFromGeneratorSeed(user, seed, kakuroName);
             return new Pair<>(data, null);
         } catch (Exception e) {
+            if (e.getMessage().equals("seed_format")) return new Pair<>(null, "Seed format follows: <rows>_<columns>_<E/M/H/X>_<F/N>_<seed>");
             return new Pair<>(null, e.getMessage());
         }
     }
