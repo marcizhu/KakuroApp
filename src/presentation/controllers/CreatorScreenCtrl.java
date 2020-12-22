@@ -254,7 +254,7 @@ public class CreatorScreenCtrl extends AbstractScreenCtrl {
     }
     public void onKakuroPublished() {
         ignoreDestroy = true;
-        Dialogs.showInfoDialog("Successfully saved to database!", "Congrats!");
+        Dialogs.showInfoDialog("Successfully published! Check your kakuro list ;)", "Congrats!");
         presentationCtrl.setScreen(presentationCtrl.getScreenCtrl(PresentationCtrl.MY_KAKUROS));
     }
     public void onExportButtonClicked() {
