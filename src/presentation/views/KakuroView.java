@@ -286,10 +286,24 @@ public class KakuroView extends JPanel {
                 boolean showLeftLbl = leftToPaint && left != -1;
                 boolean showRightLbl = rightToPaint && right != -1;
 
-                if (showTopLbl) topLbl.setText(""+top);
-                if (showBottomLbl) bottomLbl.setText(""+bottom);
-                if (showLeftLbl) leftLbl.setText(""+left);
-                if (showRightLbl) rightLbl.setText(""+right);
+                Color fontColor = RGBUtils.getContrastColor(blackCellColor);
+
+                if (showTopLbl) {
+                    topLbl.setText(""+top);
+                    topLbl.setForeground(fontColor);
+                }
+                if (showBottomLbl) {
+                    bottomLbl.setText(""+bottom);
+                    bottomLbl.setForeground(fontColor);
+                }
+                if (showLeftLbl) {
+                    leftLbl.setText(""+left);
+                    leftLbl.setForeground(fontColor);
+                }
+                if (showRightLbl) {
+                    rightLbl.setText(""+right);
+                    rightLbl.setForeground(fontColor);
+                }
 
                 setLayout(new GridLayout(3,3));
                 add(new TransparentPanel());
