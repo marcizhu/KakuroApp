@@ -27,6 +27,7 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
         String name = obj.get("name").getAsString();
         String seed = obj.get("seed").getAsString();
         UUID boardId = UUID.fromString(obj.get("boardId").getAsString());
+        int colorCode = obj.get("color").getAsInt();
 
         Board b;
 
@@ -51,6 +52,6 @@ public class KakuroDeserializer implements JsonDeserializer<Kakuro> {
             }
         }
 
-        return new Kakuro(name, createdAt, d, b, u, seed);
+        return new Kakuro(name, createdAt, d, b, u, seed, colorCode);
     }
 }

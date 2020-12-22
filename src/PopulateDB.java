@@ -41,7 +41,7 @@ public class PopulateDB {
         Generator gen = new Generator(width, height, diff);
         gen.generate();
         Board board = gen.getGeneratedBoard();
-        Kakuro kak = new Kakuro(name, diff, board, null, "");
+        Kakuro kak = new Kakuro(name, diff, board, null, "", 0);
 
         KakuroRepository kr = new KakuroRepositoryDB(new DB());
         kr.saveKakuro(kak);
