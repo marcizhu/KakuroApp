@@ -14,27 +14,48 @@ public class PopulateDB {
         createUser("Cesc");
         createUser("Alex");
         createUser("Marc");
-        createUser("Xabi");
+        createUser("Xavi");
 
-        createKakuro("Easy 5x5", Difficulty.EASY, 5, 5);
-        createKakuro("Easy 10x10", Difficulty.EASY, 10, 10);
-        createKakuro("Easy 15x15", Difficulty.EASY, 15, 15);
-        createKakuro("Easy 20x20", Difficulty.EASY, 20, 20);
+        createKakuro("Easy 8x8 1", Difficulty.EASY, 8, 8);
+        createKakuro("Easy 8x8 2", Difficulty.EASY, 8, 8);
+        createKakuro("Easy 8x8 3", Difficulty.EASY, 8, 8);
+        createKakuro("Easy 10x10 1", Difficulty.EASY, 10, 10);
+        createKakuro("Easy 10x10 2", Difficulty.EASY, 10, 10);
+        createKakuro("Easy 10x10 3", Difficulty.EASY, 10, 10);
+        createKakuro("Easy 13x13 1", Difficulty.EASY, 13, 13);
+        createKakuro("Easy 13x13 2", Difficulty.EASY, 13, 13);
+        createKakuro("Easy 13x13 3", Difficulty.EASY, 13, 13);
 
-        createKakuro("Medium 5x5", Difficulty.MEDIUM, 5, 5);
-        createKakuro("Medium 10x10", Difficulty.MEDIUM, 10, 10);
-        createKakuro("Medium 15x15", Difficulty.MEDIUM, 15, 15);
-        createKakuro("Medium 20x20", Difficulty.MEDIUM, 20, 20);
 
-        createKakuro("Hard 5x5", Difficulty.HARD, 5, 5);
-        createKakuro("Hard 10x10", Difficulty.HARD, 10, 10);
-        createKakuro("Hard 15x15", Difficulty.HARD, 15, 15);
-        createKakuro("Hard 20x20", Difficulty.HARD, 20, 20);
+        createKakuro("Medium 8x8 1", Difficulty.MEDIUM, 8, 8);
+        createKakuro("Medium 8x8 2", Difficulty.MEDIUM, 8, 8);
+        createKakuro("Medium 8x8 3", Difficulty.MEDIUM, 8, 8);
+        createKakuro("Medium 10x10 1", Difficulty.MEDIUM, 10, 10);
+        createKakuro("Medium 10x10 2", Difficulty.MEDIUM, 10, 10);
+        createKakuro("Medium 10x10 3", Difficulty.MEDIUM, 10, 10);
+        createKakuro("Medium 13x13 1", Difficulty.MEDIUM, 13, 13);
+        createKakuro("Medium 13x13 2", Difficulty.MEDIUM, 13, 13);
+        createKakuro("Medium 13x13 3", Difficulty.MEDIUM, 13, 13);
 
-        createKakuro("Extreme 5x5", Difficulty.EXTREME, 5, 5);
-        createKakuro("Extreme 10x10", Difficulty.EXTREME, 10, 10);
-        createKakuro("Extreme 15x15", Difficulty.EXTREME, 15, 15);
-        createKakuro("Extreme 20x20", Difficulty.EXTREME, 20, 20);
+        createKakuro("Hard 8x8 1", Difficulty.HARD, 8, 8);
+        createKakuro("Hard 8x8 2", Difficulty.HARD, 8, 8);
+        createKakuro("Hard 8x8 3", Difficulty.HARD, 8, 8);
+        createKakuro("Hard 10x10 1", Difficulty.HARD, 10, 10);
+        createKakuro("Hard 10x10 2", Difficulty.HARD, 10, 10);
+        createKakuro("Hard 10x10 3", Difficulty.HARD, 10, 10);
+        createKakuro("Hard 13x13 1", Difficulty.HARD, 13, 13);
+        createKakuro("Hard 13x13 2", Difficulty.HARD, 13, 13);
+        createKakuro("Hard 13x13 3", Difficulty.HARD, 13, 13);
+
+        createKakuro("Extreme 8x8 1", Difficulty.EXTREME, 8, 8);
+        createKakuro("Extreme 8x8 2", Difficulty.EXTREME, 8, 8);
+        createKakuro("Extreme 8x8 3", Difficulty.EXTREME, 8, 8);
+        createKakuro("Extreme 10x10 1", Difficulty.EXTREME, 10, 10);
+        createKakuro("Extreme 10x10 2", Difficulty.EXTREME, 10, 10);
+        createKakuro("Extreme 10x10 3", Difficulty.EXTREME, 10, 10);
+        createKakuro("Extreme 13x13 1", Difficulty.EXTREME, 13, 13);
+        createKakuro("Extreme 13x13 2", Difficulty.EXTREME, 13, 13);
+        createKakuro("Extreme 13x13 3", Difficulty.EXTREME, 13, 13);
     }
 
     public static void createKakuro(String name, Difficulty diff, int width, int height) throws IOException{

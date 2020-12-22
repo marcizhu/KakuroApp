@@ -9,6 +9,7 @@ public class Main {
 			// Uncomment line below to populate Database! (Warning: it will delete everything in it before populating it)
 			// PopulateDB.populateDB();
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Whatever...");
 		}
 
