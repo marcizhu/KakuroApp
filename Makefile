@@ -25,7 +25,7 @@ src/Main.class: src/Main.java
 
 
 # Unit tests
-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class test/repository/BoardRepositoryDBTest.class test/repository/DBTest.class test/repository/KakuroRepositoryDBTest.class test/repository/UserRepositoryDBTest.class
+tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class test/repository/BoardRepositoryDBTest.class test/repository/DBTest.class test/repository/KakuroRepositoryDBTest.class test/repository/UserRepositoryDBTest.class test/GameTest.class test/KakuroTest.class test/UserTest.class
 
 test/SolverTest.class: test/SolverTest.java src/domain/controllers/Reader.java src/domain/algorithms/Solver.java src/domain/entities/Board.java
 	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar test/SolverTest.java
@@ -47,6 +47,15 @@ test/repository/KakuroRepositoryDBTest.class: test/repository/KakuroRepositoryDB
 
 test/repository/UserRepositoryDBTest.class: test/repository/UserRepositoryDBTest.java
 	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/repository/UserRepositoryDBTest.java
+
+test/GameTest.class: test/GameTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/GameTest.java
+
+test/KakuroTest.class: test/KakuroTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/KakuroTest.java
+
+test/UserTest.class: test/UserTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/UserTest.java
 
 
 # Make kakurosolver.tar.gz
@@ -70,11 +79,12 @@ run-solver: app/SolverApp.class
 run-generator: app/GeneratorApp.class
 	java app/GeneratorApp
 
-run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class test/repository/BoardRepositoryDBTest.class test/repository/DBTest.class test/repository/KakuroRepositoryDBTest.class test/repository/UserRepositoryDBTest.class
+run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class test/repository/BoardRepositoryDBTest.class test/repository/DBTest.class test/repository/KakuroRepositoryDBTest.class test/repository/UserRepositoryDBTest.class test/GameTest.class test/KakuroTest.class test/UserTest.class
 	java -jar lib/junit-platform-console-standalone-1.7.0.jar -cp .:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/byte-buddy-1.4.17.jar:lib/mockito-core-2.0.111-beta.jar:test/SolverTest.class --scan-classpath
 
 run-app: app
 	java -cp .:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar src/Main
+
 
 # Cleanup
 clean:
