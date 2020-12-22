@@ -90,12 +90,6 @@ public class KakuroRepositoryDB implements KakuroRepository {
     }
 
     @Override
-    public ArrayList<Kakuro> getAllKakurosUserCreated() throws IOException {
-        //TODO:
-        return null;
-    }
-
-    @Override
     public ArrayList<Kakuro> getAllKakurosByDifficulty(Difficulty difficulty) throws IOException {
         ArrayList<Kakuro> kakuros = getAllKakuros();
         ArrayList<Kakuro> res = new ArrayList<>();

@@ -54,13 +54,6 @@ public interface KakuroRepository {
     ArrayList<Kakuro> getAllKakurosByUser (User user) throws IOException;
 
     /**
-     * Returns all kakuros created by users
-     * @throws IOException if an unexpected problem occurs when reading from the database
-     * @return ArrayList of Kakuro objects with all the kakuros created by users that have been persisted
-     */
-    ArrayList<Kakuro> getAllKakurosUserCreated () throws IOException;
-
-    /**
      * Returns all Kakuros with the given Difficulty that have been saved
      * @throws IOException if an unexpected problem occurs when reading from the database
      * @param difficulty the Difficulty of the kakuros

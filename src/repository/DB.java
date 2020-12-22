@@ -71,6 +71,6 @@ public class DB {
     }
 
     public void writeToFile(Collection<?> col, String fileName) throws IOException {
-        writeToFile(col, fileName, null, Object.class); // Fixme: replace Object.class with the actual type of the Collection elements
+        writeToFile(col, fileName, null, Object.class);
     }
 }

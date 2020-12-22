@@ -50,7 +50,7 @@ public class KakuroRepositoryDBTest {
 
         // Assert that the database driver was called properly
         verify(dbMock).readAll(any(), any(JsonDeserializer.class));
-        //verify(dbMock).writeToFile(any(ArrayList.class), any(String.class), any(KakuroSeializer.class), any()); // FIXME: fix bug with this line
+        verify(dbMock).writeToFile(any(ArrayList.class), any(String.class), any(KakuroSeializer.class), any(Object.class.getClass()));
     }
 
     @Test
