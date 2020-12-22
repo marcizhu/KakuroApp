@@ -140,6 +140,8 @@ public class KakuroCtrl {
         } catch (Exception e) {
             throw new Exception("seed_format");
         }
+        if (rows < 3 || rows > 75) throw new Exception("The number of rows should be between 3 and 75");
+        if (columns < 3 || columns > 75) throw new Exception("The number of columns should be between 3 and 75");
         Difficulty difficulty;
         switch (parameters[2]) {
             case "E": difficulty = Difficulty.EASY;    break;
