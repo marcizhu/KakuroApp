@@ -46,7 +46,7 @@ public class GameInProgress extends Game{
         boolean rebuildFromMovements = false;
         if (idx <= movements.size()) {
             rebuildFromMovements = true;
-            for (int i = movements.size()-1; i >= idx-1 && i > 0; i--) {
+            for (int i = movements.size()-1; i >= idx-1 && i >= 0; i--) {
                 movements.remove(i);
             }
         }
