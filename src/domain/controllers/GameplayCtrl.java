@@ -535,6 +535,7 @@ public class GameplayCtrl {
             lastHint.first.second = badMove;
             lastHint.second = -1;
         } else {
+            totalNumOfHints --;
             lastHint.first.first = -1;
             lastHint.first.second = -1;
             lastHint.second = -1;
@@ -791,7 +792,6 @@ public class GameplayCtrl {
     }
 
     private void validateKakuro() { // when this function is called it should always be valid
-        System.out.println("Starting verification");
         // verify rows
         for (int rowID = 0; rowID < rowLineSize; rowID++) {
             int expectedSum = currentGame.getBoard().getHorizontalSum(firstRowCoord[rowID].first, firstRowCoord[rowID].second-1);
@@ -816,11 +816,9 @@ public class GameplayCtrl {
             if (currentSum != expectedSum) return;
         }
 
-        System.out.println("Setting time spent");
         currentGame.setTimeSpent(currentGame.getTimeSpent() + ((System.currentTimeMillis()-initialTime)/1000f));
 
         // Correct solution
-        System.out.println("Creating game finished");
         GameFinished finished = new GameFinished(currentGame, false);
 
         // delete in progress game and save the finished one in db
@@ -833,7 +831,6 @@ public class GameplayCtrl {
             e.printStackTrace();
         }
 
-        System.out.println("Back to presentation");
         viewCtrl.onKakuroSolutionValidated(finished.getScore(), finished.getTimeSpent(), currentGame.getBoard().toString());
     }
 }

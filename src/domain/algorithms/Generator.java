@@ -174,7 +174,7 @@ public class Generator {
         int height = b.getHeight();
 
         // Chance of a white cell turning black
-        int diff; //TODO: tweak parameters
+        int diff;
 
         switch (difficulty) {
             case EASY:
@@ -1116,97 +1116,6 @@ public class Generator {
             }
         }
         return false;
-    }
-
-    // FIXME: DEBUGGING PURPOSES
-    public void printData(){
-        System.out.println();
-        System.out.println(workingBoard.toString());
-
-        System.out.println("Row IDs: ");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                int rowID = rowLine[i][j];
-                if (rowID < 0 || rowID/10>0) System.out.print("["+rowID+"] ");
-                else System.out.print("[ "+rowID+"] ");
-            }
-            System.out.println();
-        }
-        System.out.println();
-
-        System.out.println("Row sizes: ");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (workingBoard.isWhiteCell(i,j)) {
-                    int rowID = rowLine[i][j];
-                    int rows = rowSize[rowID];
-                    System.out.print("["+rows+"] ");
-                } else {
-                    System.out.print("[*] ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-
-        System.out.println("Col IDs: ");
-        for (int i = 0; i <rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                int colID = colLine[i][j];
-                if (colID < 0 || colID/10>0) System.out.print("["+colID+"] ");
-                else System.out.print("[ "+colID+"] ");
-            }
-            System.out.println();
-        }
-        System.out.println();
-        System.out.println("Col sizes: ");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (workingBoard.isWhiteCell(i,j)) {
-                    int colID = colLine[i][j];
-                    int cols = colSize[colID];
-                    System.out.print("["+cols+"] ");
-                } else {
-                    System.out.print("[*] ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    // FIXME: DEBUGGING PURPOSES
-    private void printNotations() {
-        System.out.println();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (workingBoard.isWhiteCell(i, j)) {
-                    if (workingBoard.isEmpty(i, j)) {
-                        int b = workingBoard.getCellNotations(i, j);
-                        System.out.print("[");
-                        for (int k = 0; k < 9; k++) {
-                            if ((b&(1<<k)) != 0) System.out.print((k+1)+"");
-                            else System.out.print("-");
-                        }
-                        System.out.print("] ");
-                    } else {
-                        System.out.print("[++++" + workingBoard.getValue(i,j) + "++++] ");
-                    }
-                }
-                else {
-                    int hs = workingBoard.getHorizontalSum(i, j);
-                    if (rowLine[i][j] != -1) hs = rowSums[rowLine[i][j]];
-                    int vs = workingBoard.getVerticalSum(i, j);
-                    if (colLine[i][j] != -1) vs = colSums[colLine[i][j]];
-                    if (hs / 10 > 0) System.out.print("[*" + hs + "*-*");
-                    else System.out.print("[**" + hs + "*-*");
-                    if (vs / 10 > 0) System.out.print(vs + "*] ");
-                    else System.out.print("*" + vs + "*] ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 
     private class Coordinates implements Comparable {

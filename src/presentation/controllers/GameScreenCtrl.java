@@ -172,7 +172,6 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
             if (i+1 == selectedValue) ((GameScreen)screen).tintValuePanelButtonText(i+1, Palette.StrongBlue);
             else if ((valuesUsed & (1<<i)) != 0) {
                 ((GameScreen)screen).tintValuePanelButtonText(i+1, Palette.StrongRed);
-                System.out.println("Marked: " + (i+1));
             }
             else ((GameScreen)screen).tintValuePanelButtonText(i+1, Color.BLACK);
         }
@@ -221,7 +220,6 @@ public class GameScreenCtrl extends AbstractScreenCtrl {
 
     public void onHintClick() {
         Pair<Pair<Integer, Integer>, Integer> response = game.getHint();
-        System.out.println("Response is: " + response.first.first + " . " + response.first.second + ": " + response.second);
         if (response.first.first == -1) {
             if (response.first.second == -1) {
                 Dialogs.showInfoDialog("The hint system hasn't found any useful hints in this position, you may try again after making some move.", "Oups!");
