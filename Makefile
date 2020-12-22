@@ -32,6 +32,13 @@ test/SwappingCellQueueTest.class: test/SwappingCellQueueTest.java src/domain/ent
 test/GeneratorTest.class: test/GeneratorTest.java src/domain/algorithms/Generator.java src/domain/entities/Board.java
 	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar test/GeneratorTest.java
 
+test/repository/BoardRepositoryDBTest.class: test/repository/BoardRepositoryDBTest.java test/repository/DBTest.java test/repository/KakuroRepositoryDBTest.java test/repository/UserRepositoryDBTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/repository/BoardRepositoryDBTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/repository/DBTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/repository/KakuroRepositoryDBTest.java
+	javac -cp .:lib/apiguardian-api-1.1.0.jar:lib/junit-jupiter-5.7.0.jar:lib/junit-jupiter-api-5.7.0.jar:lib/junit-jupiter-params-5.7.0.jar:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/mockito-core-2.0.111-beta.jar test/repository/UserRepositoryDBTest.java
+
+
 # Make kakurosolver.tar.gz
 kakurosolver: clean
 	cp test/kakurosolver.java kakurosolver.java
@@ -51,8 +58,8 @@ run-solver: app/SolverApp.class
 run-generator: app/GeneratorApp.class
 	java app/GeneratorApp
 
-run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class
-	java -jar lib/junit-platform-console-standalone-1.7.0.jar -cp .:test/SolverTest.class --scan-classpath
+run-tests: test/SolverTest.class test/SwappingCellQueueTest.class test/GeneratorTest.class test/repository/BoardRepositoryDBTest.class
+	java -jar lib/junit-platform-console-standalone-1.7.0.jar -cp .:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar:lib/byte-buddy-1.4.17.jar:lib/mockito-core-2.0.111-beta.jar:test/SolverTest.class --scan-classpath
 
 run-app: app
 	java -cp .:lib/byte-buddy-1.4.17.jar:lib/gson-2.8.6.jar:lib/objenesis-2.4.jar src/Main
