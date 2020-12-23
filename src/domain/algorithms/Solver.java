@@ -194,41 +194,15 @@ public class Solver {
             return 1;
         }
 
-        ArrayList<IntPair> remainingCells = new ArrayList<>();
-        Board justInCaseBoard = new Board(workingBoard);
-        int[] rowValuesUsedLocal = new int[rowLineSize];
-        int[] colValuesUsedLocal = new int[colLineSize];
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
-                if (workingBoard.isWhiteCell(r, c)) {
-                    if (workingBoard.isEmpty(r, c)) {
-                        remainingCells.add(new IntPair(r, c));
-                        if (notationsQueue.isHiding(r, c)) notationsQueue.insertOrderedCell(r, c);
-                    } else {
-                        rowValuesUsedLocal[rowLine[r][c]] |= (1 << (workingBoard.getValue(r,c)-1));
-                        colValuesUsedLocal[colLine[r][c]] |= (1 << (workingBoard.getValue(r,c)-1));
-                    }
+                if (workingBoard.isWhiteCell(r, c) && workingBoard.isEmpty(r, c)) {
+                    notationsQueue.insertOrderedCell(r, c);
                 }
             }
         }
 
         inferenceBacktracking();
-
-        if (solutions.size() != 0) return solutions.size();
-
-        Collections.sort(remainingCells, new Comparator<IntPair>() {
-            @Override
-            public int compare(IntPair a, IntPair b) {
-                int aNot = justInCaseBoard.getCellNotationSize(a.first, a.second);
-                int bNot = justInCaseBoard.getCellNotationSize(b.first, b.second);
-                if (aNot < bNot) return -1;
-                if (aNot > bNot) return 1;
-                return a.compareTo(b);
-            }
-        });
-
-        backtrackingSolve(justInCaseBoard, rowValuesUsedLocal, colValuesUsedLocal, remainingCells, 0);
 
         return solutions.size();
     }
@@ -262,7 +236,8 @@ public class Solver {
         ArrayList<Pair<Integer, Integer>> cellValuesRollback = new ArrayList<>();
         ArrayList<Pair<Pair<Integer, Integer>, Integer>> cellNotationsRollback = new ArrayList<>();
 
-        assigFunctions.setAssignationEventListener(new KakuroFunctions.AssignationEventListener() {
+
+        KakuroFunctions.AssignationEventListener thisIterationListener = new KakuroFunctions.AssignationEventListener() {
             @Override
             public void onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> p) {
                 cellValuesRollback.add(p.first);
@@ -285,8 +260,9 @@ public class Solver {
             public void onRowNoValuesLeft(Pair<Integer, Integer> coord) {}
             @Override
             public void onColNoValuesLeft(Pair<Integer, Integer> coord) {}
-        });
+        };
 
+        assigFunctions.setAssignationEventListener(thisIterationListener);
 
         WhiteCell cell = notationsQueue.getFirstElement();
         int notations = cell.getNotations();
@@ -296,6 +272,7 @@ public class Solver {
             if (assigFunctions.cellValueAssignation(cell.getCoordinates().first, cell.getCoordinates().second, i+1)) {
                 inferenceBacktracking();
                 if (solutions.size() > 1) return;
+                assigFunctions.setAssignationEventListener(thisIterationListener);
                 assigFunctions.externalRollback(
                         rowSumsRollback,
                         colSumsRollback,
@@ -308,60 +285,6 @@ public class Solver {
             colSumsRollback.clear();
             cellValuesRollback.clear();
             cellNotationsRollback.clear();
-            if (solutions.size() > 1) return;
-        }
-    }
-
-    private int getPossibleValues(int[] rowValuesUsedLocal, int[] colValuesUsedLocal, int row, int col) {
-        // Get options for each row and column
-        final int rowID = rowLine[row][col];
-        final int colID = colLine[row][col];
-        int hAvailable = 0;
-        int vAvailable = 0;
-
-        ArrayList<Integer> hOptions =
-                KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSums[rowID], rowValuesUsedLocal[rowID]);
-        ArrayList<Integer> vOptions =
-                KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSums[colID], colValuesUsedLocal[colID]);
-
-        // Calculate available options for this row
-        for (Integer i : hOptions)
-            hAvailable |= i;
-
-        // Calculate available options for this column
-        for (Integer i : vOptions)
-            vAvailable |= i;
-
-        // Do the intersection
-        return hAvailable & vAvailable   // A value is available if it is available in both row & col...
-                & ~colValuesUsedLocal[colID]  // ...and it is not used in the current column...
-                & ~rowValuesUsedLocal[rowID]; // ...nor in the current row.
-    }
-
-    private void backtrackingSolve(Board b, int[] rowValuesUsedLocal, int[] colValuesUsedLocal, ArrayList<IntPair> cells, int idx) {
-        // Check if we found a solution
-        if (cells.size() == idx) {
-            // At this point a solution has been found
-            // Add a copy of this board to the list of solutions
-            solutions.add(copySolution(b));
-            return;
-        }
-
-        int row = cells.get(idx).first;
-        int col = cells.get(idx).second;
-
-        int possibleValues = getPossibleValues(rowValuesUsedLocal, colValuesUsedLocal, row, col);
-
-        for (int i = 1; i <= 9; i++) {
-            if(((possibleValues >> (i - 1)) & 1) == 0) continue; // if n-th bit is 0, skip
-
-            b.setCellValue(row, col, i);
-            rowValuesUsedLocal[rowLine[row][col]] |= (1 << (i-1));
-            colValuesUsedLocal[colLine[row][col]] |= (1 << (i-1));
-            backtrackingSolve(b, rowValuesUsedLocal, colValuesUsedLocal, cells, idx+1);
-            b.clearCellValue(row, col);
-            rowValuesUsedLocal[rowLine[row][col]] &= ~(1 << (i-1));
-            colValuesUsedLocal[colLine[row][col]] &= ~(1 << (i-1));
             if (solutions.size() > 1) return;
         }
     }

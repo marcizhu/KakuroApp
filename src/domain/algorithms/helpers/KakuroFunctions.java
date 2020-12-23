@@ -307,14 +307,15 @@ public class KakuroFunctions {
                 return false; //new sum would be greater than it should
         }
 
+        if (assignationEventListener != null) assignationEventListener.onCellValueAssignation(new Pair<>(new Pair<>(r, c), value));
         cellValueRollBack.add(new Pair<>(r, c)); //if rollback we clear these coordinates and insert in notationsQueue
         if (master.getWorkingBoard().getCellNotationSize(r, c) > 1) { //cell notations should be removed (important in ambiguity checking), this won't be checked before then.
             int cellNotations = master.getWorkingBoard().getCellNotations(r, c);
+            if (assignationEventListener != null) assignationEventListener.onCellNotationsChanged(new Pair<>(new Pair<>(r, c), new Pair<>(cellNotations, 1<<(value-1))));
             if (master.getNotationsQueue().isHiding(r, c)) hidingCellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             else cellNotationsRollBack.add(new RollbackNotations(r, c, cellNotations));
             master.getNotationsQueue().eraseNotationsFromCell(r, c, (cellNotations & ~(1<<(value-1))));
         }
-        if (assignationEventListener != null) assignationEventListener.onCellValueAssignation(new Pair<>(new Pair<>(r, c), value));
         master.getNotationsQueue().removeOrderedCell(r, c); // removes it from queue but notations are maintained
         master.getWorkingBoard().setCellValue(r, c, value);
         master.setRowValuesUsed(r, c, master.getRowValuesUsed(r, c) | 1 << (value-1));
