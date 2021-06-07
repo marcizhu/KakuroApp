@@ -1,12 +1,13 @@
 package src.domain.algorithms;
 
 import src.domain.algorithms.helpers.*;
-import src.domain.entities.BlackCell;
-import src.domain.entities.Board;
-import src.domain.entities.WhiteCell;
+import src.domain.entities.*;
+import src.utils.IntPair;
 import src.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Solver {
     private final Board initialBoard;
@@ -189,87 +190,101 @@ public class Solver {
         if (notationsQueue.isEmpty()) {
             // there is only one solution,
             // we can't just add the working board because rowSum and colSum assignations aren't done directly to the black cells
-            solutions.add(copySolution());
+            solutions.add(copySolution(workingBoard));
             return 1;
         }
 
-        ArrayList<Pair<Integer, Integer>> remainingCells = new ArrayList<>();
-
-        while(!notationsQueue.isEmpty()) {
-            WhiteCell c = notationsQueue.getFirstElement();
-            remainingCells.add(c.getCoordinates());
-            notationsQueue.hideFirstElement();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                if (workingBoard.isWhiteCell(r, c) && workingBoard.isEmpty(r, c)) {
+                    notationsQueue.insertOrderedCell(r, c);
+                }
+            }
         }
 
-        backtrackingSolve(remainingCells, 0);
+        inferenceBacktracking();
 
         return solutions.size();
     }
 
-    private Board copySolution() {
+    private Board copySolution(Board b) {
         Board solvedBoard = new Board(columns, rows);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (workingBoard.isBlackCell(i, j)) {
+                if (b.isBlackCell(i, j)) {
                     solvedBoard.setCell(new BlackCell((BlackCell)initialBoard.getCell(i, j)), i, j);
                 } else {
-                    solvedBoard.setCell(new WhiteCell(workingBoard.getValue(i, j)), i, j);
+                    if (b.isEmpty(i, j)) {
+                        solvedBoard.setCell(new WhiteCell(), i, j);
+                    }
+                    else solvedBoard.setCell(new WhiteCell(b.getValue(i, j)), i, j);
                 }
             }
         }
         return solvedBoard;
     }
 
-    private int getPossibleValues(int row, int col) {
-        // Get options for each row and column
-        final int rowID = rowLine[row][col];
-        final int colID = colLine[row][col];
-        int hAvailable = 0;
-        int vAvailable = 0;
-
-        ArrayList<Integer> hOptions =
-                KakuroConstants.INSTANCE.getPossibleCasesWithValues(rowSize[rowID], rowSums[rowID], rowValuesUsed[rowID]);
-        ArrayList<Integer> vOptions =
-                KakuroConstants.INSTANCE.getPossibleCasesWithValues(colSize[colID], colSums[colID], colValuesUsed[colID]);
-
-        // Calculate available options for this row
-        for (Integer i : hOptions)
-            hAvailable |= i;
-
-        // Calculate available options for this column
-        for (Integer i : vOptions)
-            vAvailable |= i;
-
-        // Do the intersection
-        return hAvailable & vAvailable   // A value is available if it is available in both row & col...
-                & ~colValuesUsed[colID]  // ...and it is not used in the current column...
-                & ~rowValuesUsed[rowID]; // ...nor in the current row.
-    }
-
-    private void backtrackingSolve(ArrayList<Pair<Integer, Integer>> cells, int idx) {
-        // Check if we found a solution
-        if (cells.size() == idx) {
-            // At this point a solution has been found
-            // Add a copy of this board to the list of solutions
-            solutions.add(copySolution());
+    private void inferenceBacktracking() {
+        if (solutions.size() > 1) return;
+        if (notationsQueue.isEmpty()) {
+            solutions.add(copySolution(workingBoard));
             return;
         }
 
-        int row = cells.get(idx).first;
-        int col = cells.get(idx).second;
+        ArrayList<Pair<Integer, Integer>> rowSumsRollback = new ArrayList<>();
+        ArrayList<Pair<Integer, Integer>> colSumsRollback = new ArrayList<>();
+        ArrayList<Pair<Integer, Integer>> cellValuesRollback = new ArrayList<>();
+        ArrayList<Pair<Pair<Integer, Integer>, Integer>> cellNotationsRollback = new ArrayList<>();
 
-        int possibleValues = getPossibleValues(row, col);
 
-        for (int i = 1; i <= 9; i++) {
-            if(((possibleValues >> (i - 1)) & 1) == 0) continue; // if n-th bit is 0, skip
+        KakuroFunctions.AssignationEventListener thisIterationListener = new KakuroFunctions.AssignationEventListener() {
+            @Override
+            public void onCellValueAssignation(Pair<Pair<Integer, Integer>, Integer> p) {
+                cellValuesRollback.add(p.first);
+            }
+            @Override
+            public void onCellNotationsChanged(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> p) {
+                cellNotationsRollback.add(new Pair<>(p.first, p.second.first));
+            }
+            @Override
+            public void onRowSumAssignation(Pair<Pair<Integer, Integer>, Integer> p) {
+                rowSumsRollback.add(p.first);
+            }
+            @Override
+            public void onColSumAssignation(Pair<Pair<Integer, Integer>, Integer> p) {
+                colSumsRollback.add(p.first);
+            }
+            @Override
+            public void onCellNoValuesLeft(Pair<Integer, Integer> coord) {}
+            @Override
+            public void onRowNoValuesLeft(Pair<Integer, Integer> coord) {}
+            @Override
+            public void onColNoValuesLeft(Pair<Integer, Integer> coord) {}
+        };
 
-            workingBoard.setCellValue(row, col, i);
-            rowValuesUsed[rowLine[row][col]] |= (1 << (i-1));
-            colValuesUsed[colLine[row][col]] |= (1 << (i-1));
-            backtrackingSolve(cells, idx+1);
-            workingBoard.clearCellValue(row, col);
-            rowValuesUsed[rowLine[row][col]] &= ~(1 << (i-1));
-            colValuesUsed[colLine[row][col]] &= ~(1 << (i-1));
+        assigFunctions.setAssignationEventListener(thisIterationListener);
+
+        WhiteCell cell = notationsQueue.getFirstElement();
+        int notations = cell.getNotations();
+
+        for (int i = 0; i < 9; i++) {
+            if ((notations&(1<<i)) == 0) continue;
+            if (assigFunctions.cellValueAssignation(cell.getCoordinates().first, cell.getCoordinates().second, i+1)) {
+                inferenceBacktracking();
+                if (solutions.size() > 1) return;
+                assigFunctions.setAssignationEventListener(thisIterationListener);
+                assigFunctions.externalRollback(
+                        rowSumsRollback,
+                        colSumsRollback,
+                        cellValuesRollback,
+                        cellNotationsRollback,
+                        new ArrayList<>()
+                );
+            }
+            rowSumsRollback.clear();
+            colSumsRollback.clear();
+            cellValuesRollback.clear();
+            cellNotationsRollback.clear();
             if (solutions.size() > 1) return;
         }
     }
